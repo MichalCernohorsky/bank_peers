@@ -14,10 +14,15 @@ import sqlite3
 from pathlib import Path
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
-DB = Path(__file__).resolve().parents[1] / "data" / "cs_financials.db"
+ROOT = Path(__file__).resolve().parents[1]
+DB = ROOT / "data" / "cs_financials.db"
+WEB = ROOT / "web"
 app = FastAPI(title="Bank Results API")
+# CORS zůstává pro dev (např. otevření samostatného HTML), ale frontend se
+# servíruje ze stejného originu jako API (viz StaticFiles níže) -> fetch bez CORS.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
@@ -159,3 +164,15 @@ def compare(banks: str = "cs,kb", basis: str = "adjusted", year: int = 2026, qua
         "banks": [{**q("SELECT code,name FROM bank WHERE code=?", (c,))[0], "accent": accents.get(c, "#333")} for c in codes],
         "groups": groups, "slope": slope,
     }
+
+
+# --- frontend (stejný origin jako API) ---
+# Root "/" vrací sloučenou SPA; ostatní statické soubory (app.html, snapshoty,
+# starší samostatné HTML) servíruje StaticFiles. API routy výše mají přednost,
+# protože jsou registrované dřív než mount na "/".
+@app.get("/", include_in_schema=False)
+def index():
+    return FileResponse(WEB / "app.html")
+
+
+app.mount("/", StaticFiles(directory=WEB), name="web")
