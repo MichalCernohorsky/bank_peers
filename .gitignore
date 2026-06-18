@@ -1,7 +1,12 @@
 .venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+.env
 *.xlsx
+# test fixture xlsx je záměrně verzovaná (potřebuje ji CI/pytest)
+!tests/fixtures/*.xlsx
 data/*.db.bak
 # data/cs_financials.db is intentionally tracked: it is the prebuilt data source
 # used when the upstream IR xlsx is not available locally.

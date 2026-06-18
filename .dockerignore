@@ -1,0 +1,11 @@
+.git
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+data/*.db
+data/*.db.bak
+.env
+node_modules
+# pozn.: zdrojový *.xlsx NEignorujeme — build_db ho potřebuje uvnitř image

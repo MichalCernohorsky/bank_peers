@@ -1,0 +1,11 @@
+# Minimal, smysluplný lint: pyflakes (F) + syntaktické chyby (E9).
+# Stylové E-pravidla (délka řádku, středníky) nevynucujeme – kód je hustý záměrně.
+line-length = 140
+target-version = "py311"
+
+[lint]
+select = ["E9", "F"]
+
+[lint.per-file-ignores]
+# frontend snapshot/heredoc generátory nejsou součástí lintu
+"web/**" = ["E", "F"]

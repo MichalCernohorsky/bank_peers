@@ -1,0 +1,36 @@
+# API + PostgreSQL. Spuštění:  docker compose up --build
+# Pozn.: zdrojový xlsx (XLSX_PATH) musí být v build kontextu (repo rootu),
+# jinak build_db nemá co načíst — viz README.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: bank
+      POSTGRES_DB: bank
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bank -d bank"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://bank:bank@db:5432/bank
+      XLSX_PATH: /app/key_figures_q1_2026.xlsx
+      ALLOWED_ORIGINS: "*"
+    # postav DB (validace je brána – při selhání se kontejner zastaví), pak servíruj
+    command: >
+      sh -c "python -m pipeline.build_db config \"$$XLSX_PATH\" \"$$DATABASE_URL\"
+             && uvicorn api.app:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:

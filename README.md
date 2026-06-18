@@ -32,6 +32,38 @@ SELECT code, value FROM fact f JOIN period p ON p.id=f.period_id
 WHERE p.period_type='FY' AND p.fiscal_year=2025;
 ```
 
+## Konfigurace (env)
+Vše z prostředí (`.env`, viz `.env.example`) přes `pydantic-settings`:
+
+| proměnná | význam | default |
+|---|---|---|
+| `DATABASE_URL` | `sqlite:///…` nebo `postgresql://…` | `sqlite:///data/cs_financials.db` |
+| `XLSX_PATH` | zdrojový ČS xlsx pro `build_db` | `key_figures_q1_2026.xlsx` |
+| `ALLOWED_ORIGINS` | `*` nebo CSV originů (CORS) | `*` |
+
+## PostgreSQL vedle SQLite
+`build_db` i API cílí obě databáze podle `DATABASE_URL` (vrstva `pipeline/db.py`).
+Schéma: `schema/001_init.sql` (SQLite) a `schema/001_init_postgres.sql` (IDENTITY, `timestamptz`).
+```bash
+# build proti Postgresu
+python -m pipeline.build_db config key_figures_q1_2026.xlsx postgresql://bank:bank@localhost:5432/bank
+DATABASE_URL=postgresql://bank:bank@localhost:5432/bank uvicorn api.app:app
+```
+
+## Docker
+```bash
+docker compose up --build      # api (8000) + postgres; build_db proběhne při startu
+```
+Pozn.: zdrojový `key_figures_q1_2026.xlsx` musí být v repo rootu (build kontext).
+
+## Testy a lint
+```bash
+pip install -r requirements.txt
+ruff check .
+pytest -q          # pipeline (validace, YTD/FY derivace) + API nad fixture xlsx
+```
+Fixture: `tests/fixtures/key_figures_sample.xlsx`. CI (`.github/workflows/ci.yml`) = lint + pytest.
+
 ## Stav
-Hotová datová vrstva pro ČS (2002–Q1 2026), validace prochází.
-Backend API a frontend jsou další na řadě — viz roadmapa v `CLAUDE.md`.
+Hotová datová vrstva pro ČS (2002–Q1 2026), validace prochází (SQLite i PostgreSQL).
+Backend API + sloučený frontend (`web/app.html`) běží ze stejného originu — viz roadmapa v `CLAUDE.md`.

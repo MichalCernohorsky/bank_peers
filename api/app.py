@@ -10,28 +10,35 @@ Endpointy:
   GET /api/facts?bank=cs&code=net_profit&period_type=Q&basis=reported
   GET /api/dashboard/{bank}     -> headline KPI + série pro frontend
 """
-import sqlite3
+import sys
 from pathlib import Path
+
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 ROOT = Path(__file__).resolve().parents[1]
-DB = ROOT / "data" / "cs_financials.db"
+sys.path.insert(0, str(ROOT))
+from pipeline.db import Conn  # noqa: E402
+from pipeline.settings import allowed_origins_list, get_settings  # noqa: E402
+
 WEB = ROOT / "web"
 app = FastAPI(title="Bank Results API")
-# CORS zůstává pro dev (např. otevření samostatného HTML), ale frontend se
-# servíruje ze stejného originu jako API (viz StaticFiles níže) -> fetch bez CORS.
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# Frontend se servíruje ze stejného originu jako API (StaticFiles níže) -> fetch
+# bez CORS. CORS zůstává pro dev / cross-origin nasazení; originy z ALLOWED_ORIGINS.
+app.add_middleware(CORSMiddleware,
+                   allow_origins=allowed_origins_list(get_settings().allowed_origins),
+                   allow_methods=["*"], allow_headers=["*"])
 
 
 def q(sql, args=()):
-    con = sqlite3.connect(DB)
-    con.row_factory = sqlite3.Row
-    rows = [dict(r) for r in con.execute(sql, args).fetchall()]
-    con.close()
-    return rows
+    """Dotaz nad SQLite i PostgreSQL (dle DATABASE_URL). Placeholdery jsou `?`."""
+    con = Conn(get_settings().database_url)
+    try:
+        return con.query(sql, args)
+    finally:
+        con.close()
 
 
 @app.get("/api/banks")
