@@ -25,6 +25,7 @@ sources:
     sheet: Fin_Statements_IFRS9
     layout: wide            # řádek = metrika, sloupec = období
     period_header_row: 1
+    priority: 3             # nejvyšší: nejnovější taxonomie (IFRS9) přebíjí starší
     covers: { from: 2018Q1, to: 2026Q1, freq: quarterly }
     basis: reported
     standard: IFRS9
@@ -33,6 +34,7 @@ sources:
     file: key_figures_q1_2026.xlsx
     sheet: "Fin_statements "   # POZOR: koncová mezera v názvu listu
     layout: wide
+    priority: 2
     covers: { from: 2013Q1, to: 2017Q4, freq: quarterly }
     basis: reported
     standard: IAS39
@@ -42,6 +44,7 @@ sources:
     file: key_figures_q1_2026.xlsx
     sheet: Key_figures
     layout: wide
+    priority: 1             # nejnižší: jen doplnění dlouhé historie / řídkých KPI
     covers: { from: 2002Q4, to: 2026Q1, freq: quarterly }
     basis: reported
     note: KPI úroveň; zdvojené restated sloupce; flow řádky (net profit) YTD.

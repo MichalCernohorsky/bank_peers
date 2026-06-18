@@ -1,18 +1,19 @@
 """
-ingest.py — parsování ČS xlsx podle config/sources/cs.yaml.
+ingest.py — parsování strukturovaného xlsx zdroje banky podle config/sources/<bank>.yaml.
+
+Multi-source: banka + cesta jsou parametry. Listy a jejich priorita se berou z
+hlavičky `sources:` v source-mapě (žádné natvrdo zadané názvy listů v kódu).
 
 Vrací:
-  facts   {code: {(year, quarter): (value, src_key)}}   (znaménkově normalizováno, YTD pro flow)
-  metrics {code: metric_def}
-  todo    [(code, status, hint)]                         (GAP / derive — doplnit jinde)
+  facts    {code: {(year, quarter): (value, src_key)}}   (znaménkově normalizováno, YTD pro flow)
+  todo     [(code, status, hint)]                         (GAP / derive — doplnit jinde)
   src_used {src_key: {file, sheet}}
 """
 import datetime as dt
 from pathlib import Path
-import openpyxl, yaml
 
-SRC_PRIORITY = {"ifrs9": 3, "ias39": 2, "kpi": 1}
-SHEET_OF = {"ifrs9": "Fin_Statements_IFRS9", "kpi": "Key_figures", "ias39": "Fin_statements "}
+import openpyxl
+import yaml
 
 
 def qkey(d):
@@ -71,14 +72,27 @@ def _series(entry_src, sheets, sign):
     return {yq: (v, src) for yq, v in merged.items()}
 
 
-def ingest(config_dir, xlsx_path):
+def _source_layout(smap):
+    """Z hlavičky `sources:` vytáhne listy a priority jen pro xlsx-podložené zdroje."""
+    sources_cfg = smap.get("sources", {})
+    sheet_of, priority = {}, {}
+    for i, (key, meta) in enumerate(sources_cfg.items(), start=1):
+        sheet = meta.get("sheet")
+        if not sheet:                       # např. peer_pdf nemá list -> nečte se z xlsx
+            continue
+        sheet_of[key] = sheet
+        priority[key] = meta.get("priority", i)
+    return sheet_of, priority
+
+
+def ingest(config_dir, bank_code, xlsx_path):
     config_dir, xlsx_path = Path(config_dir), Path(xlsx_path)
-    metrics = {m["code"]: m for m in yaml.safe_load((config_dir / "metrics.yaml").read_text())["metrics"]}
-    smap = yaml.safe_load((config_dir / "sources" / "cs.yaml").read_text())
+    smap = yaml.safe_load((config_dir / "sources" / f"{bank_code}.yaml").read_text())
+    sheet_of, priority = _source_layout(smap)
 
     wb = openpyxl.load_workbook(xlsx_path, data_only=True)
     sheets, src_used = {}, {}
-    for key, sheet in SHEET_OF.items():
+    for key, sheet in sheet_of.items():
         try:
             sheets[key] = _load_sheet(wb, sheet)
             src_used[key] = {"file": xlsx_path.name, "sheet": sheet}
@@ -98,8 +112,8 @@ def ingest(config_dir, xlsx_path):
             es = entry.get(key)
             if es and "src" in es:
                 for yq, (v, src) in _series(es, sheets, sign).items():
-                    if yq not in per or SRC_PRIORITY[src] > SRC_PRIORITY[per[yq][1]]:
+                    if yq not in per or priority[src] > priority[per[yq][1]]:
                         per[yq] = (v, src)
         if per:
             facts[code] = per
-    return facts, metrics, todo, src_used
+    return facts, todo, src_used

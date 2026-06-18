@@ -12,7 +12,9 @@ def test_validation_all_pass(built_db):
 
 def test_counts_nonzero(built_db):
     r = built_db["result"]
-    assert r["n_metrics"] == 30
+    # 28 = mapované kanonické kódy z cs.yaml, které jsou v katalogu metrics.yaml
+    # (number_of_atms a number_of_payment_cards nejsou v katalogu -> přeskočeny)
+    assert r["n_metrics"] == 28
     assert r["n_facts"] > 2000
     assert r["derived"]["total_liabilities"] > 0
     assert r["derived"]["loan_to_deposit_ratio"] > 0
@@ -57,6 +59,30 @@ def test_fy_rollup_equals_q4_ytd(built_db):
     con.close()
     assert fy is not None and q4 is not None
     assert abs(fy["v"] - q4["ytd"]) < 1e-6
+
+
+def test_bank_basis_separation(built_db):
+    """Pravidlo: reported (deep-dive) a adjusted (peer) se nemíchají.
+    KB má jen adjusted (žádné reported); CS má reported i adjusted peer řádky."""
+    con = Conn(built_db["url"])
+
+    def cnt(bank, basis):
+        return con.query_one("""SELECT COUNT(*) AS c FROM fact f JOIN bank b ON b.id=f.bank_id
+                                WHERE b.code=? AND f.basis=?""", (bank, basis))["c"]
+
+    kb_rep, kb_adj = cnt("kb", "reported"), cnt("kb", "adjusted")
+    cs_rep, cs_adj = cnt("cs", "reported"), cnt("cs", "adjusted")
+    con.close()
+    assert kb_rep == 0 and kb_adj > 0      # KB jen adjusted (peer)
+    assert cs_rep > 0 and cs_adj > 0       # CS reported (deep-dive) + adjusted (peer)
+
+
+def test_structured_source_is_config_driven(built_db):
+    """Strukturovaná banka (cs) se plní z xlsx -> source rows typu xlsx_*."""
+    con = Conn(built_db["url"])
+    srcs = {r["doc_type"] for r in con.query("SELECT DISTINCT doc_type FROM source")}
+    con.close()
+    assert any(s.startswith("xlsx_") for s in srcs)
 
 
 def test_derivation_total_liabilities(built_db):

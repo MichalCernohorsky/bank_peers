@@ -1,7 +1,18 @@
+# Katalog bank. `source` říká, JAK se banka plní:
+#   kind: xlsx      strukturovaný zdroj -> ingest přes config/sources/<map>.yaml (basis=reported)
+#                   path (volitelné) přepíše cestu k souboru; jinak se bere globální XLSX_PATH/CLI arg
+#   kind: adjusted  jen peer/PDF data -> config/manual/peer_adjusted.csv (basis=adjusted)
+# Pravidlo: reported (deep-dive) a adjusted (peer srovnání) se v jednom grafu nemíchají.
 banks:
   - code: cs
     name: Česká spořitelna
     parent_group: Erste Group
+    source:
+      kind: xlsx
+      map: cs            # config/sources/cs.yaml
+
   - code: kb
     name: Komerční banka
     parent_group: Société Générale
+    source:
+      kind: adjusted     # zatím jen peer-comparable data z ČS Peer Group PDF
