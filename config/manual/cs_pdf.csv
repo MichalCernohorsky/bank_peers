@@ -1,0 +1,13 @@
+bank,code,fiscal_year,quarter,value,basis,source_ref
+cs,mortgage_volume,2025,1,468000,reported,peer_pdf_s18
+cs,mortgage_volume,2026,1,517000,reported,peer_pdf_s18
+cs,consumer_loan_volume,2025,1,87000,reported,peer_pdf_s20
+cs,consumer_loan_volume,2026,1,93000,reported,peer_pdf_s20
+cs,corporate_loan_volume,2025,1,458000,reported,peer_pdf_s21
+cs,corporate_loan_volume,2026,1,493000,reported,peer_pdf_s21
+cs,aum,2025,1,333000,reported,peer_pdf_s24
+cs,aum,2026,1,396000,reported,peer_pdf_s24
+cs,npl_coverage_ratio,2025,1,1.040,reported,peer_pdf_s16
+cs,npl_coverage_ratio,2026,1,1.069,reported,peer_pdf_s16
+cs,number_of_clients,2022,1,4495000,reported,peer_pdf_s31
+cs,number_of_clients,2026,1,4565000,reported,peer_pdf_s31

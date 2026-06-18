@@ -1,0 +1,579 @@
+# ============================================================================
+#  KANONICKÝ KATALOG METRIK — banky (IFRS)
+#  Jediný zdroj pravdy pro:
+#    (a) seed tabulky `metric` v databázi
+#    (b) konfiguraci dashboardu (pole `headline` + `category`)
+#
+#  Klíčová logika YTD / kvartál vs. rok je u KAŽDÉ metriky explicitní,
+#  aby nešlo nic splést při dopočtu samostatného čtvrtletí ani ročního pohledu.
+# ----------------------------------------------------------------------------
+#  POLE
+#    code          stabilní identifikátor (snake_case) — nikdy neměnit
+#    label_cs/en   popisek pro UI
+#    category      income_statement | balance_sheet | capital |
+#                  asset_quality | ratios | business_volume
+#    unit          CZK_m (miliony Kč) | percent | bps | count | CZK
+#    type          flow  = výsledovková položka (sčítá se v čase)
+#                  stock = rozvahový stav (hodnota k datu)
+#                  ratio = poměrový ukazatel (počítá se / přebírá se)
+#
+#    interim_basis  JAK to banka vykazuje v mezitímní (Q/H1/9M) zprávě:
+#                     ytd_cumulative = kumulativně od začátku roku
+#                     point_in_time  = stav ke konci čtvrtletí
+#                     ratio          = poměr za dané období
+#
+#    quarter_calc   jak získat SAMOSTATNÉ čtvrtletí:
+#                     ytd_diff   = Q_n = YTD_n − YTD_(n−1)   (flow)
+#                     period_end = hodnota ke konci čtvrtletí (stock)
+#                     as_reported= ukazatel za období bereme tak, jak je vykázán
+#    annual_calc    jak získat ROČNÍ pohled (FY):
+#                     sum_quarters = součet 4 čtvrtletí (nebo přímo z výroční zprávy)
+#                     year_end     = stav k 31.12.
+#                     as_reported  = poměr za rok přebíráme z výkazu
+#                     recompute    = přepočítat z komponent
+#
+#    annualize      jen u ratio: při interim období je nutné YTD flow
+#                   anualizovat (×4 pro Q1, ×2 pro H1, ×4/3 pro 9M),
+#                   než se ukazatel spočítá. true/false.
+#    formula        výpočet/validace přes jiné `code` (kde dává smysl)
+#    headline       true = patří na výchozí přehled dashboardu
+#    note           upřesnění
+# ============================================================================
+
+conventions:
+  reporting_currency: CZK
+  amounts_in: millions          # všechny CZK_m hodnoty v milionech
+  fiscal_year: calendar         # ČS i Erste: kalendářní rok
+  basis_default: consolidated   # konsolidované, IFRS
+
+metrics:
+
+  # ─────────────────────────────  VÝSLEDOVKA (flow, YTD)  ─────────────────────
+  - code: net_interest_income
+    label_cs: Čistý úrokový výnos
+    label_en: Net interest income
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    headline: true
+
+  - code: net_fee_commission_income
+    label_cs: Čisté výnosy z poplatků a provizí
+    label_en: Net fee and commission income
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    headline: true
+
+  - code: net_trading_result
+    label_cs: Čistý zisk z obchodních operací a z přecenění
+    label_en: Net trading & fair value result
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+
+  - code: operating_income
+    label_cs: Provozní výnosy
+    label_en: Operating income
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    headline: true
+    formula: net_interest_income + net_fee_commission_income + net_trading_result + other_operating_income
+    note: U ČS Q1/2026 = 15,4 mld. Kč. Definice „operating income" se mezi bankami liší — drž se členění z výkazu konkrétní banky.
+
+  - code: other_operating_income
+    label_cs: Ostatní provozní výnosy
+    label_en: Other operating income
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+
+  - code: operating_expenses
+    label_cs: Provozní náklady
+    label_en: Operating expenses
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    formula: personnel_expenses + other_admin_expenses + depreciation_amortization
+    note: Obvykle vykazováno se záporným znaménkem — sjednoť konvenci znamének při ingestion.
+
+  - code: personnel_expenses
+    label_cs: Osobní náklady
+    label_en: Personnel expenses
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+
+  - code: other_admin_expenses
+    label_cs: Ostatní správní náklady
+    label_en: Other administrative expenses
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+
+  - code: depreciation_amortization
+    label_cs: Odpisy hmotného a nehmotného majetku
+    label_en: Depreciation & amortization
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+
+  - code: operating_result
+    label_cs: Provozní výsledek
+    label_en: Operating result
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    headline: true
+    formula: operating_income - operating_expenses
+    note: U ČS Q1/2026 = 8,8 mld. Kč (+12,8 % r/r). Validuj proti operating_income − operating_expenses.
+
+  - code: impairment_result
+    label_cs: Ztráty ze znehodnocení finančních nástrojů (náklady na riziko)
+    label_en: Impairment result / risk costs
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    note: U ČS Q1/2026 kolem nuly. Vstup pro cost_of_risk_bps.
+
+  - code: other_operating_result
+    label_cs: Ostatní provozní výsledek
+    label_en: Other operating result
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    note: Sem typicky patří bankovní daně a odvody do fondů — často nerovnoměrně rozložené v roce.
+
+  - code: pre_tax_profit
+    label_cs: Zisk před zdaněním
+    label_en: Profit before tax
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+
+  - code: income_tax
+    label_cs: Daň z příjmů
+    label_en: Income tax
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+
+  - code: net_profit
+    label_cs: Čistý zisk
+    label_en: Net profit
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    headline: true
+    note: U ČS Q1/2026 = 7,1 mld. Kč (+23,4 % r/r). Headline číslo z press release = validační kontrola.
+
+  - code: net_profit_attributable
+    label_cs: Čistý zisk náležející vlastníkům mateřské společnosti
+    label_en: Net profit attributable to owners
+    category: income_statement
+    unit: CZK_m
+    type: flow
+    interim_basis: ytd_cumulative
+    quarter_calc: ytd_diff
+    annual_calc: sum_quarters
+    note: Po menšinových podílech — pro ROE/EPS používej tuto, ne hrubý net_profit.
+
+  # ─────────────────────────────  ROZVAHA (stock, k datu)  ───────────────────
+  - code: total_assets
+    label_cs: Bilanční suma (celková aktiva)
+    label_en: Total assets
+    category: balance_sheet
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+    headline: true
+
+  - code: gross_customer_loans
+    label_cs: Hrubé úvěry a pohledávky za klienty
+    label_en: Gross customer loans
+    category: balance_sheet
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+    note: Hrubá hodnota (před opravnými položkami) — vstup pro npl_ratio a cost_of_risk_bps.
+
+  - code: net_customer_loans
+    label_cs: Úvěry a pohledávky za klienty (netto)
+    label_en: Net customer loans
+    category: balance_sheet
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+    headline: true
+
+  - code: customer_deposits
+    label_cs: Závazky ke klientům (vklady klientů)
+    label_en: Customer deposits
+    category: balance_sheet
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+    headline: true
+
+  - code: debt_securities_issued
+    label_cs: Emitované dluhové cenné papíry
+    label_en: Debt securities issued
+    category: balance_sheet
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: total_liabilities
+    label_cs: Celkové závazky
+    label_en: Total liabilities
+    category: balance_sheet
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: total_equity
+    label_cs: Vlastní kapitál
+    label_en: Total equity
+    category: balance_sheet
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+    note: Pro ROE používej PRŮMĚR (začátek+konec období)/2, ne hodnotu k datu.
+
+  # ─────────────────────────────  KAPITÁL / REGULATORIKA  ────────────────────
+  - code: rwa
+    label_cs: Rizikově vážená aktiva (RWA)
+    label_en: Risk-weighted assets
+    category: capital
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: cet1_ratio
+    label_cs: Poměr CET1
+    label_en: CET1 ratio
+    category: capital
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+    headline: true
+    formula: cet1_capital / rwa * 100
+    note: Banka vykazuje přímo — přebírej z výkazu, vzorec jen pro validaci.
+
+  - code: tier1_ratio
+    label_cs: Poměr Tier 1
+    label_en: Tier 1 ratio
+    category: capital
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+
+  - code: total_capital_ratio
+    label_cs: Celková kapitálová přiměřenost
+    label_en: Total capital ratio
+    category: capital
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+
+  - code: leverage_ratio
+    label_cs: Pákový poměr
+    label_en: Leverage ratio
+    category: capital
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+
+  - code: lcr
+    label_cs: Ukazatel krytí likvidity (LCR)
+    label_en: Liquidity coverage ratio
+    category: capital
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+
+  # ─────────────────────────────  KVALITA PORTFOLIA  ─────────────────────────
+  - code: npl_ratio
+    label_cs: Podíl nevýkonných úvěrů (NPL)
+    label_en: NPL ratio
+    category: asset_quality
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+    headline: true
+    formula: npl_volume / gross_customer_loans * 100
+
+  - code: npl_coverage_ratio
+    label_cs: Krytí nevýkonných úvěrů opravnými položkami
+    label_en: NPL coverage ratio
+    category: asset_quality
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+
+  - code: npl_volume
+    label_cs: Objem nevýkonných úvěrů
+    label_en: NPL volume
+    category: asset_quality
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: loan_loss_allowances
+    label_cs: Opravné položky k úvěrům
+    label_en: Loan loss allowances
+    category: asset_quality
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: cost_of_risk_bps
+    label_cs: Náklady na riziko (v bazických bodech)
+    label_en: Cost of risk
+    category: asset_quality
+    unit: bps
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: recompute
+    annual_calc: recompute
+    annualize: true
+    formula: impairment_result / avg(gross_customer_loans) * 10000
+    note: POZOR na anualizaci — interim impairment_result je YTD, pro roční bps × (4 / počet_čtvrtletí).
+
+  # ─────────────────────────────  POMĚROVÉ UKAZATELE  ────────────────────────
+  - code: net_interest_margin
+    label_cs: Čistá úroková marže (NIM)
+    label_en: Net interest margin
+    category: ratios
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+    headline: true
+    note: U ČS Q1/2026 = 2,11 %. Banka vykazuje přímo; vlastní přepočet vyžaduje průměrná úročená aktiva, která nemusíme mít.
+
+  - code: cost_income_ratio
+    label_cs: Poměr nákladů k výnosům (C/I)
+    label_en: Cost/income ratio
+    category: ratios
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: recompute
+    annual_calc: recompute
+    annualize: false
+    formula: operating_expenses / operating_income * 100
+    headline: true
+    note: U ČS Q1/2026 = 42,6 %. Poměr dvou flow za stejné období — anualizace netřeba.
+
+  - code: roe
+    label_cs: Návratnost vlastního kapitálu (ROE)
+    label_en: Return on equity
+    category: ratios
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: recompute
+    annual_calc: recompute
+    annualize: true
+    formula: net_profit_attributable / avg(total_equity) * 100
+    headline: true
+    note: Interim ROE = anualizovaný YTD zisk / průměrný kapitál. Pokud banka vykazuje vlastní ROE/ROTE, přebírej ho přednostně.
+
+  - code: rote
+    label_cs: Návratnost hmotného vlastního kapitálu (ROTE)
+    label_en: Return on tangible equity
+    category: ratios
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+
+  - code: roa
+    label_cs: Návratnost aktiv (ROA)
+    label_en: Return on assets
+    category: ratios
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: recompute
+    annual_calc: recompute
+    annualize: true
+    formula: net_profit / avg(total_assets) * 100
+
+  - code: loan_to_deposit_ratio
+    label_cs: Poměr úvěrů k vkladům (LTD)
+    label_en: Loan-to-deposit ratio
+    category: ratios
+    unit: percent
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: recompute
+    annual_calc: recompute
+    annualize: false
+    formula: net_customer_loans / customer_deposits * 100
+
+  - code: eps
+    label_cs: Zisk na akcii (EPS)
+    label_en: Earnings per share
+    category: ratios
+    unit: CZK
+    type: ratio
+    interim_basis: ratio
+    quarter_calc: as_reported
+    annual_calc: as_reported
+    note: Relevantní hlavně pro kótované (Erste, KB, Moneta). U dceřiných bank přeskoč.
+
+  # ─────────────────────────────  OBJEMY / PROVOZ  ──────────────────────────
+  - code: number_of_clients
+    label_cs: Počet klientů
+    label_en: Number of clients
+    category: business_volume
+    unit: count
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: number_of_employees
+    label_cs: Počet zaměstnanců (FTE)
+    label_en: Number of employees (FTE)
+    category: business_volume
+    unit: count
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: number_of_branches
+    label_cs: Počet poboček
+    label_en: Number of branches
+    category: business_volume
+    unit: count
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: mortgage_volume
+    label_cs: Objem hypotečních úvěrů
+    label_en: Mortgage loan volume
+    category: business_volume
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: consumer_loan_volume
+    label_cs: Objem spotřebitelských úvěrů
+    label_en: Consumer loan volume
+    category: business_volume
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+    note: U ČS poprvé překročil 100 mld. Kč v Q1/2026.
+
+  - code: corporate_loan_volume
+    label_cs: Objem firemních úvěrů
+    label_en: Corporate loan volume
+    category: business_volume
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
+
+  - code: aum
+    label_cs: Objem investičních produktů (AUM)
+    label_en: Assets under management
+    category: business_volume
+    unit: CZK_m
+    type: stock
+    interim_basis: point_in_time
+    quarter_calc: period_end
+    annual_calc: year_end
