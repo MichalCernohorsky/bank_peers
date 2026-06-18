@@ -1,0 +1,7 @@
+banks:
+  - code: cs
+    name: Česká spořitelna
+    parent_group: Erste Group
+  - code: kb
+    name: Komerční banka
+    parent_group: Société Générale

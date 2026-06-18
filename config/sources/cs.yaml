@@ -1,0 +1,342 @@
+# ============================================================================
+#  SOURCE-MAPPING — Česká spořitelna (ČS), konsolidované IFRS
+#  Mapuje kanonické `code` (z metrics.yaml) na konkrétní řádky reálných zdrojů.
+#  Vstup pro ingestion loader: "z čeho a odkud naplnit fact tabulku".
+# ----------------------------------------------------------------------------
+#  KLÍČOVÁ ZJIŠTĚNÍ
+#  1. xlsx je strukturovaná časová řada (wide: řádek=metrika, sloupec=období).
+#     → Pro ČS žádné parsování PDF tabulek pro období v rozsahu níže.
+#  2. Tři taxonomie/vintages v jednom souboru:
+#       Key_figures        KPI, 2002-Q4 → 2026-Q1 (řídké metriky, dlouhá historie)
+#       Fin_statements     plná P&L+BS, 2013-Q1 → 2017-Q4 (IAS 39)
+#       Fin_Statements_IFRS9 plná P&L+BS, 2018-Q1 → 2026-Q1 (IFRS 9)  ← hlavní zdroj
+#     Pro okno 2020–Q1 2026 stačí IFRS9 + Key_figures.
+#  3. Výsledovkové (flow) řádky jsou KUMULATIVNĚ YTD → quarter_calc: ytd_diff.
+#  4. Excel = REPORTED IFRS. PEER PDF = ADJUSTED (peer-comparable).
+#     Most reported↔adjusted je na slide 51 PDF ("ČS One-offs").
+#     Ukládáme reported jako kanonické; adjusted volitelně jako basis='adjusted'.
+#  5. Restatementy: Key_figures má zdvojené sloupce (datum + restated varianta)
+#     a poznámky o změnách definic → řeší se přes source.as_of / vintage v DB.
+# ============================================================================
+
+sources:
+  ifrs9:
+    file: key_figures_q1_2026.xlsx
+    sheet: Fin_Statements_IFRS9
+    layout: wide            # řádek = metrika, sloupec = období
+    period_header_row: 1
+    covers: { from: 2018Q1, to: 2026Q1, freq: quarterly }
+    basis: reported
+    standard: IFRS9
+    interim_pl: ytd_cumulative
+  ias39:
+    file: key_figures_q1_2026.xlsx
+    sheet: "Fin_statements "   # POZOR: koncová mezera v názvu listu
+    layout: wide
+    covers: { from: 2013Q1, to: 2017Q4, freq: quarterly }
+    basis: reported
+    standard: IAS39
+    interim_pl: ytd_cumulative
+    note: Starší taxonomie (available-for-sale, held-to-maturity…); pro continuitu mostit na IFRS9.
+  kpi:
+    file: key_figures_q1_2026.xlsx
+    sheet: Key_figures
+    layout: wide
+    covers: { from: 2002Q4, to: 2026Q1, freq: quarterly }
+    basis: reported
+    note: KPI úroveň; zdvojené restated sloupce; flow řádky (net profit) YTD.
+  peer_pdf:
+    file: C_S_Peer_Group_Q1_2026_Final.pdf
+    covers: { from: 2026Q1, to: 2026Q1 }   # + dlouhodobé grafy Q1 2022–2026
+    basis: adjusted
+    note: >
+      Jediné čtvrtletí, adjusted figures. Most na reported = slide 51.
+      Zdroj pro metriky, které v xlsx časové řadě nejsou (NPL coverage,
+      objemy úvěrů dle produktu, mutual funds, počet klientů, digital).
+
+# ----------------------------------------------------------------------------
+# sign: jak normalizovat znaménko při importu do `value`
+#   as_is        = ber tak, jak je
+#   flip_to_pos  = náklady jsou v xlsx záporné → ukládat kladně (dle metrics.yaml konvence)
+# row: PŘESNÝ text popisku řádku ve zdrojovém listu
+# ----------------------------------------------------------------------------
+
+mapping:
+
+  # ───────── VÝSLEDOVKA (flow, YTD) ─────────
+  - code: net_interest_income
+    primary: { src: ifrs9, row: "Net interest income" }
+    history: { src: ias39, row: "Net interest income", from: 2013Q1 }
+    long_kpi: null
+    sign: as_is
+
+  - code: net_fee_commission_income
+    primary: { src: ifrs9, row: "Net fee and commission income" }
+    history: { src: ias39, row: "Net fee and commision income" }   # pozor: překlep "commision" ve starém listu
+    sign: as_is
+
+  - code: net_trading_result
+    primary: { src: ifrs9, rows: ["Net trading result", "Gains/losses from financial instruments measured at FV through profit or loss"] }
+    history: { src: ias39, rows: ["Net trading result", "Result from financial assets and liabilities designated at FV through profit or loss"] }
+    sign: as_is
+    note: >
+      ČS reportuje NTR & FV ve dvou řádcích; pro kanonickou hodnotu sečíst.
+      Slide 56 PDF dokumentuje, kam ČS účtuje FVTPL vs. non-FVTPL (liší se napříč bankami).
+
+  - code: operating_income
+    primary: { src: ifrs9, row: "Operating income" }
+    history: { src: ias39, row: "Operating income" }
+    long_kpi: null
+    sign: as_is
+    validate: net_interest_income + net_fee_commission_income + net_trading_result + dividend_income + other_op_income_items
+    note: Reported Q1/2026 = 15,398. Adjusted (PDF) = 15,301 (rozdíl = "Other" reklasifikace, slide 51).
+
+  - code: operating_expenses
+    primary: { src: ifrs9, row: "Operating expenses" }   # = řádek "General administrative expenses"
+    history: { src: ias39, row: "Operating expenses " }
+    sign: flip_to_pos
+    note: >
+      Reported Q1/2026 = -6,554 a ZAHRNUJE DIF (-424, řádek "thereof DIF payments").
+      Adjusted opex v PDF = -6,130 (excl. regulatory). Pro adjusted basis odečti DIF.
+
+  - code: personnel_expenses
+    primary: { src: ifrs9, row: "Personnel expenses" }
+    history: { src: ias39, row: "Personnel expenses" }
+    sign: flip_to_pos
+
+  - code: other_admin_expenses
+    primary: { src: ifrs9, row: "Other administrative expenses" }
+    history: { src: ias39, row: "Other administrative expenses" }
+    sign: flip_to_pos
+    related: { dif: { src: ifrs9, row: "thereof DIF payments" } }   # regulatory charge pro adjusted výpočet
+
+  - code: depreciation_amortization
+    primary: { src: ifrs9, row: "Depreciation" }
+    history: { src: ias39, row: "Depreciation" }
+    sign: flip_to_pos
+
+  - code: operating_result
+    primary: { src: ifrs9, row: "Operating result" }
+    history: { src: ias39, row: "Operating result  " }
+    sign: as_is
+    validate: operating_income - operating_expenses
+    note: Reported Q1/2026 = 8,844 (+12.8%). Adjusted (PDF) = 9,171.
+
+  - code: impairment_result
+    primary: { src: ifrs9, row: "Impairment result on financial instruments" }
+    history: { src: ias39, row: "Net impairment loss on financial assets not measured at fair value through profit or loss" }
+    sign: as_is
+    note: Konvence ČS/PDF — kladné = rozpuštění, záporné = tvorba. Q1/2026 = +37 (rozpuštění).
+
+  - code: other_operating_result
+    primary: { src: ifrs9, row: "Other operating result" }
+    history: { src: ias39, row: "Other operating result" }
+    sign: as_is
+    note: Obsahuje bankovní odvody / příspěvek do Resolution fondu (slide 56). Nerovnoměrné v roce.
+
+  - code: pre_tax_profit
+    primary: { src: ifrs9, row: "Pre-tax result from continuing operations" }
+    history: { src: ias39, row: "Pre-tax result from continuing operations" }
+    sign: as_is
+
+  - code: income_tax
+    primary: { src: ifrs9, row: "Taxes on income" }
+    history: { src: ias39, row: "Taxes on income" }
+    sign: flip_to_pos
+
+  - code: net_profit
+    primary: { src: ifrs9, row: "Net result attributable to owners of the parent" }
+    history: { src: ias39, row: "Net result attributable to owners of the parent" }
+    long_kpi: { src: kpi, row: "Net profit (CZK m)", from: 2002Q4 }
+    sign: as_is
+    note: >
+      HEADLINE 7,086 (≈7,1 mld, +23,5%) = "attributable to owners", NE "Post-tax result" (7,093).
+      Key_figures "Net profit" = také attributable, ale YTD a delší historie.
+
+  - code: net_profit_attributable
+    primary: { src: ifrs9, row: "Net result attributable to owners of the parent" }
+    sign: as_is
+    note: Použít pro ROE/EPS (po menšinových podílech).
+
+  # ───────── ROZVAHA (stock, k datu) ─────────
+  - code: total_assets
+    primary: { src: ifrs9, row: "Total assets" }
+    history: { src: ias39, row: "Total assets" }
+    long_kpi: { src: kpi, row: "Total assets (CZK m)", from: 2002Q4 }
+    sign: as_is
+
+  - code: net_customer_loans
+    primary: { src: ifrs9, row: "Loans and advances to customers" }   # at amortised cost (řádek pod "Financial assets at amortised cost")
+    long_kpi: { src: kpi, row: "Net loans to customers (CZK m)*", from: 2002Q4 }
+    sign: as_is
+    note: >
+      Definice "net loans" se měnila (od 2018 zahrnuje i FVTPL/lease/trade receivables, viz pozn. Key_figures).
+      → vintage. Připočti řádek "thereof Loans and advances to customers" pod FVTPL pro úplnost.
+
+  - code: gross_customer_loans
+    status: PARTIAL
+    primary: null
+    source_hint: { src: peer_pdf, slide: 54, label: "Loans to customers (gross, excl. repos)" }
+    note: >
+      Excel BS dává AMORTISED-COST (≈ net) hodnotu, ne gross excl. repos.
+      Gross (1,222 mld v Q1/26) je v PDF (slide 54) a ve výkazech ČS. GAP v časové řadě → doplnit z reportů.
+
+  - code: customer_deposits
+    primary: { src: ifrs9, rows: ["Deposits from customers", "thereof Deposits from customers"] }   # amortised cost + FVTPL
+    history: { src: ias39, row: "Deposits from customers" }
+    long_kpi: { src: kpi, row: "Customer deposits (CZK m)**", from: 2002Q4 }
+    sign: as_is
+    note: Sečíst amortised-cost + FVTPL deposits. Definice restated od 2019/2020/2021 (pozn. Key_figures) → vintage.
+
+  - code: debt_securities_issued
+    primary: { src: ifrs9, row: "Debt securities issued" }
+    sign: as_is
+
+  - code: total_liabilities
+    primary: { src: ifrs9, derive: "Total liabilities and equity - Total equity" }
+    sign: as_is
+
+  - code: total_equity
+    primary: { src: ifrs9, row: "Total equity" }
+    long_kpi: { src: kpi, row: "Shareholders´ equity (CZK m)", from: 2002Q4 }
+    sign: as_is
+    related: { attributable: { src: ifrs9, row: "Equity attributable to owners of the parent" } }
+    note: Pro ROE použij PRŮMĚR (začátek+konec období), ne stav k datu.
+
+  # ───────── KAPITÁL / REGULATORIKA ─────────
+  - code: total_capital_ratio
+    primary: { src: kpi, row: "Capital adequacy (BIS until June 2007, CNB, i.e. Basel II, from September 2007, from 2014 according to Basel III)", from: 2002Q4 }
+    sign: as_is
+    note: Key_figures dává JEDEN kombinovaný ukazatel, ne rozpad CET1/Tier1.
+
+  - code: cet1_ratio
+    status: GAP
+    source_hint: { src: report, doc: "ČS interim/annual report, Pillar 3" }
+    note: V xlsx není samostatný CET1 — jen kombinovaná kapitálová přiměřenost. Doplnit z výkazů/Pillar 3.
+
+  - code: tier1_ratio
+    status: GAP
+    source_hint: { src: report, doc: "Pillar 3" }
+
+  - code: rwa
+    status: GAP
+    source_hint: { src: report, doc: "Pillar 3 / annual report" }
+    note: RWA v xlsx není.
+
+  - code: leverage_ratio
+    status: GAP
+    source_hint: { src: report, doc: "Pillar 3" }
+
+  - code: lcr
+    status: GAP
+    source_hint: { src: report, doc: "Pillar 3 / annual report" }
+
+  # ───────── KVALITA PORTFOLIA ─────────
+  - code: npl_ratio
+    primary: { src: kpi, row: "High risk loans / Total loans (until Sep 2008); NPLs in total customer loans (since Dec 2008)***", from: 2008Q4 }
+    sign: as_is
+    note: Definice/způsob reportingu změněn od Dec 2009, restated od Dec 2008 (pozn. Key_figures) → vintage.
+
+  - code: npl_coverage_ratio
+    status: GAP
+    source_hint: { src: peer_pdf, slide: 16, label: "Provision coverage" }
+    note: V xlsx časové řadě není; v PDF jen aktuální čtvrtletí. Pro historii doplnit z výkazů.
+
+  - code: loan_loss_allowances
+    status: PARTIAL
+    source_hint: { src: report }
+    note: Lze odvodit z gross−net loans nebo z poznámek výkazu; není samostatný řádek v xlsx.
+
+  - code: cost_of_risk_bps
+    primary: { derive: "impairment_result / avg(gross_customer_loans) * 10000" }
+    annualize: true
+    sign: as_is
+    note: Dopočítat. POZOR na anualizaci (impairment_result je YTD). PDF (slide 16) má "Risk costs in bps (YTD)" jako kontrolu.
+
+  # ───────── POMĚROVÉ UKAZATELE ─────────
+  - code: net_interest_margin
+    primary: { src: kpi, row: "Net interest margin (interest bearing assets)", from: 2002Q4 }
+    sign: as_is
+    note: Reported, banka vykazuje přímo. Q1/2026 = 2,11 %.
+
+  - code: cost_income_ratio
+    primary: { src: ifrs9, row: "Cost/Income ratio" }
+    long_kpi: { src: kpi, row: "Cost/Income ratio", from: 2002Q4 }
+    sign: as_is
+    note: Reported Q1/2026 = 42,6 %. Adjusted (PDF) = 40,0 %.
+
+  - code: roe
+    primary: { src: ifrs9, row: "Return on equity (new calculation since FY 2019, values since FY 2018 restated)" }
+    history: { src: kpi, row: "ROAE (new calculation since FY 2019, values since FY 2018 restated)" }
+    legacy: { src: kpi, row: "ROAE", from: 2002Q4 }
+    sign: as_is
+    note: Dvě metodiky (stará ROAE do FY2018, nová od FY2019). V katalogu rozliš vintage.
+
+  - code: rote
+    status: GAP
+    source_hint: { src: report }
+    note: ROTE ČS samostatně nevykazuje v xlsx; Erste Group ROTE je v IR datech skupiny.
+
+  - code: roa
+    primary: { src: kpi, row: "ROAA", from: 2002Q4 }
+    sign: as_is
+
+  - code: loan_to_deposit_ratio
+    primary: { derive: "net_customer_loans / customer_deposits * 100" }
+    sign: as_is
+    note: PDF má "L/D ratio adj" (87,7 %) jako kontrolu (adjusted basis).
+
+  - code: eps
+    status: GAP
+    source_hint: { src: report, doc: "Erste Group (kótovaná)" }
+    note: ČS jako dcera EPS nevykazuje; relevantní u Erste/KB/Moneta.
+
+  # ───────── OBJEMY / PROVOZ ─────────
+  - code: number_of_employees
+    primary: { src: kpi, row: "Number of employees (FTE, Group)", from: 2002Q4 }
+    sign: as_is
+
+  - code: number_of_branches
+    primary: { src: kpi, row: "Number of branches ****", from: 2002Q4 }
+    sign: as_is
+    note: Od June 2022 = fyzické pobočky, restated od Dec 2018 → vintage.
+
+  - code: number_of_atms
+    primary: { src: kpi, row: "Number of ATMs", from: 2002Q4 }
+    sign: as_is
+    note: Rozšíření katalogu (v metrics.yaml zatím není) — data k dispozici, doporučeno přidat.
+
+  - code: number_of_payment_cards
+    primary: { src: kpi, row: "Number of active payment cards (in thousands)", from: 2002Q4 }
+    unit: thousands
+    sign: as_is
+    note: Rozšíření katalogu; pozor jednotka = tisíce.
+
+  - code: number_of_clients
+    status: GAP
+    source_hint: { src: peer_pdf, slide: 6, label: "4.6 m clients" }
+    note: V xlsx časové řadě klienti nejsou. Dlouhodobá řada je v PDF (slide 31), aktuál na slide 6.
+
+  - code: mortgage_volume
+    status: GAP
+    source_hint: { src: peer_pdf, slide: 18, label: "517 bn" }
+  - code: consumer_loan_volume
+    status: GAP
+    source_hint: { src: peer_pdf, slide: 20, label: "93 bn cash loans" }
+  - code: corporate_loan_volume
+    status: GAP
+    source_hint: { src: peer_pdf, slide: 21, label: "493 bn" }
+  - code: aum
+    status: GAP
+    source_hint: { src: peer_pdf, slide: 24, label: "396 bn mutual funds" }
+    note: Objemy dle produktu nejsou v xlsx časové řadě — PDF má aktuál + Q1 2022–2026 trend.
+
+# ----------------------------------------------------------------------------
+# SHRNUTÍ POKRYTÍ
+#   PLNĚ z xlsx (reported, časová řada):  celá výsledovka, rozvaha, NII detail,
+#     opex rozpad, C/I, ROE, NIM, ROAA, kombinovaná kap. přiměřenost, NPL ratio,
+#     FTE, pobočky, ATM, karty.  → 2018-Q1+ plně, KPI až 2002.
+#   GAP (doplnit z reportů / PDF / Erste / ČNB):  CET1, Tier1, RWA, leverage, LCR,
+#     NPL coverage, ROTE, EPS, gross loans (excl. repos), počet klientů,
+#     objemy úvěrů dle produktu, mutual funds/AUM.
+# ----------------------------------------------------------------------------
