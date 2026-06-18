@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- DESIGN PREVIEW (self-contained, bez backendu) — viz web/design/DESIGN.md -->
+<title>BankPulse · design preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,16..72,500;0,16..72,600;1,16..72,500&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== app shell ===== */
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#0B2238;-webkit-font-smoothing:antialiased}
+  .view{display:none;min-height:calc(100vh - 56px)}
+  .view.active{display:block}
+  .appnav{position:sticky;top:0;z-index:50;min-height:56px;display:flex;align-items:center;gap:16px;
+    padding:0 22px;background:#0B2238;color:#E8EEF4;font-family:'IBM Plex Sans',system-ui,sans-serif;flex-wrap:wrap}
+  .appnav .brand{display:flex;align-items:center;gap:11px;font-weight:600;font-size:15px}
+  .appnav .brand .mark{width:30px;height:30px;border-radius:7px;background:#C8102E;display:grid;place-items:center;
+    font-family:'IBM Plex Serif',serif;color:#fff;font-size:15px}
+  .appnav .brand small{color:#9DB2C8;font-weight:400;font-size:12px}
+  .appnav .tabs{display:flex;gap:4px;margin-left:6px}
+  .appnav .tabs button{font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:#9DB2C8;
+    background:transparent;border:1px solid transparent;padding:7px 14px;border-radius:8px}
+  .appnav .tabs button:hover{color:#fff}
+  .appnav .tabs button.on{color:#fff;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.14)}
+  .appnav .spacer{flex:1}
+  .appnav .banksel{display:flex;align-items:center;gap:9px}
+  .appnav .banksel .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#9DB2C8;font-weight:600}
+  .appnav .bankbtns{display:flex;gap:3px}
+  .appnav .bankbtns button{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;
+    color:#9DB2C8;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:5px 11px;
+    border-radius:6px;text-transform:uppercase}
+  .appnav .bankbtns button.on{color:#fff;background:#C8102E;border-color:#C8102E}
+  @media(max-width:560px){.appnav{padding:8px 14px}.appnav .spacer{display:none}}
+
+  /* ===== Přehled banky (IBM Plex dashboard) — převzato z index.html ===== */
+  #ov{--ink:#0B2238;--soft:#566B82;--line:#E3E9F0;--l2:#EEF2F7;--canvas:#F3F6FA;--panel:#fff;
+    --navy:#0B2238;--navy2:#13314C;--brand:#C8102E;--accent:#2D6FB3;--pos:#157347;--neg:#C0392B;
+    --radius:14px;--shadow:0 1px 2px rgba(11,34,56,.05),0 8px 24px -16px rgba(11,34,56,.25);
+    background:var(--canvas);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;
+    line-height:1.45;font-feature-settings:'tnum' 1}
+  #ov .mono{font-family:'IBM Plex Mono',monospace}
+  #ov .wrap{max-width:1180px;margin:0 auto;padding:26px 24px 60px}
+  #ov h1{font-family:'IBM Plex Serif';font-weight:600;font-size:27px;letter-spacing:-.3px}
+  #ov .sub{color:var(--soft);font-size:13px;margin-top:4px}#ov .sub b{color:var(--ink)}
+  #ov .ovhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  #ov .statusline{display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--soft)}
+  #ov .dot{width:7px;height:7px;border-radius:99px;background:#43C08A;display:inline-block;margin-right:5px}
+  #ov .period{font-family:'IBM Plex Mono';font-size:12.5px;font-weight:600;color:var(--navy2);background:#EAF0F6;
+    border:1px solid var(--line);padding:5px 12px;border-radius:99px}
+  #ov .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 16px}
+  #ov .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+  #ov .kpi .name{font-size:11.5px;color:var(--soft);font-weight:500;min-height:30px}
+  #ov .kpi .val{font-family:'IBM Plex Mono';font-weight:600;font-size:22px;letter-spacing:-.5px;margin:6px 0 4px}
+  #ov .kpi .val .u{font-size:11px;color:var(--soft)}
+  #ov .kpi .d{font-size:11px;font-family:'IBM Plex Mono'}
+  #ov .pos{color:var(--pos)}#ov .neg{color:var(--neg)}#ov .flat{color:var(--soft)}
+  #ov .panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+  #ov .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+  #ov .panel h2{font-family:'IBM Plex Serif';font-size:15px;font-weight:600}
+  #ov .panel .ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  #ov .panel .ph p{font-size:12px;color:var(--soft)}
+  #ov .seg{display:flex;gap:3px;flex-wrap:wrap}
+  #ov .seg button{border:1px solid var(--line);background:#fff;color:var(--soft);cursor:pointer;font-family:inherit;
+    font-size:11px;font-weight:500;padding:4px 8px;border-radius:6px}
+  #ov .seg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  #ov svg{display:block;overflow:visible}
+  #ov .axis{font-family:'IBM Plex Mono';font-size:9.5px;fill:var(--soft)}
+  #ov .vlabel{font-family:'IBM Plex Mono';font-size:9.5px;fill:var(--ink);font-weight:500}
+  #ov .cats{margin-top:20px}
+  #ov .cat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:6px 0 2px;margin-bottom:14px;overflow:hidden}
+  #ov .cat h3{font-family:'IBM Plex Serif';font-size:15px;font-weight:600;padding:12px 20px 8px;display:flex;align-items:center;gap:10px}
+  #ov .cat h3 span{font-family:'IBM Plex Sans';font-size:11px;color:var(--soft);font-weight:400}
+  #ov table{width:100%;border-collapse:collapse}
+  #ov thead th{font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--soft);font-weight:600;
+    text-align:right;padding:6px 20px;border-bottom:1px solid var(--line)}
+  #ov thead th:first-child{text-align:left}
+  #ov tbody td{padding:9px 20px;border-bottom:1px solid var(--l2);font-size:13px;text-align:right;vertical-align:middle}
+  #ov tbody tr:last-child td{border-bottom:0}
+  #ov tbody td:first-child{text-align:left;font-weight:500}
+  #ov tbody tr.hl td:first-child{font-weight:600}
+  #ov tbody tr.hl td:first-child::before{content:'';display:inline-block;width:6px;height:6px;border-radius:99px;
+    background:var(--brand);margin-right:8px;vertical-align:1px}
+  #ov td.num{font-family:'IBM Plex Mono';font-weight:500}
+  #ov td .u{color:var(--soft);font-size:10px}
+  #ov .spk{width:90px}
+  #ov tbody tr:hover{background:#FAFBFD}
+  #ov .foot{margin-top:22px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--soft);
+    display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  #ov .pill{background:#EAF0F6;border:1px solid var(--line);border-radius:99px;padding:5px 12px;color:var(--navy2);font-weight:500}
+  #ov .empty{padding:54px 4px;color:var(--soft);font-size:15px;line-height:1.6}
+  #ov .empty b{color:var(--ink)}
+  @media(max-width:920px){#ov .grid{grid-template-columns:repeat(2,1fr)}#ov .panels{grid-template-columns:1fr}#ov .spk{display:none}}
+  @media(max-width:520px){#ov .grid{grid-template-columns:1fr}}
+
+  /* ===== Srovnání (HBR exhibit) — převzato z compare.html ===== */
+  #cmp{--paper:#FAF7F1;--ink:#1A1815;--soft:#6F6A62;--rule:#1A1815;--crimson:#A6192E;--cs:#1A3A5C;--kb:#A6192E;
+    --hair:#D9D2C6;--l2:#EFEBE2;background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
+    font-feature-settings:'tnum' 1;line-height:1.5}
+  #cmp .serif{font-family:'Source Serif 4',Georgia,serif}
+  #cmp .display{font-family:'Newsreader',Georgia,serif}
+  #cmp .wrap{max-width:940px;margin:0 auto;padding:46px 28px 64px}
+  #cmp .kicker{font-size:11.5px;letter-spacing:2.4px;text-transform:uppercase;color:var(--crimson);font-weight:600}
+  #cmp h1.head{font-family:'Newsreader',serif;font-weight:600;font-size:42px;line-height:1.06;letter-spacing:-.4px;margin:14px 0 0}
+  #cmp .deck{font-family:'Source Serif 4',serif;font-size:17px;line-height:1.55;color:#3A352E;max-width:62ch;margin-top:14px}
+  #cmp .deck em{font-style:italic}
+  #cmp .byline{font-size:12px;letter-spacing:.4px;color:var(--soft);margin-top:16px}
+  #cmp .rule{height:2px;background:var(--ink);margin:22px 0 0}
+  #cmp .hair{height:1px;background:var(--hair)}
+  #cmp .legend{display:flex;gap:26px;align-items:center;margin:20px 0 8px;flex-wrap:wrap}
+  #cmp .legitem{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px}
+  #cmp .sw{width:13px;height:13px;border-radius:2px}
+  #cmp .legitem small{font-weight:400;color:var(--soft);font-size:12px}
+  #cmp .exhibit{margin-top:40px}
+  #cmp .exhibit .etag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--soft);font-weight:600}
+  #cmp .exhibit h2{font-family:'Source Serif 4',serif;font-weight:600;font-size:21px;margin:5px 0 2px}
+  #cmp .exhibit .enote{font-size:12.5px;color:var(--soft);margin-bottom:18px}
+  #cmp .exhibit .topline{height:2px;background:var(--ink);margin-bottom:16px}
+  #cmp .barrow{display:grid;grid-template-columns:172px 1fr;gap:16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--hair)}
+  #cmp .barrow:last-child{border-bottom:0}
+  #cmp .barrow .lbl{font-size:13px;font-weight:500;line-height:1.25}
+  #cmp .barrow .lbl small{display:block;color:var(--soft);font-weight:400;font-size:11px}
+  #cmp .pair{display:flex;flex-direction:column;gap:6px}
+  #cmp .bar{display:flex;align-items:center;gap:10px}
+  #cmp .bar .track{flex:1;height:15px;position:relative;background:transparent}
+  #cmp .bar .fill{height:100%;border-radius:0 2px 2px 0}
+  #cmp .bar .v{min-width:78px;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+  #cmp .bar .tag{width:22px;font-size:10px;color:var(--soft);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  #cmp .dumb{display:grid;grid-template-columns:172px 1fr;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--hair)}
+  #cmp .dumb:last-child{border-bottom:0}
+  #cmp svg{display:block;width:100%;height:auto;overflow:visible}
+  #cmp .axis{font-family:'Inter';font-size:10px;fill:var(--soft)}
+  #cmp .dval{font-size:11.5px;font-weight:600}
+  #cmp .slope-wrap{display:grid;grid-template-columns:1fr;gap:0}
+  #cmp .foot{margin-top:46px;padding-top:16px;border-top:2px solid var(--ink);font-size:12px;color:var(--soft);
+    display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  #cmp .foot b{color:var(--ink)}
+  @media(max-width:680px){#cmp h1.head{font-size:32px}#cmp .barrow,#cmp .dumb{grid-template-columns:1fr;gap:8px}}
+</style>
+</head>
+<body>
+<header class="appnav">
+  <div class="brand"><div class="mark">B</div><span>BankPulse <small>· přehled finančních výsledků bank</small></span></div>
+  <nav class="tabs">
+    <button data-view="overview" class="on">Přehled banky</button>
+    <button data-view="compare">Srovnání</button>
+  </nav>
+  <div class="spacer"></div>
+  <div class="banksel" id="bankselWrap"><span class="lab">Banka</span><div class="bankbtns" id="bankbtns"></div></div>
+</header>
+
+<main>
+  <section id="ov" class="view active">
+    <div class="wrap">
+      <div class="ovhead">
+        <div><h1 id="ov-bankname">—</h1><div class="sub" id="ov-bsub">—</div></div>
+        <div class="statusline"><span id="ov-src"><span class="dot"></span>data z DB</span><span id="ov-per" class="period">—</span></div>
+      </div>
+      <div id="ov-empty" class="empty" style="display:none"></div>
+      <div id="ov-body">
+        <div class="grid" id="ov-kpis"></div>
+        <div class="panels">
+          <div class="panel"><div class="ph"><div><h2>Vývoj po čtvrtletích</h2><p>samostatná čtvrtletí · mld. Kč</p></div><div class="seg" id="ov-qseg"></div></div><div id="ov-qchart"></div></div>
+          <div class="panel"><div class="ph"><div><h2>Dlouhodobý pohled</h2><p id="ov-annsub">roční čistý zisk · mld. Kč</p></div></div><div id="ov-achart"></div></div>
+        </div>
+        <div class="cats" id="ov-cats"></div>
+        <div class="foot"><span id="ov-prov">—</span><span class="pill">konfigurací řízené · katalog metrik</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cmp" class="view">
+    <div class="wrap">
+      <div class="kicker" id="cmp-kicker">ČS Peer Group · Q1 2026</div>
+      <h1 class="head display">Dvě banky, jedno čtvrtletí</h1>
+      <p class="deck" id="cmp-deck">—</p>
+      <div class="byline">Srovnání na peer-comparable (adjusted) bázi · jednotka mld. Kč není-li uvedeno jinak</div>
+      <div class="rule"></div>
+      <div class="legend" id="cmp-legend"></div>
+      <div id="cmp-exhibits"></div>
+      <div class="foot">
+        <span>Zdroj: ČS Peer Group Q1 2026 (Investor Relations) · adjusted, peer-comparable</span>
+        <span>Exhibit generován z databáze · báze <b>adjusted</b></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* offline fallback snapshoty (primární zdroj je vždy API, viz load() v každém modulu) */
+const SNAPSHOT = {"bank": {"code": "cs", "name": "Česká spořitelna", "parent_group": "Erste Group"}, "period": {"year": 2026, "quarter": 1}, "kpis": [{"code": "net_interest_income", "label_cs": "Čistý úrokový výnos", "unit": "CZK_m", "type": "flow", "value": 10722.800000000001, "yoy": 5.767352857044239}, {"code": "net_fee_commission_income", "label_cs": "Čisté výnosy z poplatků a provizí", "unit": "CZK_m", "type": "flow", "value": 3396.0, "yoy": 5.893358278765204}, {"code": "operating_income", "label_cs": "Provozní výnosy", "unit": "CZK_m", "type": "flow", "value": 15398.0, "yoy": 8.54363456929368}, {"code": "operating_result", "label_cs": "Provozní výsledek", "unit": "CZK_m", "type": "flow", "value": 8844.0, "yoy": 12.762973352033669}, {"code": "net_profit", "label_cs": "Čistý zisk", "unit": "CZK_m", "type": "flow", "value": 7086.0, "yoy": 23.5140317238975}, {"code": "total_assets", "label_cs": "Bilanční suma (celková aktiva)", "unit": "CZK_m", "type": "stock", "value": 2229880.0, "yoy": 8.42054850135776}, {"code": "net_customer_loans", "label_cs": "Úvěry a pohledávky za klienty (netto)", "unit": "CZK_m", "type": "stock", "value": 1190553.0, "yoy": 9.448260075364722}, {"code": "customer_deposits", "label_cs": "Závazky ke klientům (vklady klientů)", "unit": "CZK_m", "type": "stock", "value": 1654880.0, "yoy": 7.320363164721133}, {"code": "npl_ratio", "label_cs": "Podíl nevýkonných úvěrů (NPL)", "unit": "percent", "type": "ratio", "value": 0.015, "yoy": -0.29999999999999993}, {"code": "net_interest_margin", "label_cs": "Čistá úroková marže (NIM)", "unit": "percent", "type": "ratio", "value": 0.0211, "yoy": 0.06999999999999992}, {"code": "cost_income_ratio", "label_cs": "Poměr nákladů k výnosům (C/I)", "unit": "percent", "type": "ratio", "value": 0.4256, "yoy": -2.150000000000002}, {"code": "roe", "label_cs": "Návratnost vlastního kapitálu (ROE)", "unit": "percent", "type": "ratio", "value": 0.1865, "yoy": 3.159999999999999}], "categories": [{"key": "income_statement", "title": "Výsledovka", "metrics": [{"code": "net_interest_income", "label": "Čistý úrokový výnos", "unit": "CZK_m", "type": "flow", "headline": 1, "latest": 10722.800000000001, "ly": 2026, "lq": 1, "prev": 10138.099999999999, "yoy": 5.767352857044239, "spark": [{"y": 2023, "q": 1, "v": 8159.0}, {"y": 2023, "q": 2, "v": 8504.0}, {"y": 2023, "q": 3, "v": 8755.0}, {"y": 2023, "q": 4, "v": 9165.0}, {"y": 2024, "q": 1, "v": 9601.999999999996}, {"y": 2024, "q": 2, "v": 9428.100000000002}, {"y": 2024, "q": 3, "v": 10383.100000000013}, {"y": 2024, "q": 4, "v": 10398.19999999999}, {"y": 2025, "q": 1, "v": 10138.099999999999}, {"y": 2025, "q": 2, "v": 10463.399999999998}, {"y": 2025, "q": 3, "v": 10633.899999999998}, {"y": 2025, "q": 4, "v": 10872.500000000015}, {"y": 2026, "q": 1, "v": 10722.800000000001}]}, {"code": "net_fee_commission_income", "label": "Čisté výnosy z poplatků a provizí", "unit": "CZK_m", "type": "flow", "headline": 1, "latest": 3396.0, "ly": 2026, "lq": 1, "prev": 3207.0, "yoy": 5.893358278765204, "spark": [{"y": 2023, "q": 1, "v": 2537.0}, {"y": 2023, "q": 2, "v": 2608.0}, {"y": 2023, "q": 3, "v": 2610.0}, {"y": 2023, "q": 4, "v": 3139.0}, {"y": 2024, "q": 1, "v": 2960.0}, {"y": 2024, "q": 2, "v": 3164.0}, {"y": 2024, "q": 3, "v": 3130.0}, {"y": 2024, "q": 4, "v": 3524.0}, {"y": 2025, "q": 1, "v": 3207.0}, {"y": 2025, "q": 2, "v": 3070.0}, {"y": 2025, "q": 3, "v": 3232.0}, {"y": 2025, "q": 4, "v": 3661.0}, {"y": 2026, "q": 1, "v": 3396.0}]}, {"code": "net_trading_result", "label": "Čistý zisk z obchodních operací a z přecenění", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 1182.0, "ly": 2026, "lq": 1, "prev": 746.0, "yoy": 58.4450402144772, "spark": [{"y": 2023, "q": 1, "v": 759.0}, {"y": 2023, "q": 2, "v": 1023.0}, {"y": 2023, "q": 3, "v": 351.0}, {"y": 2023, "q": 4, "v": 281.0}, {"y": 2024, "q": 1, "v": 888.0}, {"y": 2024, "q": 2, "v": 783.0}, {"y": 2024, "q": 3, "v": 1017.0}, {"y": 2024, "q": 4, "v": 677.0}, {"y": 2025, "q": 1, "v": 746.0}, {"y": 2025, "q": 2, "v": 761.0}, {"y": 2025, "q": 3, "v": 858.0}, {"y": 2025, "q": 4, "v": 924.0}, {"y": 2026, "q": 1, "v": 1182.0}]}, {"code": "operating_income", "label": "Provozní výnosy", "unit": "CZK_m", "type": "flow", "headline": 1, "latest": 15398.0, "ly": 2026, "lq": 1, "prev": 14186.0, "yoy": 8.54363456929368, "spark": [{"y": 2023, "q": 1, "v": 11526.0}, {"y": 2023, "q": 2, "v": 12295.0}, {"y": 2023, "q": 3, "v": 11830.0}, {"y": 2023, "q": 4, "v": 12714.0}, {"y": 2024, "q": 1, "v": 13522.0}, {"y": 2024, "q": 2, "v": 13538.0}, {"y": 2024, "q": 3, "v": 14642.0}, {"y": 2024, "q": 4, "v": 14784.0}, {"y": 2025, "q": 1, "v": 14186.0}, {"y": 2025, "q": 2, "v": 14456.0}, {"y": 2025, "q": 3, "v": 14874.0}, {"y": 2025, "q": 4, "v": 15644.0}, {"y": 2026, "q": 1, "v": 15398.0}]}, {"code": "operating_expenses", "label": "Provozní náklady", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 6554.0, "ly": 2026, "lq": 1, "prev": 6343.0, "yoy": 3.3265016553681193, "spark": [{"y": 2023, "q": 1, "v": 5874.0}, {"y": 2023, "q": 2, "v": 5680.0}, {"y": 2023, "q": 3, "v": 5453.0}, {"y": 2023, "q": 4, "v": 6137.0}, {"y": 2024, "q": 1, "v": 5975.0}, {"y": 2024, "q": 2, "v": 5882.0}, {"y": 2024, "q": 3, "v": 5808.0}, {"y": 2024, "q": 4, "v": 6639.0}, {"y": 2025, "q": 1, "v": 6343.0}, {"y": 2025, "q": 2, "v": 6211.0}, {"y": 2025, "q": 3, "v": 6234.0}, {"y": 2025, "q": 4, "v": 6488.0}, {"y": 2026, "q": 1, "v": 6554.0}]}, {"code": "personnel_expenses", "label": "Osobní náklady", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 3371.0, "ly": 2026, "lq": 1, "prev": 3216.0, "yoy": 4.819651741293529, "spark": [{"y": 2023, "q": 1, "v": 3050.0}, {"y": 2023, "q": 2, "v": 3201.0}, {"y": 2023, "q": 3, "v": 3074.0}, {"y": 2023, "q": 4, "v": 3360.0}, {"y": 2024, "q": 1, "v": 3077.0}, {"y": 2024, "q": 2, "v": 3273.0}, {"y": 2024, "q": 3, "v": 3237.0}, {"y": 2024, "q": 4, "v": 3645.0}, {"y": 2025, "q": 1, "v": 3216.0}, {"y": 2025, "q": 2, "v": 3467.0}, {"y": 2025, "q": 3, "v": 3356.0}, {"y": 2025, "q": 4, "v": 3496.0}, {"y": 2026, "q": 1, "v": 3371.0}]}, {"code": "other_admin_expenses", "label": "Ostatní správní náklady", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 2435.0, "ly": 2026, "lq": 1, "prev": 2457.0, "yoy": -0.8954008954008996, "spark": [{"y": 2023, "q": 1, "v": 2149.0}, {"y": 2023, "q": 2, "v": 1785.0}, {"y": 2023, "q": 3, "v": 1666.0}, {"y": 2023, "q": 4, "v": 2075.0}, {"y": 2024, "q": 1, "v": 2219.0}, {"y": 2024, "q": 2, "v": 1917.0}, {"y": 2024, "q": 3, "v": 1882.0}, {"y": 2024, "q": 4, "v": 2282.0}, {"y": 2025, "q": 1, "v": 2457.0}, {"y": 2025, "q": 2, "v": 2052.0}, {"y": 2025, "q": 3, "v": 2175.0}, {"y": 2025, "q": 4, "v": 2245.0}, {"y": 2026, "q": 1, "v": 2435.0}]}, {"code": "depreciation_amortization", "label": "Odpisy hmotného a nehmotného majetku", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 748.0, "ly": 2026, "lq": 1, "prev": 670.0, "yoy": 11.641791044776117, "spark": [{"y": 2023, "q": 1, "v": 675.0}, {"y": 2023, "q": 2, "v": 694.0}, {"y": 2023, "q": 3, "v": 713.0}, {"y": 2023, "q": 4, "v": 702.0}, {"y": 2024, "q": 1, "v": 679.0}, {"y": 2024, "q": 2, "v": 692.0}, {"y": 2024, "q": 3, "v": 689.0}, {"y": 2024, "q": 4, "v": 712.0}, {"y": 2025, "q": 1, "v": 670.0}, {"y": 2025, "q": 2, "v": 692.0}, {"y": 2025, "q": 3, "v": 703.0}, {"y": 2025, "q": 4, "v": 747.0}, {"y": 2026, "q": 1, "v": 748.0}]}, {"code": "operating_result", "label": "Provozní výsledek", "unit": "CZK_m", "type": "flow", "headline": 1, "latest": 8844.0, "ly": 2026, "lq": 1, "prev": 7843.0, "yoy": 12.762973352033669, "spark": [{"y": 2023, "q": 1, "v": 5652.0}, {"y": 2023, "q": 2, "v": 6615.0}, {"y": 2023, "q": 3, "v": 6377.0}, {"y": 2023, "q": 4, "v": 6577.0}, {"y": 2024, "q": 1, "v": 7547.0}, {"y": 2024, "q": 2, "v": 7656.0}, {"y": 2024, "q": 3, "v": 8834.0}, {"y": 2024, "q": 4, "v": 8145.0}, {"y": 2025, "q": 1, "v": 7843.0}, {"y": 2025, "q": 2, "v": 8245.0}, {"y": 2025, "q": 3, "v": 8640.0}, {"y": 2025, "q": 4, "v": 9156.0}, {"y": 2026, "q": 1, "v": 8844.0}]}, {"code": "impairment_result", "label": "Ztráty ze znehodnocení finančních nástrojů (náklady na riziko)", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 37.0, "ly": 2026, "lq": 1, "prev": -335.0, "yoy": -111.04477611940298, "spark": [{"y": 2023, "q": 1, "v": -231.0}, {"y": 2023, "q": 2, "v": -72.0}, {"y": 2023, "q": 3, "v": -163.0}, {"y": 2023, "q": 4, "v": -359.0}, {"y": 2024, "q": 1, "v": -73.0}, {"y": 2024, "q": 2, "v": 307.0}, {"y": 2024, "q": 3, "v": -217.0}, {"y": 2024, "q": 4, "v": 244.0}, {"y": 2025, "q": 1, "v": -335.0}, {"y": 2025, "q": 2, "v": 537.0}, {"y": 2025, "q": 3, "v": -145.0}, {"y": 2025, "q": 4, "v": -504.0}, {"y": 2026, "q": 1, "v": 37.0}]}, {"code": "other_operating_result", "label": "Ostatní provozní výsledek", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": -275.0, "ly": 2026, "lq": 1, "prev": -422.0, "yoy": -34.834123222748815, "spark": [{"y": 2023, "q": 1, "v": -858.0}, {"y": 2023, "q": 2, "v": 115.0}, {"y": 2023, "q": 3, "v": 85.0}, {"y": 2023, "q": 4, "v": -1048.0}, {"y": 2024, "q": 1, "v": -486.0}, {"y": 2024, "q": 2, "v": 224.0}, {"y": 2024, "q": 3, "v": 286.0}, {"y": 2024, "q": 4, "v": 223.0}, {"y": 2025, "q": 1, "v": -422.0}, {"y": 2025, "q": 2, "v": -46.0}, {"y": 2025, "q": 3, "v": -172.0}, {"y": 2025, "q": 4, "v": 2350.0}, {"y": 2026, "q": 1, "v": -275.0}]}, {"code": "pre_tax_profit", "label": "Zisk před zdaněním", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 8606.0, "ly": 2026, "lq": 1, "prev": 6932.0, "yoy": 24.14887478361223, "spark": [{"y": 2023, "q": 1, "v": 4563.0}, {"y": 2023, "q": 2, "v": 6658.0}, {"y": 2023, "q": 3, "v": 6265.0}, {"y": 2023, "q": 4, "v": 4930.0}, {"y": 2024, "q": 1, "v": 6984.0}, {"y": 2024, "q": 2, "v": 8184.0}, {"y": 2024, "q": 3, "v": 8496.0}, {"y": 2024, "q": 4, "v": 8176.0}, {"y": 2025, "q": 1, "v": 6932.0}, {"y": 2025, "q": 2, "v": 8554.0}, {"y": 2025, "q": 3, "v": 7839.0}, {"y": 2025, "q": 4, "v": 10386.0}, {"y": 2026, "q": 1, "v": 8606.0}]}, {"code": "income_tax", "label": "Daň z příjmů", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 1513.0, "ly": 2026, "lq": 1, "prev": 1184.0, "yoy": 27.787162162162172, "spark": [{"y": 2023, "q": 1, "v": 1260.0}, {"y": 2023, "q": 2, "v": 670.0}, {"y": 2023, "q": 3, "v": 912.0}, {"y": 2023, "q": 4, "v": 894.0}, {"y": 2024, "q": 1, "v": 1259.0}, {"y": 2024, "q": 2, "v": 1476.0}, {"y": 2024, "q": 3, "v": 1494.0}, {"y": 2024, "q": 4, "v": 1373.0}, {"y": 2025, "q": 1, "v": 1184.0}, {"y": 2025, "q": 2, "v": 1461.0}, {"y": 2025, "q": 3, "v": 1612.0}, {"y": 2025, "q": 4, "v": 1580.0}, {"y": 2026, "q": 1, "v": 1513.0}]}, {"code": "net_profit", "label": "Čistý zisk", "unit": "CZK_m", "type": "flow", "headline": 1, "latest": 7086.0, "ly": 2026, "lq": 1, "prev": 5737.0, "yoy": 23.5140317238975, "spark": [{"y": 2023, "q": 1, "v": 3300.0}, {"y": 2023, "q": 2, "v": 5965.0}, {"y": 2023, "q": 3, "v": 5336.0}, {"y": 2023, "q": 4, "v": 4013.0}, {"y": 2024, "q": 1, "v": 5720.0}, {"y": 2024, "q": 2, "v": 6690.0}, {"y": 2024, "q": 3, "v": 6989.0}, {"y": 2024, "q": 4, "v": 6763.0}, {"y": 2025, "q": 1, "v": 5737.0}, {"y": 2025, "q": 2, "v": 7072.0}, {"y": 2025, "q": 3, "v": 6203.0}, {"y": 2025, "q": 4, "v": 8750.0}, {"y": 2026, "q": 1, "v": 7086.0}]}, {"code": "net_profit_attributable", "label": "Čistý zisk náležející vlastníkům mateřské společnosti", "unit": "CZK_m", "type": "flow", "headline": 0, "latest": 7086.0, "ly": 2026, "lq": 1, "prev": 5737.0, "yoy": 23.5140317238975, "spark": [{"y": 2023, "q": 1, "v": 3300.0}, {"y": 2023, "q": 2, "v": 5965.0}, {"y": 2023, "q": 3, "v": 5336.0}, {"y": 2023, "q": 4, "v": 4013.0}, {"y": 2024, "q": 1, "v": 5720.0}, {"y": 2024, "q": 2, "v": 6690.0}, {"y": 2024, "q": 3, "v": 6989.0}, {"y": 2024, "q": 4, "v": 6763.0}, {"y": 2025, "q": 1, "v": 5737.0}, {"y": 2025, "q": 2, "v": 7072.0}, {"y": 2025, "q": 3, "v": 6203.0}, {"y": 2025, "q": 4, "v": 8750.0}, {"y": 2026, "q": 1, "v": 7086.0}]}]}, {"key": "balance_sheet", "title": "Rozvaha", "metrics": [{"code": "total_assets", "label": "Bilanční suma (celková aktiva)", "unit": "CZK_m", "type": "stock", "headline": 1, "latest": 2229880.0, "ly": 2026, "lq": 1, "prev": 2056695.0, "yoy": 8.42054850135776, "spark": [{"y": 2023, "q": 1, "v": 1846809.0}, {"y": 2023, "q": 2, "v": 1917363.0}, {"y": 2023, "q": 3, "v": 1878174.0}, {"y": 2023, "q": 4, "v": 1797820.0}, {"y": 2024, "q": 1, "v": 2021742.0}, {"y": 2024, "q": 2, "v": 2054412.0}, {"y": 2024, "q": 3, "v": 2052185.0}, {"y": 2024, "q": 4, "v": 2030076.0}, {"y": 2025, "q": 1, "v": 2056695.0}, {"y": 2025, "q": 2, "v": 2081158.0}, {"y": 2025, "q": 3, "v": 2099159.0}, {"y": 2025, "q": 4, "v": 2038533.0}, {"y": 2026, "q": 1, "v": 2229880.0}]}, {"code": "net_customer_loans", "label": "Úvěry a pohledávky za klienty (netto)", "unit": "CZK_m", "type": "stock", "headline": 1, "latest": 1190553.0, "ly": 2026, "lq": 1, "prev": 1087777.0, "yoy": 9.448260075364722, "spark": [{"y": 2023, "q": 1, "v": 904508.0}, {"y": 2023, "q": 2, "v": 953034.0}, {"y": 2023, "q": 3, "v": 971557.0}, {"y": 2023, "q": 4, "v": 996818.0}, {"y": 2024, "q": 1, "v": 1013575.0}, {"y": 2024, "q": 2, "v": 1031477.0}, {"y": 2024, "q": 3, "v": 1058094.0}, {"y": 2024, "q": 4, "v": 1076242.0}, {"y": 2025, "q": 1, "v": 1087777.0}, {"y": 2025, "q": 2, "v": 1113472.0}, {"y": 2025, "q": 3, "v": 1147409.0}, {"y": 2025, "q": 4, "v": 1162968.0}, {"y": 2026, "q": 1, "v": 1190553.0}]}, {"code": "customer_deposits", "label": "Závazky ke klientům (vklady klientů)", "unit": "CZK_m", "type": "stock", "headline": 1, "latest": 1654880.0, "ly": 2026, "lq": 1, "prev": 1542000.0, "yoy": 7.320363164721133, "spark": [{"y": 2023, "q": 1, "v": 1397929.0}, {"y": 2023, "q": 2, "v": 1455883.0}, {"y": 2023, "q": 3, "v": 1414753.0}, {"y": 2023, "q": 4, "v": 1366038.0}, {"y": 2024, "q": 1, "v": 1459884.0}, {"y": 2024, "q": 2, "v": 1495964.0}, {"y": 2024, "q": 3, "v": 1496382.0}, {"y": 2024, "q": 4, "v": 1483174.0}, {"y": 2025, "q": 1, "v": 1542000.0}, {"y": 2025, "q": 2, "v": 1627279.0}, {"y": 2025, "q": 3, "v": 1584680.0}, {"y": 2025, "q": 4, "v": 1529840.0}, {"y": 2026, "q": 1, "v": 1654880.0}]}, {"code": "debt_securities_issued", "label": "Emitované dluhové cenné papíry", "unit": "CZK_m", "type": "stock", "headline": 0, "latest": 110625.0, "ly": 2026, "lq": 1, "prev": 83003.0, "yoy": 33.278315241617776, "spark": [{"y": 2023, "q": 1, "v": 64079.0}, {"y": 2023, "q": 2, "v": 75621.0}, {"y": 2023, "q": 3, "v": 89799.0}, {"y": 2023, "q": 4, "v": 121451.0}, {"y": 2024, "q": 1, "v": 78315.0}, {"y": 2024, "q": 2, "v": 77880.0}, {"y": 2024, "q": 3, "v": 92510.0}, {"y": 2024, "q": 4, "v": 81509.0}, {"y": 2025, "q": 1, "v": 83003.0}, {"y": 2025, "q": 2, "v": 86321.0}, {"y": 2025, "q": 3, "v": 97392.0}, {"y": 2025, "q": 4, "v": 98265.0}, {"y": 2026, "q": 1, "v": 110625.0}]}, {"code": "total_liabilities", "label": "Celkové závazky", "unit": "CZK_m", "type": "stock", "headline": 0, "latest": 2074016.0, "ly": 2026, "lq": 1, "prev": 1895571.0, "yoy": 9.41378613620909, "spark": [{"y": 2023, "q": 1, "v": 1704469.0}, {"y": 2023, "q": 2, "v": 1784805.0}, {"y": 2023, "q": 3, "v": 1739439.0}, {"y": 2023, "q": 4, "v": 1653319.0}, {"y": 2024, "q": 1, "v": 1871090.0}, {"y": 2024, "q": 2, "v": 1912748.0}, {"y": 2024, "q": 3, "v": 1902922.0}, {"y": 2024, "q": 4, "v": 1875310.0}, {"y": 2025, "q": 1, "v": 1895571.0}, {"y": 2025, "q": 2, "v": 1945908.0}, {"y": 2025, "q": 3, "v": 1958308.0}, {"y": 2025, "q": 4, "v": 1888052.0}, {"y": 2026, "q": 1, "v": 2074016.0}]}, {"code": "total_equity", "label": "Vlastní kapitál", "unit": "CZK_m", "type": "stock", "headline": 0, "latest": 155864.0, "ly": 2026, "lq": 1, "prev": 161124.0, "yoy": -3.2645664208932224, "spark": [{"y": 2023, "q": 1, "v": 142340.0}, {"y": 2023, "q": 2, "v": 132558.0}, {"y": 2023, "q": 3, "v": 138735.0}, {"y": 2023, "q": 4, "v": 144501.0}, {"y": 2024, "q": 1, "v": 150652.0}, {"y": 2024, "q": 2, "v": 141664.0}, {"y": 2024, "q": 3, "v": 149263.0}, {"y": 2024, "q": 4, "v": 154766.0}, {"y": 2025, "q": 1, "v": 161124.0}, {"y": 2025, "q": 2, "v": 135250.0}, {"y": 2025, "q": 3, "v": 140851.0}, {"y": 2025, "q": 4, "v": 150481.0}, {"y": 2026, "q": 1, "v": 155864.0}]}]}, {"key": "capital", "title": "Kapitál", "metrics": [{"code": "total_capital_ratio", "label": "Celková kapitálová přiměřenost", "unit": "percent", "type": "ratio", "headline": 0, "latest": 0.196, "ly": 2026, "lq": 1, "prev": 0.198, "yoy": -0.20000000000000018, "spark": [{"y": 2023, "q": 1, "v": 0.196}, {"y": 2023, "q": 2, "v": 0.194}, {"y": 2023, "q": 3, "v": 0.192}, {"y": 2023, "q": 4, "v": 0.196}, {"y": 2024, "q": 1, "v": 0.191}, {"y": 2024, "q": 2, "v": 0.19}, {"y": 2024, "q": 3, "v": 0.183}, {"y": 2024, "q": 4, "v": 0.186}, {"y": 2025, "q": 1, "v": 0.198}, {"y": 2025, "q": 2, "v": 0.188}, {"y": 2025, "q": 3, "v": 0.191}, {"y": 2025, "q": 4, "v": 0.2}, {"y": 2026, "q": 1, "v": 0.196}]}]}, {"key": "asset_quality", "title": "Kvalita portfolia", "metrics": [{"code": "npl_ratio", "label": "Podíl nevýkonných úvěrů (NPL)", "unit": "percent", "type": "ratio", "headline": 1, "latest": 0.015, "ly": 2026, "lq": 1, "prev": 0.018, "yoy": -0.29999999999999993, "spark": [{"y": 2023, "q": 1, "v": 0.019}, {"y": 2023, "q": 2, "v": 0.018}, {"y": 2023, "q": 3, "v": 0.018}, {"y": 2023, "q": 4, "v": 0.018}, {"y": 2024, "q": 1, "v": 0.018}, {"y": 2024, "q": 2, "v": 0.018}, {"y": 2024, "q": 3, "v": 0.018}, {"y": 2024, "q": 4, "v": 0.018}, {"y": 2025, "q": 1, "v": 0.018}, {"y": 2025, "q": 2, "v": 0.017}, {"y": 2025, "q": 3, "v": 0.016}, {"y": 2025, "q": 4, "v": 0.016}, {"y": 2026, "q": 1, "v": 0.015}]}, {"code": "npl_coverage_ratio", "label": "Krytí nevýkonných úvěrů opravnými položkami", "unit": "percent", "type": "ratio", "headline": 0, "latest": 1.069, "ly": 2026, "lq": 1, "prev": 1.04, "yoy": 2.8999999999999915, "spark": [{"y": 2025, "q": 1, "v": 1.04}, {"y": 2026, "q": 1, "v": 1.069}]}]}, {"key": "ratios", "title": "Poměrové ukazatele", "metrics": [{"code": "net_interest_margin", "label": "Čistá úroková marže (NIM)", "unit": "percent", "type": "ratio", "headline": 1, "latest": 0.0211, "ly": 2026, "lq": 1, "prev": 0.0204, "yoy": 0.06999999999999992, "spark": [{"y": 2023, "q": 1, "v": 0.019}, {"y": 2023, "q": 2, "v": 0.0189}, {"y": 2023, "q": 3, "v": 0.0191}, {"y": 2023, "q": 4, "v": 0.0195}, {"y": 2024, "q": 1, "v": 0.0201}, {"y": 2024, "q": 2, "v": 0.0195}, {"y": 2024, "q": 3, "v": 0.02}, {"y": 2024, "q": 4, "v": 0.0203}, {"y": 2025, "q": 1, "v": 0.0204}, {"y": 2025, "q": 2, "v": 0.0207}, {"y": 2025, "q": 3, "v": 0.021}, {"y": 2025, "q": 4, "v": 0.0212}, {"y": 2026, "q": 1, "v": 0.0211}]}, {"code": "cost_income_ratio", "label": "Poměr nákladů k výnosům (C/I)", "unit": "percent", "type": "ratio", "headline": 1, "latest": 0.4256, "ly": 2026, "lq": 1, "prev": 0.4471, "yoy": -2.150000000000002, "spark": [{"y": 2023, "q": 1, "v": 0.5096}, {"y": 2023, "q": 2, "v": 0.485}, {"y": 2023, "q": 3, "v": 0.477}, {"y": 2023, "q": 4, "v": 0.4785}, {"y": 2024, "q": 1, "v": 0.4419}, {"y": 2024, "q": 2, "v": 0.4382}, {"y": 2024, "q": 3, "v": 0.4236}, {"y": 2024, "q": 4, "v": 0.4303}, {"y": 2025, "q": 1, "v": 0.4471}, {"y": 2025, "q": 2, "v": 0.4383}, {"y": 2025, "q": 3, "v": 0.4318}, {"y": 2025, "q": 4, "v": 0.4272}, {"y": 2026, "q": 1, "v": 0.4256}]}, {"code": "roe", "label": "Návratnost vlastního kapitálu (ROE)", "unit": "percent", "type": "ratio", "headline": 1, "latest": 0.1865, "ly": 2026, "lq": 1, "prev": 0.1549, "yoy": 3.159999999999999, "spark": [{"y": 2023, "q": 1, "v": 0.101}, {"y": 2023, "q": 2, "v": 0.138}, {"y": 2023, "q": 3, "v": 0.148}, {"y": 2023, "q": 4, "v": 0.1392}, {"y": 2024, "q": 1, "v": 0.1661}, {"y": 2024, "q": 2, "v": 0.1759}, {"y": 2024, "q": 3, "v": 0.185}, {"y": 2024, "q": 4, "v": 0.1837}, {"y": 2025, "q": 1, "v": 0.1549}, {"y": 2025, "q": 2, "v": 0.168}, {"y": 2025, "q": 3, "v": 0.1711}, {"y": 2025, "q": 4, "v": 0.1885}, {"y": 2026, "q": 1, "v": 0.1865}]}, {"code": "roa", "label": "Návratnost aktiv (ROA)", "unit": "percent", "type": "ratio", "headline": 0, "latest": 0.0128, "ly": 2026, "lq": 1, "prev": 0.0109, "yoy": 0.19000000000000006, "spark": [{"y": 2023, "q": 1, "v": 0.0073}, {"y": 2023, "q": 2, "v": 0.0099}, {"y": 2023, "q": 3, "v": 0.0103}, {"y": 2023, "q": 4, "v": 0.0099}, {"y": 2024, "q": 1, "v": 0.0115}, {"y": 2024, "q": 2, "v": 0.0121}, {"y": 2024, "q": 3, "v": 0.0126}, {"y": 2024, "q": 4, "v": 0.0127}, {"y": 2025, "q": 1, "v": 0.0109}, {"y": 2025, "q": 2, "v": 0.012}, {"y": 2025, "q": 3, "v": 0.0119}, {"y": 2025, "q": 4, "v": 0.0131}, {"y": 2026, "q": 1, "v": 0.0128}]}, {"code": "loan_to_deposit_ratio", "label": "Poměr úvěrů k vkladům (LTD)", "unit": "percent", "type": "ratio", "headline": 0, "latest": 71.94195349511747, "ly": 2026, "lq": 1, "prev": 70.54325551232165, "yoy": 139.86979827958237, "spark": [{"y": 2023, "q": 1, "v": 64.70342914411246}, {"y": 2023, "q": 2, "v": 65.46089211839138}, {"y": 2023, "q": 3, "v": 68.67325957251902}, {"y": 2023, "q": 4, "v": 72.97146931490924}, {"y": 2024, "q": 1, "v": 69.42846143940203}, {"y": 2024, "q": 2, "v": 68.95065656660188}, {"y": 2024, "q": 3, "v": 70.71015288876771}, {"y": 2024, "q": 4, "v": 72.56343490379416}, {"y": 2025, "q": 1, "v": 70.54325551232165}, {"y": 2025, "q": 2, "v": 68.42538986860889}, {"y": 2025, "q": 3, "v": 72.40635333316506}, {"y": 2025, "q": 4, "v": 76.01893008419182}, {"y": 2026, "q": 1, "v": 71.94195349511747}]}]}, {"key": "business_volume", "title": "Objemy a provoz", "metrics": [{"code": "number_of_clients", "label": "Počet klientů", "unit": "count", "type": "stock", "headline": 0, "latest": 4565000.0, "ly": 2026, "lq": 1, "prev": null, "yoy": null, "spark": [{"y": 2022, "q": 1, "v": 4495000.0}, {"y": 2026, "q": 1, "v": 4565000.0}]}, {"code": "number_of_employees", "label": "Počet zaměstnanců (FTE)", "unit": "count", "type": "stock", "headline": 0, "latest": 9299.0, "ly": 2026, "lq": 1, "prev": 9639.23, "yoy": -3.5296387782011607, "spark": [{"y": 2023, "q": 1, "v": 10032.0}, {"y": 2023, "q": 2, "v": 9992.0}, {"y": 2023, "q": 3, "v": 9925.0}, {"y": 2023, "q": 4, "v": 9829.0}, {"y": 2024, "q": 1, "v": 9627.0}, {"y": 2024, "q": 2, "v": 9574.0}, {"y": 2024, "q": 3, "v": 9583.0}, {"y": 2024, "q": 4, "v": 9674.0}, {"y": 2025, "q": 1, "v": 9639.23}, {"y": 2025, "q": 2, "v": 9629.0}, {"y": 2025, "q": 3, "v": 9607.0}, {"y": 2025, "q": 4, "v": 9483.0}, {"y": 2026, "q": 1, "v": 9299.0}]}, {"code": "number_of_branches", "label": "Počet poboček", "unit": "count", "type": "stock", "headline": 0, "latest": 324.0, "ly": 2026, "lq": 1, "prev": 336.0, "yoy": -3.57142857142857, "spark": [{"y": 2023, "q": 1, "v": 396.0}, {"y": 2023, "q": 2, "v": 389.0}, {"y": 2023, "q": 3, "v": 369.0}, {"y": 2023, "q": 4, "v": 366.0}, {"y": 2024, "q": 1, "v": 360.0}, {"y": 2024, "q": 2, "v": 356.0}, {"y": 2024, "q": 3, "v": 346.0}, {"y": 2024, "q": 4, "v": 337.0}, {"y": 2025, "q": 1, "v": 336.0}, {"y": 2025, "q": 2, "v": 336.0}, {"y": 2025, "q": 3, "v": 332.0}, {"y": 2025, "q": 4, "v": 329.0}, {"y": 2026, "q": 1, "v": 324.0}]}, {"code": "mortgage_volume", "label": "Objem hypotečních úvěrů", "unit": "CZK_m", "type": "stock", "headline": 0, "latest": 517000.0, "ly": 2026, "lq": 1, "prev": 468000.0, "yoy": 10.470085470085477, "spark": [{"y": 2025, "q": 1, "v": 468000.0}, {"y": 2026, "q": 1, "v": 517000.0}]}, {"code": "consumer_loan_volume", "label": "Objem spotřebitelských úvěrů", "unit": "CZK_m", "type": "stock", "headline": 0, "latest": 93000.0, "ly": 2026, "lq": 1, "prev": 87000.0, "yoy": 6.896551724137923, "spark": [{"y": 2025, "q": 1, "v": 87000.0}, {"y": 2026, "q": 1, "v": 93000.0}]}, {"code": "corporate_loan_volume", "label": "Objem firemních úvěrů", "unit": "CZK_m", "type": "stock", "headline": 0, "latest": 493000.0, "ly": 2026, "lq": 1, "prev": 458000.0, "yoy": 7.641921397379914, "spark": [{"y": 2025, "q": 1, "v": 458000.0}, {"y": 2026, "q": 1, "v": 493000.0}]}, {"code": "aum", "label": "Objem investičních produktů (AUM)", "unit": "CZK_m", "type": "stock", "headline": 0, "latest": 396000.0, "ly": 2026, "lq": 1, "prev": 333000.0, "yoy": 18.918918918918926, "spark": [{"y": 2025, "q": 1, "v": 333000.0}, {"y": 2026, "q": 1, "v": 396000.0}]}]}], "quarterly": {"net_profit": [{"y": 2024, "q": 1, "v": 5720.0}, {"y": 2024, "q": 2, "v": 6690.0}, {"y": 2024, "q": 3, "v": 6989.0}, {"y": 2024, "q": 4, "v": 6763.0}, {"y": 2025, "q": 1, "v": 5737.0}, {"y": 2025, "q": 2, "v": 7072.0}, {"y": 2025, "q": 3, "v": 6203.0}, {"y": 2025, "q": 4, "v": 8750.0}, {"y": 2026, "q": 1, "v": 7086.0}], "operating_result": [{"y": 2024, "q": 1, "v": 7547.0}, {"y": 2024, "q": 2, "v": 7656.0}, {"y": 2024, "q": 3, "v": 8834.0}, {"y": 2024, "q": 4, "v": 8145.0}, {"y": 2025, "q": 1, "v": 7843.0}, {"y": 2025, "q": 2, "v": 8245.0}, {"y": 2025, "q": 3, "v": 8640.0}, {"y": 2025, "q": 4, "v": 9156.0}, {"y": 2026, "q": 1, "v": 8844.0}], "operating_income": [{"y": 2024, "q": 1, "v": 13522.0}, {"y": 2024, "q": 2, "v": 13538.0}, {"y": 2024, "q": 3, "v": 14642.0}, {"y": 2024, "q": 4, "v": 14784.0}, {"y": 2025, "q": 1, "v": 14186.0}, {"y": 2025, "q": 2, "v": 14456.0}, {"y": 2025, "q": 3, "v": 14874.0}, {"y": 2025, "q": 4, "v": 15644.0}, {"y": 2026, "q": 1, "v": 15398.0}], "net_interest_income": [{"y": 2024, "q": 1, "v": 9601.999999999996}, {"y": 2024, "q": 2, "v": 9428.100000000002}, {"y": 2024, "q": 3, "v": 10383.100000000013}, {"y": 2024, "q": 4, "v": 10398.19999999999}, {"y": 2025, "q": 1, "v": 10138.099999999999}, {"y": 2025, "q": 2, "v": 10463.399999999998}, {"y": 2025, "q": 3, "v": 10633.899999999998}, {"y": 2025, "q": 4, "v": 10872.500000000015}, {"y": 2026, "q": 1, "v": 10722.800000000001}]}, "annual": [{"y": 2002, "v": 5805.0}, {"y": 2003, "v": 7615.0}, {"y": 2004, "v": 8137.0}, {"y": 2005, "v": 9134.0}, {"y": 2006, "v": 10385.0}, {"y": 2007, "v": 12148.0}, {"y": 2008, "v": 15813.0}, {"y": 2009, "v": 12022.0}, {"y": 2010, "v": 12052.0}, {"y": 2011, "v": 13638.0}, {"y": 2012, "v": 16612.40672626968}, {"y": 2013, "v": 15588.0}, {"y": 2014, "v": 15071.0}, {"y": 2015, "v": 14293.0}, {"y": 2016, "v": 15457.0}, {"y": 2017, "v": 14610.0}, {"y": 2018, "v": 15362.0}, {"y": 2019, "v": 17743.0}, {"y": 2020, "v": 10006.0}, {"y": 2021, "v": 14181.0}, {"y": 2022, "v": 20161.0}, {"y": 2023, "v": 18614.0}, {"y": 2024, "v": 26162.0}, {"y": 2025, "v": 27762.0}]};
+const COMPARE  = {
+ "period": {
+  "year": 2026,
+  "quarter": 1
+ },
+ "banks": [
+  {
+   "code": "cs",
+   "name": "Česká spořitelna",
+   "accent": "#15527B"
+  },
+  {
+   "code": "kb",
+   "name": "Komerční banka",
+   "accent": "#A6192E"
+  }
+ ],
+ "groups": [
+  {
+   "title": "Profitabilita",
+   "unit": "bn",
+   "metrics": [
+    {
+     "code": "net_profit",
+     "label": "Čistý zisk",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 7100.0,
+      "prev": 5700.0,
+      "yoy": 24.56140350877194
+     },
+     "kb": {
+      "v": 4000.0,
+      "prev": 4200.0,
+      "yoy": -4.761904761904767
+     }
+    },
+    {
+     "code": "operating_result",
+     "label": "Provozní výsledek",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 9200.0,
+      "prev": 8200.0,
+      "yoy": 12.195121951219523
+     },
+     "kb": {
+      "v": 5100.0,
+      "prev": 4900.0,
+      "yoy": 4.081632653061229
+     }
+    },
+    {
+     "code": "operating_income",
+     "label": "Provozní výnosy",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 15300.0,
+      "prev": 14100.0,
+      "yoy": 8.51063829787233
+     },
+     "kb": {
+      "v": 9100.0,
+      "prev": 9100.0,
+      "yoy": 0.0
+     }
+    },
+    {
+     "code": "net_interest_income",
+     "label": "Čistý úrokový výnos",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 10700.0,
+      "prev": 10100.0,
+      "yoy": 5.940594059405946
+     },
+     "kb": {
+      "v": 6400.0,
+      "prev": 6400.0,
+      "yoy": 0.0
+     }
+    },
+    {
+     "code": "net_fee_commission_income",
+     "label": "Čisté výnosy z poplatků a provizí",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 3400.0,
+      "prev": 3200.0,
+      "yoy": 6.25
+     },
+     "kb": {
+      "v": 1600.0,
+      "prev": 1800.0,
+      "yoy": -11.111111111111116
+     }
+    }
+   ]
+  },
+  {
+   "title": "Efektivita a návratnost",
+   "unit": "pct",
+   "metrics": [
+    {
+     "code": "cost_income_ratio",
+     "label": "Poměr nákladů k výnosům (C/I)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.4,
+      "prev": 0.419,
+      "yoy": -1.8999999999999961
+     },
+     "kb": {
+      "v": 0.438,
+      "prev": 0.463,
+      "yoy": -2.500000000000002
+     }
+    },
+    {
+     "code": "roe",
+     "label": "Návratnost vlastního kapitálu (ROE)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.186,
+      "prev": 0.145,
+      "yoy": 4.1000000000000005
+     },
+     "kb": {
+      "v": 0.124,
+      "prev": 0.13,
+      "yoy": -0.6000000000000005
+     }
+    }
+   ]
+  },
+  {
+   "title": "Velikost rozvahy",
+   "unit": "bn",
+   "metrics": [
+    {
+     "code": "total_assets",
+     "label": "Bilanční suma (celková aktiva)",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 2230000.0,
+      "prev": 2057000.0,
+      "yoy": 8.41030627126884
+     },
+     "kb": {
+      "v": 1742000.0,
+      "prev": 1586000.0,
+      "yoy": 9.836065573770503
+     }
+    },
+    {
+     "code": "gross_customer_loans",
+     "label": "Hrubé úvěry a pohledávky za klienty",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 1222000.0,
+      "prev": 1123000.0,
+      "yoy": 8.815672306322341
+     },
+     "kb": {
+      "v": 914000.0,
+      "prev": 849000.0,
+      "yoy": 7.656065959952896
+     }
+    },
+    {
+     "code": "customer_deposits",
+     "label": "Závazky ke klientům (vklady klientů)",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 1394000.0,
+      "prev": 1370000.0,
+      "yoy": 1.751824817518255
+     },
+     "kb": {
+      "v": 1129000.0,
+      "prev": 1039000.0,
+      "yoy": 8.662175168431174
+     }
+    }
+   ]
+  },
+  {
+   "title": "Kvalita portfolia",
+   "unit": "pct",
+   "metrics": [
+    {
+     "code": "npl_ratio",
+     "label": "Podíl nevýkonných úvěrů (NPL)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.015,
+      "prev": 0.018,
+      "yoy": -0.29999999999999993
+     },
+     "kb": {
+      "v": 0.015,
+      "prev": 0.02,
+      "yoy": -0.5000000000000001
+     }
+    }
+   ]
+  }
+ ],
+ "slope": {
+  "label": "ROE",
+  "unit": "pct",
+  "banks": {
+   "cs": [
+    {
+     "t": "Q1 2025",
+     "v": 0.145
+    },
+    {
+     "t": "Q1 2026",
+     "v": 0.186
+    }
+   ],
+   "kb": [
+    {
+     "t": "Q1 2025",
+     "v": 0.13
+    },
+    {
+     "t": "Q1 2026",
+     "v": 0.124
+    }
+   ]
+  }
+ }
+};
+
+// DESIGN PREVIEW: žádné volání API — vše se renderuje z vloženého snapshotu níže.
+// (V produkční web/app.html zůstává fetch z živého API; tady ho schválně neutralizujeme.)
+async function fetchJSON(urls){ return null; }
+
+/* ================= Přehled banky (renderery z index.html) ================= */
+const Overview = (function(){
+  const cz=(n,d=1)=>n.toLocaleString('cs-CZ',{minimumFractionDigits:d,maximumFractionDigits:d});
+  function fmt(unit,type,v){
+    if(v==null) return '—';
+    if(unit==='percent'||unit==='ratio') return cz(v*100,1)+'<span class="u"> %</span>';
+    if(unit==='CZK_m') return cz(v/1000, Math.abs(v/1000)>=100?0:1)+'<span class="u"> mld</span>';
+    if(unit==='count') return v>=1e6? cz(v/1e6,1)+'<span class="u"> mil.</span>' : Math.round(v).toLocaleString('cs-CZ');
+    return cz(v,1);
+  }
+  function yoyHtml(unit,type,yoy){
+    if(yoy==null) return '<span class="flat">—</span>';
+    const ratio=(type==='ratio'); const up=yoy>=0;
+    const cls=up?'pos':'neg', arr=up?'▲':'▼';
+    const txt=ratio?(up?'+':'')+yoy.toFixed(1)+' pp':(up?'+':'')+yoy.toFixed(1)+' %';
+    return `<span class="${cls}">${arr} ${txt}</span>`;
+  }
+  function spark(ser,unit){
+    if(!ser||ser.length<2) return '';
+    const vs=ser.map(p=>unit==='CZK_m'?p.v/1000:(unit==='percent'||unit==='ratio'?p.v*100:p.v));
+    const W=90,H=24,mn=Math.min(...vs),mx=Math.max(...vs),sp=(mx-mn)||1;
+    const X=i=>2+i*(W-4)/(vs.length-1), Y=v=>2+(H-4)*(1-(v-mn)/sp);
+    const d=vs.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+    const last=vs[vs.length-1], up=vs[vs.length-1]>=vs[0];
+    return `<svg class="spk" viewBox="0 0 ${W} ${H}" height="24"><path d="${d}" fill="none" stroke="${up?'#157347':'#C0392B'}" stroke-width="1.4"/>`+
+           `<circle cx="${X(vs.length-1).toFixed(1)}" cy="${Y(last).toFixed(1)}" r="2" fill="${up?'#157347':'#C0392B'}"/></svg>`;
+  }
+  function barChart(el,rows,color){
+    const W=520,H=220,pad={l:8,r:8,t:14,b:24};const vals=rows.map(r=>r.v/1000);
+    const max=Math.max(...vals,0.1),min=Math.min(...vals,0),span=(max-min)||1,iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
+    const gap=iw/rows.length,bw=gap*0.62,y0=pad.t+ih*(max/span);let s=`<svg viewBox="0 0 ${W} ${H}" width="100%">`;
+    s+=`<line x1="${pad.l}" y1="${y0.toFixed(1)}" x2="${W-pad.r}" y2="${y0.toFixed(1)}" stroke="#E3E9F0"/>`;
+    rows.forEach((r,i)=>{const v=r.v/1000,x=pad.l+gap*i+(gap-bw)/2,h=Math.abs(v)/span*ih,y=v>=0?y0-h:y0;
+      s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h,1).toFixed(1)}" rx="3" fill="${color}"/>`;
+      s+=`<text class="vlabel" x="${(x+bw/2).toFixed(1)}" y="${(v>=0?y-4:y+h+11).toFixed(1)}" text-anchor="middle">${cz(v,1)}</text>`;
+      s+=`<text class="axis" x="${(x+bw/2).toFixed(1)}" y="${H-8}" text-anchor="middle">${r.y}Q${r.q}</text>`;});
+    el.innerHTML=s+'</svg>';
+  }
+  function lineChart(el,rows){
+    const W=520,H=220,pad={l:8,r:8,t:16,b:24};const vals=rows.map(r=>r.v/1000),max=Math.max(...vals),min=Math.min(...vals)*0.9;
+    const iw=W-pad.l-pad.r,ih=H-pad.t-pad.b,span=(max-min)||1,X=i=>pad.l+iw*i/(rows.length-1),Y=v=>pad.t+ih*(1-(v/1000-min)/span);
+    const pts=rows.map((r,i)=>[X(i),Y(r.v)]);const path=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    const area=path+` L ${pts.at(-1)[0].toFixed(1)} ${pad.t+ih} L ${pts[0][0].toFixed(1)} ${pad.t+ih} Z`;
+    let s=`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs><linearGradient id="ovg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2D6FB3" stop-opacity=".22"/><stop offset="1" stop-color="#2D6FB3" stop-opacity="0"/></linearGradient></defs>`;
+    s+=`<path d="${area}" fill="url(#ovg)"/><path d="${path}" fill="none" stroke="#2D6FB3" stroke-width="2"/>`;
+    rows.forEach((r,i)=>{const last=i===rows.length-1;if(last||i===0||i%4===0)s+=`<text class="axis" x="${X(i).toFixed(1)}" y="${H-8}" text-anchor="middle">${r.y}</text>`;
+      if(last){s+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(r.v).toFixed(1)}" r="3.4" fill="#C8102E"/><text class="vlabel" x="${X(i).toFixed(1)}" y="${(Y(r.v)-9).toFixed(1)}" text-anchor="end">${cz(r.v/1000,1)}</text>`;}});
+    el.innerHTML=s+'</svg>';
+  }
+  const QLAB={net_profit:'Čistý zisk',operating_result:'Provozní výsledek',operating_income:'Provozní výnosy',net_interest_income:'Čistý úrok. výnos'};
+  function render(d){
+    const empty = (!d || ((d.kpis||[]).length===0 && (d.categories||[]).length===0));
+    document.getElementById('ov-bankname').textContent = (d&&d.bank)?d.bank.name:'—';
+    document.getElementById('ov-empty').style.display = empty?'block':'none';
+    document.getElementById('ov-body').style.display  = empty?'none':'block';
+    if(empty){
+      document.getElementById('ov-bsub').textContent='';
+      document.getElementById('ov-per').textContent='—';
+      const nm = (d&&d.bank)?d.bank.name:'tato banka';
+      document.getElementById('ov-empty').innerHTML =
+        `Pro <b>${nm}</b> nejsou k dispozici <b>reported</b> data pro detailní přehled — `+
+        `tato banka je v datasetu jen na peer-comparable (adjusted) bázi. `+
+        `Otevři ji v pohledu <b>Srovnání</b>.`;
+      return;
+    }
+    document.getElementById('ov-per').textContent=`Q${d.period.quarter} ${d.period.year}`;
+    document.getElementById('ov-bsub').innerHTML=`Konsolidované neauditované výsledky dle <b>IFRS</b> · ${d.bank.parent_group} · měna <b>CZK</b>`;
+    const ord=['net_profit','operating_result','operating_income','net_interest_income','net_fee_commission_income','total_assets','net_customer_loans','customer_deposits','net_interest_margin','cost_income_ratio','roe','npl_ratio'];
+    const by={};d.kpis.forEach(k=>by[k.code]=k);
+    document.getElementById('ov-kpis').innerHTML=ord.filter(c=>by[c]).map(c=>{const k=by[c];
+      return `<div class="kpi"><div class="name">${k.label_cs}</div><div class="val mono">${fmt(k.unit,k.type,k.value)}</div><div class="d">${yoyHtml(k.unit,k.type,k.yoy)} <span class="flat">r/r</span></div></div>`;}).join('');
+    const seg=document.getElementById('ov-qseg');let cur='net_profit';
+    const draw=()=>barChart(document.getElementById('ov-qchart'),d.quarterly[cur],'var(--navy2)');
+    seg.innerHTML=Object.keys(d.quarterly).map(c=>`<button data-c="${c}" class="${c===cur?'on':''}">${QLAB[c]||c}</button>`).join('');
+    seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.c;seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));draw();});
+    draw(); lineChart(document.getElementById('ov-achart'),d.annual);
+    document.getElementById('ov-annsub').textContent=`roční čistý zisk ${d.annual[0].y}–${d.annual.at(-1).y} · mld. Kč`;
+    document.getElementById('ov-cats').innerHTML=d.categories.map(c=>{
+      const rows=c.metrics.map(m=>`<tr class="${m.headline?'hl':''}">
+        <td>${m.label}</td>
+        <td class="num">${fmt(m.unit,m.type,m.latest)}</td>
+        <td class="num">${yoyHtml(m.unit,m.type,m.yoy)}</td>
+        <td>${spark(m.spark,m.unit)}</td></tr>`).join('');
+      return `<div class="cat"><h3>${c.title} <span>${c.metrics.length} metrik · Q${c.metrics[0].lq} ${c.metrics[0].ly}</span></h3>
+        <table><thead><tr><th>Metrika</th><th>Hodnota</th><th>r/r</th><th>vývoj</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }).join('');
+    document.getElementById('ov-prov').textContent='Zdroj: IR (reported IFRS) + peer PDF · '+d.categories.reduce((a,c)=>a+c.metrics.length,0)+' metrik z katalogu';
+  }
+  async function load(bank){
+    const s=document.getElementById('ov-src');
+    const d = await fetchJSON(['/api/dashboard/'+bank, bank==='cs'?'./data.json':null]);
+    if(d){ s.innerHTML='<span class="dot"></span>živá data'; return render(d); }
+    if(bank===SNAPSHOT.bank.code){ s.innerHTML='<span class="dot"></span>vložený snapshot'; return render(SNAPSHOT); }
+    s.innerHTML='<span class="dot"></span>bez dat'; render({bank:null,kpis:[],categories:[]});
+  }
+  return {load};
+})();
+
+/* ================= Srovnání (renderery z compare.html) ================= */
+const Compare = (function(){
+  const cz=(n,d=1)=>n.toLocaleString('cs-CZ',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const bn=v=>cz(v/1000, Math.abs(v/1000)>=100?0:1);
+  const pct=v=>cz(v*100,1);
+  function legend(d){
+    document.getElementById('cmp-legend').innerHTML = d.banks.map(b=>
+      `<div class="legitem"><span class="sw" style="background:${b.accent}"></span>${b.name} <small>(${b.code.toUpperCase()})</small></div>`
+    ).join('');
+  }
+  function deckText(d){
+    const g=d.groups.flatMap(x=>x.metrics); const by=Object.fromEntries(g.map(m=>[m.code,m]));
+    const np=by.net_profit, roe=by.roe, ci=by.cost_income_ratio;
+    const [a,b]=d.banks;
+    return `Za první čtvrtletí ${d.period.year} vykázala <strong>${a.name}</strong> čistý zisk ${bn(np.cs.v)} mld. Kč proti ${bn(np.kb.v)} mld. u <strong>${b.name}</strong>. `+
+      `Vede i návratností (ROE ${pct(roe.cs.v)} % vs ${pct(roe.kb.v)} %) a provozní efektivitou `+
+      `(poměr nákladů k výnosům ${pct(ci.cs.v)} % vs ${pct(ci.kb.v)} %). `+
+      `<em>Rozdíl táhne vyšší úroková marže a silnější poplatkové výnosy.</em>`;
+  }
+  function barGroup(group, banks){
+    const max=Math.max(...group.metrics.flatMap(m=>banks.map(b=>m[b.code].v||0)));
+    let h=`<div class="exhibit"><div class="etag">Exhibit</div><h2 class="serif">${group.title}</h2>`+
+          `<div class="enote">mld. Kč · adjusted</div><div class="topline"></div>`;
+    group.metrics.forEach(m=>{
+      h+=`<div class="barrow"><div class="lbl">${m.label}</div><div class="pair">`;
+      banks.forEach(b=>{
+        const v=m[b.code].v||0, w=(v/max*100);
+        h+=`<div class="bar"><span class="tag">${b.code}</span>`+
+           `<div class="track"><div class="fill" style="width:${w.toFixed(1)}%;background:${b.accent}"></div></div>`+
+           `<span class="v">${bn(v)}</span></div>`;
+      });
+      h+=`</div></div>`;
+    });
+    return h+`</div>`;
+  }
+  function dumbGroup(group, banks){
+    let h=`<div class="exhibit"><div class="etag">Exhibit</div><h2 class="serif">${group.title}</h2>`+
+          `<div class="enote">v % · adjusted · spojnice = rozdíl mezi bankami</div><div class="topline"></div>`;
+    group.metrics.forEach(m=>{
+      const vals=banks.map(b=>m[b.code].v*100);
+      const lo=0, hi=Math.max(...vals)*1.25;
+      const X=v=>8+(v-lo)/(hi-lo)*84;
+      const x=banks.map(b=>X(m[b.code].v*100));
+      h+=`<div class="dumb"><div class="lbl">${m.label}</div><div><svg viewBox="0 0 100 30" preserveAspectRatio="none" style="height:30px">`+
+         `<line x1="${Math.min(...x)}" y1="15" x2="${Math.max(...x)}" y2="15" stroke="#C9C1B4" stroke-width="0.6"/>`;
+      banks.forEach((b,i)=>{ h+=`<circle cx="${x[i]}" cy="15" r="2.4" fill="${b.accent}"/>`; });
+      h+=`</svg></div></div>`;
+      h+=`<div class="dumb" style="border-bottom:0;padding-top:0"><div></div><div style="display:flex;gap:18px;margin-top:-8px">`+
+         banks.map((b,i)=>`<span class="dval" style="color:${b.accent}">${b.code.toUpperCase()} ${pct(m[b.code].v)} %</span>`).join('')+`</div></div>`;
+    });
+    return h+`</div>`;
+  }
+  function slope(s, banks){
+    const all=banks.flatMap(b=>s.banks[b.code].map(p=>p.v*100));
+    const lo=Math.min(...all)*0.9, hi=Math.max(...all)*1.08, span=(hi-lo)||1;
+    const W=520,H=260,padX=120,padY=30;
+    const Y=v=>padY+(H-2*padY)*(1-(v*100-lo)/span);
+    const xL=padX, xR=W-padX;
+    const lab=s.banks[banks[0].code].map(p=>p.t);
+    let svg=`<svg viewBox="0 0 ${W} ${H}">`;
+    svg+=`<line x1="${xL}" y1="14" x2="${xL}" y2="${H-14}" stroke="#D9D2C6"/><line x1="${xR}" y1="14" x2="${xR}" y2="${H-14}" stroke="#D9D2C6"/>`;
+    svg+=`<text class="axis" x="${xL}" y="${H-2}" text-anchor="middle">${lab[0]}</text>`;
+    svg+=`<text class="axis" x="${xR}" y="${H-2}" text-anchor="middle">${lab[1]}</text>`;
+    banks.forEach(b=>{
+      const pts=s.banks[b.code];
+      const y1=Y(pts[0].v), y2=Y(pts[1].v);
+      svg+=`<line x1="${xL}" y1="${y1.toFixed(1)}" x2="${xR}" y2="${y2.toFixed(1)}" stroke="${b.accent}" stroke-width="2.2"/>`;
+      svg+=`<circle cx="${xL}" cy="${y1.toFixed(1)}" r="3.4" fill="${b.accent}"/><circle cx="${xR}" cy="${y2.toFixed(1)}" r="3.4" fill="${b.accent}"/>`;
+      svg+=`<text class="dval" x="${xL-9}" y="${y1+4}" text-anchor="end" fill="${b.accent}">${pct(pts[0].v)} %</text>`;
+      svg+=`<text class="dval" x="${xR+9}" y="${y2+4}" fill="${b.accent}">${pct(pts[1].v)} %</text>`;
+      svg+=`<text x="${xR+9}" y="${y2-9}" font-size="11" font-weight="600" fill="${b.accent}">${b.name}</text>`;
+    });
+    svg+=`</svg>`;
+    return `<div class="exhibit"><div class="etag">Exhibit</div><h2 class="serif">Vývoj návratnosti (ROE)</h2>`+
+           `<div class="enote">${lab[0]} → ${lab[1]} · adjusted</div><div class="topline"></div>${svg}</div>`;
+  }
+  function render(d){
+    document.getElementById('cmp-kicker').textContent=`ČS Peer Group · Q${d.period.quarter} ${d.period.year}`;
+    document.getElementById('cmp-deck').innerHTML=deckText(d);
+    legend(d);
+    let html='';
+    d.groups.forEach(g=>{ html += g.unit==='pct' ? dumbGroup(g,d.banks) : barGroup(g,d.banks); });
+    html += slope(d.slope, d.banks);
+    document.getElementById('cmp-exhibits').innerHTML=html;
+  }
+  let done=false;
+  async function load(){
+    if(done) return;
+    const d = await fetchJSON(['/api/compare?banks=cs,kb&basis=adjusted','./compare.json']);
+    render(d || COMPARE); done=true;
+  }
+  return {load};
+})();
+
+/* ================= shell: navigace + selector banky ================= */
+const App = {view:'overview', bank:'cs', banks:[]};
+const ORDER=['cs','kb'];
+
+function renderBankSel(){
+  const el=document.getElementById('bankbtns');
+  el.innerHTML=App.banks.map(b=>`<button data-bank="${b.code}" class="${b.code===App.bank?'on':''}" title="${b.name}">${b.code.toUpperCase()}</button>`).join('');
+  el.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{
+    App.bank=btn.dataset.bank;
+    el.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===btn));
+    Overview.load(App.bank);
+  });
+}
+async function loadBanks(){
+  const b = await fetchJSON(['/api/banks']);
+  const list = b && b.length ? b : [{code:'cs',name:'Česká spořitelna'},{code:'kb',name:'Komerční banka'}];
+  list.sort((x,y)=>{const a=ORDER.indexOf(x.code),b2=ORDER.indexOf(y.code);return (a<0?99:a)-(b2<0?99:b2);});
+  App.banks=list; renderBankSel();
+}
+function setView(v){
+  App.view=v;
+  document.querySelectorAll('.appnav .tabs button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+  document.getElementById('ov').classList.toggle('active',v==='overview');
+  document.getElementById('cmp').classList.toggle('active',v==='compare');
+  document.getElementById('bankselWrap').style.display = v==='overview'?'flex':'none';
+  if(v==='overview') Overview.load(App.bank); else Compare.load();
+}
+document.querySelectorAll('.appnav .tabs button').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+loadBanks().then(()=>setView('overview'));
+</script>
+</body>
+</html>
