@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peer Comparison · ČS vs KB · Q1 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,16..72,500;0,16..72,600;1,16..72,500&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF7F1; --ink:#1A1815; --soft:#6F6A62; --rule:#1A1815;
+    --crimson:#A6192E; --cs:#1A3A5C; --kb:#A6192E; --hair:#D9D2C6; --l2:#EFEBE2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
+    font-feature-settings:'tnum' 1;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .serif{font-family:'Source Serif 4',Georgia,serif}
+  .display{font-family:'Newsreader',Georgia,serif}
+  .wrap{max-width:940px;margin:0 auto;padding:46px 28px 64px}
+
+  .kicker{font-size:11.5px;letter-spacing:2.4px;text-transform:uppercase;color:var(--crimson);font-weight:600}
+  h1.head{font-family:'Newsreader',serif;font-weight:600;font-size:42px;line-height:1.06;letter-spacing:-.4px;margin:14px 0 0}
+  .deck{font-family:'Source Serif 4',serif;font-size:17px;line-height:1.55;color:#3A352E;max-width:62ch;margin-top:14px}
+  .deck em{font-style:italic}
+  .byline{font-size:12px;letter-spacing:.4px;color:var(--soft);margin-top:16px}
+  .rule{height:2px;background:var(--ink);margin:22px 0 0}
+  .hair{height:1px;background:var(--hair)}
+
+  .legend{display:flex;gap:26px;align-items:center;margin:20px 0 8px;flex-wrap:wrap}
+  .legitem{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px}
+  .sw{width:13px;height:13px;border-radius:2px}
+  .legitem small{font-weight:400;color:var(--soft);font-size:12px}
+
+  .exhibit{margin-top:40px}
+  .exhibit .etag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--soft);font-weight:600}
+  .exhibit h2{font-family:'Source Serif 4',serif;font-weight:600;font-size:21px;margin:5px 0 2px}
+  .exhibit .enote{font-size:12.5px;color:var(--soft);margin-bottom:18px}
+  .exhibit .topline{height:2px;background:var(--ink);margin-bottom:16px}
+
+  .barrow{display:grid;grid-template-columns:172px 1fr;gap:16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--hair)}
+  .barrow:last-child{border-bottom:0}
+  .barrow .lbl{font-size:13px;font-weight:500;line-height:1.25}
+  .barrow .lbl small{display:block;color:var(--soft);font-weight:400;font-size:11px}
+  .pair{display:flex;flex-direction:column;gap:6px}
+  .bar{display:flex;align-items:center;gap:10px}
+  .bar .track{flex:1;height:15px;position:relative;background:transparent}
+  .bar .fill{height:100%;border-radius:0 2px 2px 0}
+  .bar .v{min-width:78px;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+  .bar .tag{width:22px;font-size:10px;color:var(--soft);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+  /* dumbbell */
+  .dumb{display:grid;grid-template-columns:172px 1fr;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--hair)}
+  .dumb:last-child{border-bottom:0}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .axis{font-family:'Inter';font-size:10px;fill:var(--soft)}
+  .dval{font-size:11.5px;font-weight:600}
+
+  .slope-wrap{display:grid;grid-template-columns:1fr;gap:0}
+  .foot{margin-top:46px;padding-top:16px;border-top:2px solid var(--ink);font-size:12px;color:var(--soft);
+    display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .foot b{color:var(--ink)}
+  @media(max-width:680px){
+    h1.head{font-size:32px}
+    .barrow,.dumb{grid-template-columns:1fr;gap:8px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker" id="kicker">ČS Peer Group · Q1 2026</div>
+  <h1 class="head display" id="head">Dvě banky, jedno čtvrtletí</h1>
+  <p class="deck" id="deck">—</p>
+  <div class="byline" id="byline">Srovnání na peer-comparable (adjusted) bázi · jednotka mld. Kč není-li uvedeno jinak</div>
+  <div class="rule"></div>
+
+  <div class="legend" id="legend"></div>
+
+  <div id="exhibits"></div>
+
+  <div class="foot">
+    <span id="src">Zdroj: ČS Peer Group Q1 2026 (Investor Relations) · adjusted, peer-comparable</span>
+    <span>Exhibit generován z databáze · báze <b>adjusted</b></span>
+  </div>
+</div>
+<script>
+const DATA = {
+ "period": {
+  "year": 2026,
+  "quarter": 1
+ },
+ "banks": [
+  {
+   "code": "cs",
+   "name": "Česká spořitelna",
+   "accent": "#15527B"
+  },
+  {
+   "code": "kb",
+   "name": "Komerční banka",
+   "accent": "#A6192E"
+  }
+ ],
+ "groups": [
+  {
+   "title": "Profitabilita",
+   "unit": "bn",
+   "metrics": [
+    {
+     "code": "net_profit",
+     "label": "Čistý zisk",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 7100.0,
+      "prev": 5700.0,
+      "yoy": 24.56140350877194
+     },
+     "kb": {
+      "v": 4000.0,
+      "prev": 4200.0,
+      "yoy": -4.761904761904767
+     }
+    },
+    {
+     "code": "operating_result",
+     "label": "Provozní výsledek",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 9200.0,
+      "prev": 8200.0,
+      "yoy": 12.195121951219523
+     },
+     "kb": {
+      "v": 5100.0,
+      "prev": 4900.0,
+      "yoy": 4.081632653061229
+     }
+    },
+    {
+     "code": "operating_income",
+     "label": "Provozní výnosy",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 15300.0,
+      "prev": 14100.0,
+      "yoy": 8.51063829787233
+     },
+     "kb": {
+      "v": 9100.0,
+      "prev": 9100.0,
+      "yoy": 0.0
+     }
+    },
+    {
+     "code": "net_interest_income",
+     "label": "Čistý úrokový výnos",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 10700.0,
+      "prev": 10100.0,
+      "yoy": 5.940594059405946
+     },
+     "kb": {
+      "v": 6400.0,
+      "prev": 6400.0,
+      "yoy": 0.0
+     }
+    },
+    {
+     "code": "net_fee_commission_income",
+     "label": "Čisté výnosy z poplatků a provizí",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 3400.0,
+      "prev": 3200.0,
+      "yoy": 6.25
+     },
+     "kb": {
+      "v": 1600.0,
+      "prev": 1800.0,
+      "yoy": -11.111111111111116
+     }
+    }
+   ]
+  },
+  {
+   "title": "Efektivita a návratnost",
+   "unit": "pct",
+   "metrics": [
+    {
+     "code": "cost_income_ratio",
+     "label": "Poměr nákladů k výnosům (C/I)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.4,
+      "prev": 0.419,
+      "yoy": -1.8999999999999961
+     },
+     "kb": {
+      "v": 0.438,
+      "prev": 0.463,
+      "yoy": -2.500000000000002
+     }
+    },
+    {
+     "code": "roe",
+     "label": "Návratnost vlastního kapitálu (ROE)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.186,
+      "prev": 0.145,
+      "yoy": 4.1000000000000005
+     },
+     "kb": {
+      "v": 0.124,
+      "prev": 0.13,
+      "yoy": -0.6000000000000005
+     }
+    }
+   ]
+  },
+  {
+   "title": "Velikost rozvahy",
+   "unit": "bn",
+   "metrics": [
+    {
+     "code": "total_assets",
+     "label": "Bilanční suma (celková aktiva)",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 2230000.0,
+      "prev": 2057000.0,
+      "yoy": 8.41030627126884
+     },
+     "kb": {
+      "v": 1742000.0,
+      "prev": 1586000.0,
+      "yoy": 9.836065573770503
+     }
+    },
+    {
+     "code": "gross_customer_loans",
+     "label": "Hrubé úvěry a pohledávky za klienty",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 1222000.0,
+      "prev": 1123000.0,
+      "yoy": 8.815672306322341
+     },
+     "kb": {
+      "v": 914000.0,
+      "prev": 849000.0,
+      "yoy": 7.656065959952896
+     }
+    },
+    {
+     "code": "customer_deposits",
+     "label": "Závazky ke klientům (vklady klientů)",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 1394000.0,
+      "prev": 1370000.0,
+      "yoy": 1.751824817518255
+     },
+     "kb": {
+      "v": 1129000.0,
+      "prev": 1039000.0,
+      "yoy": 8.662175168431174
+     }
+    }
+   ]
+  },
+  {
+   "title": "Kvalita portfolia",
+   "unit": "pct",
+   "metrics": [
+    {
+     "code": "npl_ratio",
+     "label": "Podíl nevýkonných úvěrů (NPL)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.015,
+      "prev": 0.018,
+      "yoy": -0.29999999999999993
+     },
+     "kb": {
+      "v": 0.015,
+      "prev": 0.02,
+      "yoy": -0.5000000000000001
+     }
+    }
+   ]
+  }
+ ],
+ "slope": {
+  "label": "ROE",
+  "unit": "pct",
+  "banks": {
+   "cs": [
+    {
+     "t": "Q1 2025",
+     "v": 0.145
+    },
+    {
+     "t": "Q1 2026",
+     "v": 0.186
+    }
+   ],
+   "kb": [
+    {
+     "t": "Q1 2025",
+     "v": 0.13
+    },
+    {
+     "t": "Q1 2026",
+     "v": 0.124
+    }
+   ]
+  }
+ }
+};
+
+const cz = (n,d=1)=>n.toLocaleString('cs-CZ',{minimumFractionDigits:d,maximumFractionDigits:d});
+const bn = v => cz(v/1000, Math.abs(v/1000)>=100?0:1);
+const pct = v => cz(v*100,1);
+function fmt(unit,v){ if(v==null) return '—'; return unit==='pct'? pct(v)+' %' : bn(v)+'  mld'; }
+
+function legend(d){
+  document.getElementById('legend').innerHTML = d.banks.map(b=>
+    `<div class="legitem"><span class="sw" style="background:${b.accent}"></span>${b.name} <small>(${b.code.toUpperCase()})</small></div>`
+  ).join('');
+}
+function deckText(d){
+  // jednoduchý takeaway z dat
+  const g=d.groups.flatMap(x=>x.metrics); const by=Object.fromEntries(g.map(m=>[m.code,m]));
+  const np=by.net_profit, roe=by.roe, ci=by.cost_income_ratio;
+  const [a,b]=d.banks;
+  return `Za první čtvrtletí 2026 vykázala <strong>${a.name}</strong> čistý zisk ${bn(np.cs.v)} mld. Kč proti ${bn(np.kb.v)} mld. u <strong>${b.name}</strong>. `+
+    `Vede i návratností (ROE ${pct(roe.cs.v)} % vs ${pct(roe.kb.v)} %) a provozní efektivitou `+
+    `(poměr nákladů k výnosům ${pct(ci.cs.v)} % vs ${pct(ci.kb.v)} %). `+
+    `<em>Rozdíl táhne vyšší úroková marže a silnější poplatkové výnosy.</em>`;
+}
+
+// párové sloupce (sdílená škála v rámci skupiny)
+function barGroup(group, banks){
+  const max=Math.max(...group.metrics.flatMap(m=>banks.map(b=>m[b.code].v||0)));
+  let h=`<div class="exhibit"><div class="etag">Exhibit</div><h2 class="serif">${group.title}</h2>`+
+        `<div class="enote">mld. Kč · adjusted</div><div class="topline"></div>`;
+  group.metrics.forEach(m=>{
+    h+=`<div class="barrow"><div class="lbl">${m.label}</div><div class="pair">`;
+    banks.forEach(b=>{
+      const v=m[b.code].v||0, w=(v/max*100);
+      h+=`<div class="bar"><span class="tag">${b.code}</span>`+
+         `<div class="track"><div class="fill" style="width:${w.toFixed(1)}%;background:${b.accent}"></div></div>`+
+         `<span class="v">${bn(v)}</span></div>`;
+    });
+    h+=`</div></div>`;
+  });
+  return h+`</div>`;
+}
+
+// dumbbell pro poměry (vlastní škála na řádek)
+function dumbGroup(group, banks){
+  let h=`<div class="exhibit"><div class="etag">Exhibit</div><h2 class="serif">${group.title}</h2>`+
+        `<div class="enote">v % · adjusted · spojnice = rozdíl mezi bankami</div><div class="topline"></div>`;
+  group.metrics.forEach(m=>{
+    const vals=banks.map(b=>m[b.code].v*100);
+    const lo=0, hi=Math.max(...vals)*1.25;
+    const X=v=>8+(v-lo)/(hi-lo)*84;   // 8%..92%
+    const x=banks.map(b=>X(m[b.code].v*100));
+    h+=`<div class="dumb"><div class="lbl">${m.label}</div><div><svg viewBox="0 0 100 30" preserveAspectRatio="none" style="height:30px">`+
+       `<line x1="${Math.min(...x)}" y1="15" x2="${Math.max(...x)}" y2="15" stroke="#C9C1B4" stroke-width="0.6"/>`;
+    banks.forEach((b,i)=>{
+      h+=`<circle cx="${x[i]}" cy="15" r="2.4" fill="${b.accent}"/>`;
+    });
+    h+=`</svg></div></div>`;
+    // hodnoty pod osou
+    h+=`<div class="dumb" style="border-bottom:0;padding-top:0"><div></div><div style="display:flex;gap:18px;margin-top:-8px">`+
+       banks.map((b,i)=>`<span class="dval" style="color:${b.accent}">${b.code.toUpperCase()} ${pct(m[b.code].v)} %</span>`).join('')+`</div></div>`;
+  });
+  return h+`</div>`;
+}
+
+// slopegraph
+function slope(s, banks){
+  const all=banks.flatMap(b=>s.banks[b.code].map(p=>p.v*100));
+  const lo=Math.min(...all)*0.9, hi=Math.max(...all)*1.08, span=(hi-lo)||1;
+  const W=520,H=260,padX=120,padY=30;
+  const Y=v=>padY+(H-2*padY)*(1-(v*100-lo)/span);
+  const xL=padX, xR=W-padX;
+  let svg=`<svg viewBox="0 0 ${W} ${H}">`;
+  svg+=`<line x1="${xL}" y1="14" x2="${xL}" y2="${H-14}" stroke="#D9D2C6"/><line x1="${xR}" y1="14" x2="${xR}" y2="${H-14}" stroke="#D9D2C6"/>`;
+  svg+=`<text class="axis" x="${xL}" y="${H-2}" text-anchor="middle">Q1 2025</text>`;
+  svg+=`<text class="axis" x="${xR}" y="${H-2}" text-anchor="middle">Q1 2026</text>`;
+  banks.forEach(b=>{
+    const pts=s.banks[b.code];
+    const y1=Y(pts[0].v), y2=Y(pts[1].v);
+    svg+=`<line x1="${xL}" y1="${y1.toFixed(1)}" x2="${xR}" y2="${y2.toFixed(1)}" stroke="${b.accent}" stroke-width="2.2"/>`;
+    svg+=`<circle cx="${xL}" cy="${y1.toFixed(1)}" r="3.4" fill="${b.accent}"/><circle cx="${xR}" cy="${y2.toFixed(1)}" r="3.4" fill="${b.accent}"/>`;
+    svg+=`<text class="dval" x="${xL-9}" y="${y1+4}" text-anchor="end" fill="${b.accent}">${pct(pts[0].v)} %</text>`;
+    svg+=`<text class="dval" x="${xR+9}" y="${y2+4}" fill="${b.accent}">${pct(pts[1].v)} %</text>`;
+    svg+=`<text x="${xR+9}" y="${y2-9}" font-size="11" font-weight="600" fill="${b.accent}">${b.name}</text>`;
+  });
+  svg+=`</svg>`;
+  return `<div class="exhibit"><div class="etag">Exhibit</div><h2 class="serif">Vývoj návratnosti (ROE)</h2>`+
+         `<div class="enote">Q1 2025 → Q1 2026 · adjusted</div><div class="topline"></div>${svg}</div>`;
+}
+
+function render(d){
+  document.getElementById('kicker').textContent=`ČS Peer Group · Q${d.period.quarter} ${d.period.year}`;
+  document.getElementById('deck').innerHTML=deckText(d);
+  legend(d);
+  let html='';
+  d.groups.forEach(g=>{ html += g.unit==='pct' ? dumbGroup(g,d.banks) : barGroup(g,d.banks); });
+  html += slope(d.slope, d.banks);
+  document.getElementById('exhibits').innerHTML=html;
+}
+async function load(){
+  for(const url of ['/api/compare?banks=cs,kb&basis=adjusted','./compare.json']){
+    try{const r=await fetch(url); if(r.ok){return render(await r.json());}}catch(e){}
+  }
+  render(DATA);
+}
+load();
+</script>
+</body>
+</html>

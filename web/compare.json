@@ -1,0 +1,235 @@
+{
+ "period": {
+  "year": 2026,
+  "quarter": 1
+ },
+ "banks": [
+  {
+   "code": "cs",
+   "name": "Česká spořitelna",
+   "accent": "#15527B"
+  },
+  {
+   "code": "kb",
+   "name": "Komerční banka",
+   "accent": "#A6192E"
+  }
+ ],
+ "groups": [
+  {
+   "title": "Profitabilita",
+   "unit": "bn",
+   "metrics": [
+    {
+     "code": "net_profit",
+     "label": "Čistý zisk",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 7100.0,
+      "prev": 5700.0,
+      "yoy": 24.56140350877194
+     },
+     "kb": {
+      "v": 4000.0,
+      "prev": 4200.0,
+      "yoy": -4.761904761904767
+     }
+    },
+    {
+     "code": "operating_result",
+     "label": "Provozní výsledek",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 9200.0,
+      "prev": 8200.0,
+      "yoy": 12.195121951219523
+     },
+     "kb": {
+      "v": 5100.0,
+      "prev": 4900.0,
+      "yoy": 4.081632653061229
+     }
+    },
+    {
+     "code": "operating_income",
+     "label": "Provozní výnosy",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 15300.0,
+      "prev": 14100.0,
+      "yoy": 8.51063829787233
+     },
+     "kb": {
+      "v": 9100.0,
+      "prev": 9100.0,
+      "yoy": 0.0
+     }
+    },
+    {
+     "code": "net_interest_income",
+     "label": "Čistý úrokový výnos",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 10700.0,
+      "prev": 10100.0,
+      "yoy": 5.940594059405946
+     },
+     "kb": {
+      "v": 6400.0,
+      "prev": 6400.0,
+      "yoy": 0.0
+     }
+    },
+    {
+     "code": "net_fee_commission_income",
+     "label": "Čisté výnosy z poplatků a provizí",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 3400.0,
+      "prev": 3200.0,
+      "yoy": 6.25
+     },
+     "kb": {
+      "v": 1600.0,
+      "prev": 1800.0,
+      "yoy": -11.111111111111116
+     }
+    }
+   ]
+  },
+  {
+   "title": "Efektivita a návratnost",
+   "unit": "pct",
+   "metrics": [
+    {
+     "code": "cost_income_ratio",
+     "label": "Poměr nákladů k výnosům (C/I)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.4,
+      "prev": 0.419,
+      "yoy": -1.8999999999999961
+     },
+     "kb": {
+      "v": 0.438,
+      "prev": 0.463,
+      "yoy": -2.500000000000002
+     }
+    },
+    {
+     "code": "roe",
+     "label": "Návratnost vlastního kapitálu (ROE)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.186,
+      "prev": 0.145,
+      "yoy": 4.1000000000000005
+     },
+     "kb": {
+      "v": 0.124,
+      "prev": 0.13,
+      "yoy": -0.6000000000000005
+     }
+    }
+   ]
+  },
+  {
+   "title": "Velikost rozvahy",
+   "unit": "bn",
+   "metrics": [
+    {
+     "code": "total_assets",
+     "label": "Bilanční suma (celková aktiva)",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 2230000.0,
+      "prev": 2057000.0,
+      "yoy": 8.41030627126884
+     },
+     "kb": {
+      "v": 1742000.0,
+      "prev": 1586000.0,
+      "yoy": 9.836065573770503
+     }
+    },
+    {
+     "code": "gross_customer_loans",
+     "label": "Hrubé úvěry a pohledávky za klienty",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 1222000.0,
+      "prev": 1123000.0,
+      "yoy": 8.815672306322341
+     },
+     "kb": {
+      "v": 914000.0,
+      "prev": 849000.0,
+      "yoy": 7.656065959952896
+     }
+    },
+    {
+     "code": "customer_deposits",
+     "label": "Závazky ke klientům (vklady klientů)",
+     "unit": "CZK_m",
+     "cs": {
+      "v": 1394000.0,
+      "prev": 1370000.0,
+      "yoy": 1.751824817518255
+     },
+     "kb": {
+      "v": 1129000.0,
+      "prev": 1039000.0,
+      "yoy": 8.662175168431174
+     }
+    }
+   ]
+  },
+  {
+   "title": "Kvalita portfolia",
+   "unit": "pct",
+   "metrics": [
+    {
+     "code": "npl_ratio",
+     "label": "Podíl nevýkonných úvěrů (NPL)",
+     "unit": "percent",
+     "cs": {
+      "v": 0.015,
+      "prev": 0.018,
+      "yoy": -0.29999999999999993
+     },
+     "kb": {
+      "v": 0.015,
+      "prev": 0.02,
+      "yoy": -0.5000000000000001
+     }
+    }
+   ]
+  }
+ ],
+ "slope": {
+  "label": "ROE",
+  "unit": "pct",
+  "banks": {
+   "cs": [
+    {
+     "t": "Q1 2025",
+     "v": 0.145
+    },
+    {
+     "t": "Q1 2026",
+     "v": 0.186
+    }
+   ],
+   "kb": [
+    {
+     "t": "Q1 2025",
+     "v": 0.13
+    },
+    {
+     "t": "Q1 2026",
+     "v": 0.124
+    }
+   ]
+  }
+ }
+}
