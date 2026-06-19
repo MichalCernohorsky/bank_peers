@@ -3,9 +3,19 @@
 Stahuje finanční výsledky hlavních českých bank, ukládá je do databáze a vykresluje
 konfigurací řízené dashboardy. Viz `CLAUDE.md` pro architekturu a konvence.
 
-## Quick start
+## Quick start (jeden příkaz, bez cloudu)
 ```bash
-pip install openpyxl pyyaml
+./run.sh          # nebo: make run
+```
+Vytvoří `.venv`, nainstaluje závislosti a spustí appku na **http://localhost:8000**
+(data nese verzovaná `data/cs_financials.db` — 4 banky, žádný xlsx ani Postgres potřeba).
+
+Bez cloudu jde appka provozovat i na vlastním VPS (`./run.sh`) nebo přes Docker
+(`make compose` → API + PostgreSQL). Render/Fly/Railway jsou jen volitelné možnosti (viz Nasazení).
+
+### Přestavba databáze ze zdroje (volitelné)
+```bash
+pip install -r requirements.txt
 python -m pipeline.build_db config /cesta/key_figures_q1_2026.xlsx data/cs_financials.db
 ```
 
