@@ -1,0 +1,30 @@
+# Finanční kalendář + zdroje dokumentů pro automatický ingest (pipeline.watch).
+# Watcher pro každou banku zkontroluje, zda je zveřejnění "due" (publish_date <= dnes),
+# stáhne dokument (local soubor / http URL vzor), spočítá checksum (idempotence),
+# postaví staging DB, projde validací (brána) a teprve pak promotuje do produkce.
+defaults:
+  gate:
+    require_validation: true     # rekonciliace (run_build) musí projít
+    headline_metric: net_profit  # headline metrika musí existovat pro nejnovější období
+
+banks:
+  cs:
+    ir_page: https://www.csas.cz/cs/o-nas/pro-investory
+    document:
+      # V produkci: kind: http + url_pattern (IR zveřejní strukturovaný xlsx).
+      # Zde kind: local (offline, běží i v CI). Cestu lze přebít přes --source cs=<path>.
+      kind: local
+      path: key_figures_q1_2026.xlsx
+      basis: reported
+      # url_pattern: https://www.csas.cz/.../key_figures_q{quarter}_{year}.xlsx
+    releases:
+      - { period: 2026Q1, publish_date: 2026-05-06 }
+      - { period: 2026Q2, publish_date: 2026-08-05 }
+
+  kb:
+    ir_page: https://www.kb.cz/en/about-the-bank/investor-relations
+    document:
+      # KB má zatím jen peer/PDF data (config/manual/peer_adjusted.csv) -> není co stahovat.
+      kind: manual
+    releases:
+      - { period: 2026Q1, publish_date: 2026-05-07 }

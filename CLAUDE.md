@@ -49,8 +49,8 @@ Pipeline na konci proběhne validací (rekonciliace P&L, součet čtvrtletí = F
 3. Doplnit GAP metriky (extrakce z PDF/výkazů, LLM-asistovaně + validace).
 4. Backend API (FastAPI) nad fact tabulkou — dotazy banka/metrika/období/báze.
 5. Frontend na živá data (prototyp dashboardu -> volání API, vykreslení z `headline` + dashboard configu).
-6. Další banky (KB, ČSOB, Moneta) — vlastní source-map per banka.
-7. Scheduler navázaný na finanční kalendář, idempotentní běh, alerty; testy, monitoring, deploy.
+6. Další banky (KB, ČSOB, Moneta) — vlastní source-map per banka. [HOTOVO: config-driven multi-source; KB adjusted; ČSOB/Moneta čekají na data]
+7. Scheduler navázaný na finanční kalendář, idempotentní běh, alerty. [HOTOVO: pipeline/watch.py + scheduler.py + .github/workflows/ingest.yml; staging→promote brána, checksum idempotence, vintage]; monitoring, deploy zbývá.
 
 ## Konvence
 - Žádné natvrdo zadané hodnoty v kódu — vše z `config/`.

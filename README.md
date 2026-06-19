@@ -64,6 +64,19 @@ pytest -q          # pipeline (validace, YTD/FY derivace) + API nad fixture xlsx
 ```
 Fixture: `tests/fixtures/key_figures_sample.xlsx`. CI (`.github/workflows/ci.yml`) = lint + pytest.
 
+## Automatický ingest (watcher)
+Navázaný na finanční kalendář `config/calendar.yaml`. Pro každou banku zkontroluje
+nový dokument, ověří checksum (idempotence), postaví staging DB, projde validací
+(brána) a teprve pak promotuje do produkce; provenance + vintage v registru, alerty
+přes `SLACK_WEBHOOK_URL`.
+```bash
+python -m pipeline.watch --once --target sqlite:///data/cs_financials.db
+# scheduler: GitHub Actions (.github/workflows/ingest.yml) nebo APScheduler:
+python -m pipeline.scheduler --cron "0 6 * * *"
+```
+Validace je brána: nevalidní data se NEpromotují (exit 1 → alert). Idempotence: stejný
+checksum se přeskočí; restatement téhož období = nový vintage.
+
 ## Stav
 Hotová datová vrstva pro ČS (2002–Q1 2026), validace prochází (SQLite i PostgreSQL).
 Backend API + sloučený frontend (`web/app.html`) běží ze stejného originu — viz roadmapa v `CLAUDE.md`.
