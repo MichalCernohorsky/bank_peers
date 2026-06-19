@@ -1,0 +1,23 @@
+# SOURCE-MAPPING — Komerční banka (KB), konsolidované IFRS.
+# Zdroj: KB Facts and Figures (xlsx). P&L = samostatná čtvrtletí (qtd).
+# Mapování přes číslo řádku (at.row) — robustní vůči popiskům (KB má víc jazyků/listů).
+sources:
+  pl:  { sheet: "Conso P_L ", interim_pl: qtd,            priority: 1 }   # pozn.: koncová mezera v názvu listu
+  bs:  { sheet: "Conso B_S ", interim_pl: point_in_time,  priority: 1 }
+  rat: { sheet: "Ratios ",    interim_pl: ratio,          priority: 1 }
+
+mapping:
+  - { code: net_interest_income,       at: { src: pl, row: 13 } }
+  - { code: net_fee_commission_income, at: { src: pl, row: 14 } }
+  - { code: operating_income,          at: { src: pl, row: 18 } }   # Net banking income
+  - { code: operating_expenses,        at: { src: pl, row: 23 }, sign: flip_to_pos }
+  - { code: operating_result,          at: { src: pl, row: 24 } }   # Operating profit
+  - { code: net_profit,                at: { src: pl, row: 36 } }   # Profit attributable to Group's equity holders
+  - { code: net_customer_loans,        at: { src: bs, row: 16 } }   # Loans and advances to customers
+  - { code: total_assets,              at: { src: bs, row: 28 } }
+  - { code: customer_deposits,         at: { src: bs, row: 36 } }   # Amounts due to customers
+  - { code: total_equity,              at: { src: bs, row: 49 } }
+  - { code: cost_income_ratio,         at: { src: rat, row: 12 } }
+  - { code: roe,                       at: { src: rat, row: 19 } }  # Return on average equity
+  - { code: net_interest_margin,       at: { src: rat, row: 11 } }
+  - { code: npl_ratio,                 at: { src: rat, row: 38 } }

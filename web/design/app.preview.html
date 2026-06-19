@@ -253,13 +253,13 @@ padding:22px 24px 14px;scroll-margin-top:16px}
 <div class="page">
 <header class="hero" id="cmp-hero"></header>
 <section class="exec" id="cmp-exec">
-<div class="sec-head"><div><h2>Souhrn srovnání</h2><div class="sh-note">peer-comparable (adjusted) · mld. Kč není-li uvedeno jinak</div></div><span class="period" id="cmp-kicker">—</span></div>
+<div class="sec-head"><div><h2>Souhrn srovnání</h2><div class="sh-note">dle reportingu jednotlivých bank · mld. Kč není-li uvedeno jinak</div></div><span class="period" id="cmp-kicker">—</span></div>
 <div class="verdict reveal" id="cmp-deck">—</div>
 <div class="legend" id="cmp-legend"></div>
 </section>
 <div class="sec-head"><div><h2>Exhibity podle kohort</h2><div class="sh-note">adjusted · banka vs. peers · Q1 2025 → Q1 2026</div></div><div class="seg" id="cmp-style"></div></div>
 <div class="cats" id="cmp-exhibits"></div>
-<div class="foot"><span>Zdroj: ČS Peer Group Q1 2026 (Investor Relations) · adjusted, peer-comparable</span><span class="pill">báze adjusted</span></div>
+<div class="foot"><span>Zdroj: IR jednotlivých bank (reported IFRS, Q1 2026)</span><span class="pill">báze reported</span></div>
 </div>
 </section>
 </main>
@@ -423,18 +423,27 @@ const li=rows.length-1;s+=`<circle cx="${X(li).toFixed(1)}" cy="${Y(rows[li].v).
 return s+'</svg>';
 }
 function hero(d,by){
-const np=by['net_profit'],roe=by['roe'],ci=by['cost_income_ratio'],nim=by['net_interest_margin'],npl=by['npl_ratio'];
-const lead=`Zisk ${np.yoy>=0?'+':''}${np.yoy.toFixed(1)} % r/r a návratnost kapitálu ${cz(roe.value*100,1)} % — ${d.bank.name} drží špičku peer skupiny.`;
-const chips=[['ROE',cz(roe.value*100,1)+' %'],['C/I',cz(ci.value*100,1)+' %'],['NIM',cz(nim.value*100,1)+' %'],['NPL',cz(npl.value*100,1)+' %']];
+// odolné vůči chybějícím metrikám (peer banky mají jen podmnožinu)
+const np=by['net_profit'],roe=by['roe'];
+const pc=m=>(m&&m.value!=null)?cz(m.value*100,1)+' %':'—';
+const hasYoY=np&&np.yoy!=null;
+const ann=(d.annual&&d.annual.length)?d.annual:null;
+const lead=(np&&roe)
+  ? `Zisk ${hasYoY?(np.yoy>=0?'+':'')+np.yoy.toFixed(1)+' % r/r':'—'} a návratnost kapitálu ${pc(roe)} — ${d.bank.name}.`
+  : `${d.bank.name} · reported IFRS, Q${d.period.quarter} ${d.period.year}.`;
+const chips=[['ROE',by['roe']],['C/I',by['cost_income_ratio']],['NIM',by['net_interest_margin']],['NPL',by['npl_ratio']]]
+  .filter(c=>c[1]&&c[1].value!=null).map(c=>[c[0],pc(c[1])]);
+const marquee=np?`<div class="marquee"><div class="big"><span class="num" data-cu="${np.value/1000}" data-dec="1">${cz(np.value/1000,1)}</span><span class="u"> mld Kč</span></div>
+<div class="chg ${hasYoY&&np.yoy<0?'neg':'pos'}">${hasYoY?(np.yoy>=0?'▲ +':'▼ ')+np.yoy.toFixed(1)+' % r/r':'—'}</div></div>
+<div class="mlabel">čistý zisk za čtvrtletí</div>`:'';
+const chart=ann?`<div class="hero-r"><div class="herochart"><div class="cap">Čistý zisk · ${ann[0].y}–${ann.at(-1).y} · mld. Kč</div>${heroArea(ann)}</div></div>`:'';
 return `<div class="hero-grid"><div class="hero-l">
 <div class="kicker">Q${d.period.quarter} ${d.period.year} · reported IFRS · CZK</div>
 <h1 id="ov-bankname">${d.bank.name}</h1>
 <div class="lead">${lead}</div>
-<div class="marquee"><div class="big"><span class="num" data-cu="${np.value/1000}" data-dec="1">${cz(np.value/1000,1)}</span><span class="u"> mld Kč</span></div>
-<div class="chg ${np.yoy>=0?'pos':'neg'}">${np.yoy>=0?'▲':'▼'} ${np.yoy>=0?'+':''}${np.yoy.toFixed(1)} % r/r</div></div>
-<div class="mlabel">čistý zisk za čtvrtletí</div>
+${marquee}
 <div class="chips">${chips.map(c=>`<div class="chip"><div class="ck">${c[0]}</div><div class="cv">${c[1]}</div></div>`).join('')}</div>
-</div><div class="hero-r"><div class="herochart"><div class="cap">Čistý zisk · ${d.annual[0].y}–${d.annual.at(-1).y} · mld. Kč</div>${heroArea(d.annual)}</div></div></div>`;
+</div>${chart}</div>`;
 }
 function regroup(d){
 const map={};(d.categories||[]).forEach(c=>c.metrics.forEach(m=>{if(!map[m.code])map[m.code]=m;}));
@@ -457,8 +466,15 @@ document.getElementById('ov-bsub').innerHTML=`Konsolidované neauditované výsl
 document.getElementById('rail-meta').textContent=`Q${d.period.quarter} ${d.period.year} · reported IFRS`;
 document.getElementById('ov-hero').innerHTML=hero(d,by);
 // verdict
-const np=by['net_profit'],roe=by['roe'],ci=by['cost_income_ratio'],orr=by['operating_result'];
-document.getElementById('ov-verdict').innerHTML=`${d.bank.name} uzavřela <b>Q${d.period.quarter} ${d.period.year}</b> s čistým ziskem <b>${fmtVal(np.unit,np.type,np.value)}</b> (${np.yoy>=0?'+':''}${np.yoy.toFixed(1)} % r/r) a návratností kapitálu <b>${cz(roe.value*100,1)} %</b>. Provozní výsledek roste o <b>${orr.yoy>=0?'+':''}${orr.yoy.toFixed(1)} %</b>, poměr nákladů k výnosům klesl na <b>${cz(ci.value*100,1)} %</b> — banka tak potvrzuje pozici nejziskovějšího hráče skupiny.`;
+const vNp=by['net_profit'],vRoe=by['roe'],vCi=by['cost_income_ratio'],vOrr=by['operating_result'];
+const vyo=m=>(m&&m.yoy!=null)?`${m.yoy>=0?'+':''}${m.yoy.toFixed(1)} %`:null;
+const vpc=m=>(m&&m.value!=null)?cz(m.value*100,1)+' %':null;
+const vparts=[];
+if(vNp) vparts.push(`čistý zisk <b>${fmtVal(vNp.unit,vNp.type,vNp.value)}</b>${vyo(vNp)?` (${vyo(vNp)} r/r)`:''}`);
+if(vOrr&&vyo(vOrr)) vparts.push(`provozní výsledek <b>${vyo(vOrr)} r/r</b>`);
+if(vRoe&&vpc(vRoe)) vparts.push(`ROE <b>${vpc(vRoe)}</b>`);
+if(vCi&&vpc(vCi)) vparts.push(`poměr nákladů k výnosům <b>${vpc(vCi)}</b>`);
+document.getElementById('ov-verdict').innerHTML=`${d.bank.name} za <b>Q${d.period.quarter} ${d.period.year}</b> (reported IFRS): ${vparts.join(', ')}.`;
 // exec kpis (6 headline)
 const ord=['net_profit','operating_result','net_interest_income','total_assets','roe','cost_income_ratio'];
 document.getElementById('ov-kpis').innerHTML=ord.filter(c=>by[c]).map(c=>{const k=by[c];
@@ -600,7 +616,7 @@ function render(d){
 _d=d;
 document.getElementById('cmp-kicker').textContent=`Q${d.period.quarter} ${d.period.year}`;
 document.getElementById('cmp-hero').innerHTML=hero(d);
-document.getElementById('cmp-deck').innerHTML='Na peer-comparable (adjusted) bázi vede <b>Česká spořitelna</b> ziskovostí i návratností kapitálu, zatímco <b>Komerční banka</b> roste rychleji v rozvaze a vkladech. Obě banky zlepšily kvalitu portfolia i nákladovou efektivitu.';
+document.getElementById('cmp-deck').innerHTML='Srovnání čtyř největších českých bank dle jejich <b>reportovaných</b> výsledků (IFRS). <b>Česká spořitelna</b> vede ziskovostí i návratností kapitálu; <b>ČSOB</b> drží srovnatelně velkou rozvahu, <b>Komerční banka</b> a <b>MONETA</b> doplňují peer skupinu. Hodnoty dle reportingu jednotlivých bank, nikoli peer-adjusted.';
 document.getElementById('cmp-legend').innerHTML=d.banks.map(b=>`<div class="legitem"><span class="sw" style="background:${b.accent}"></span>${b.name} <small>${(SHORT[b.code]||b.code).toUpperCase()}</small></div>`).join('');
 styleSeg();
 renderExhibits();
@@ -610,7 +626,7 @@ buildKohnav([{id:'cmp-exec',label:'Souhrn'}].concat(_items));
 const body=document.getElementById('cmp');
 playDraw(body);revealStagger(body);
 }
-async function load(){const d=await fetchJSON(['/api/compare?banks=cs,kb&basis=adjusted','./compare.json']);render(d||COMPARE);}
+async function load(){const d=await fetchJSON(['/api/compare?banks=cs,kb,csob,moneta&basis=reported','./compare.json']);render(d||COMPARE);}
 return {render:render,load:load,afterShow:afterShow};
 })();
 

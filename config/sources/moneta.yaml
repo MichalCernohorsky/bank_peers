@@ -1,0 +1,21 @@
+# SOURCE-MAPPING — MONETA Money Bank, konsolidované IFRS.
+# Zdroj: MMB Basic financial data (xlsx). "PL" = samostatná čtvrtletí.
+# cost_income_ratio se dopočítá (operating_expenses / operating_income).
+sources:
+  pl:  { sheet: "PL",   interim_pl: qtd,           priority: 1 }
+  bs:  { sheet: "BS",   interim_pl: point_in_time, priority: 1 }
+  rat: { sheet: "KPIs", interim_pl: ratio,         priority: 1 }
+
+mapping:
+  - { code: net_interest_income,       at: { src: pl, row: 7 } }
+  - { code: net_fee_commission_income, at: { src: pl, row: 10 } }
+  - { code: operating_income,          at: { src: pl, row: 14 } }   # Total operating income
+  - { code: operating_expenses,        at: { src: pl, row: 20 }, sign: flip_to_pos }
+  - { code: operating_result,          at: { src: pl, row: 21 } }   # Profit before tax and impairment
+  - { code: net_profit,                at: { src: pl, row: 25 } }   # Profit for the period after tax
+  - { code: net_customer_loans,        at: { src: bs, row: 11 } }   # Loans and receivables to customers
+  - { code: total_assets,              at: { src: bs, row: 19 } }
+  - { code: customer_deposits,         at: { src: bs, row: 24 } }   # Due to customers
+  - { code: roe,                       at: { src: rat, row: 15 } }
+  - { code: net_interest_margin,       at: { src: rat, row: 9 } }
+  - { code: npl_ratio,                 at: { src: rat, row: 30 } }

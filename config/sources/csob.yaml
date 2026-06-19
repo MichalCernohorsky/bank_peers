@@ -1,0 +1,21 @@
+# SOURCE-MAPPING — ČSOB (KBC Group), konsolidované IFRS.
+# Zdroj: ČSOB Fact Sheet (xlsx). "P&L Qtd." = samostatná čtvrtletí.
+# operating_result se dopočítá (operating_income − operating_expenses).
+sources:
+  pl:  { sheet: "P&L Qtd.",               interim_pl: qtd,           priority: 1 }
+  bs:  { sheet: "Balance Sheet",          interim_pl: point_in_time, priority: 1 }
+  rat: { sheet: "Additional information", interim_pl: ratio,         priority: 1 }
+
+mapping:
+  - { code: net_interest_income,       at: { src: pl, row: 11 } }
+  - { code: net_fee_commission_income, at: { src: pl, row: 14 } }
+  - { code: operating_income,          at: { src: pl, row: 21 } }
+  - { code: operating_expenses,        at: { src: pl, row: 27 }, sign: flip_to_pos }
+  - { code: net_profit,                at: { src: pl, row: 34 } }   # Owners of the parent
+  - { code: net_customer_loans,        at: { src: bs, row: 19 } }   # loans to (non-bank) customers
+  - { code: total_assets,              at: { src: bs, row: 32 } }
+  - { code: customer_deposits,         at: { src: bs, row: 41 } }   # Deposits from other customers
+  - { code: cost_income_ratio,         at: { src: rat, row: 10 } }
+  - { code: roe,                       at: { src: rat, row: 12 } }  # RoE (Ytd.)
+  - { code: net_interest_margin,       at: { src: rat, row: 8 } }   # NIM (Qtd., annualized)
+  - { code: npl_ratio,                 at: { src: rat, row: 29 } }

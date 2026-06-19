@@ -134,7 +134,7 @@ def qseries_fy(bank):
 
 
 @app.get("/api/compare")
-def compare(banks: str = "cs,kb", basis: str = "adjusted", year: int = 2026, quarter: int = 1):
+def compare(banks: str = "cs,kb,csob,moneta", basis: str = "reported", year: int = 2026, quarter: int = 1):
     codes = [c.strip() for c in banks.split(",")]
     accents = {"cs": "#1A3A5C", "kb": "#A6192E", "csob": "#0098D4", "moneta": "#6A2C70"}
     meta = {m["code"]: m for m in q("SELECT code,label_cs,unit,type FROM metric")}
@@ -159,7 +159,7 @@ def compare(banks: str = "cs,kb", basis: str = "adjusted", year: int = 2026, qua
     layout = [
         ("Profitabilita", "bn", ["net_profit", "operating_result", "operating_income", "net_interest_income", "net_fee_commission_income"]),
         ("Efektivita a návratnost", "pct", ["cost_income_ratio", "roe"]),
-        ("Velikost rozvahy", "bn", ["total_assets", "gross_customer_loans", "customer_deposits"]),
+        ("Velikost rozvahy", "bn", ["total_assets", "net_customer_loans", "customer_deposits"]),
         ("Kvalita portfolia", "pct", ["npl_ratio"]),
     ]
     groups = [{"title": t, "unit": u, "metrics": [pair(c) for c in cs]} for t, u, cs in layout]

@@ -66,16 +66,24 @@ def run_build(cfg, xlsx, database_url):
     metrics = {m["code"]: m for m in _yaml.safe_load((cfg / "metrics.yaml").read_text())["metrics"]}
     banks_cfg = _yaml.safe_load((cfg / "banks.yaml").read_text())["banks"]
 
-    # --- 1: ingest strukturovaných zdrojů up-front (fail-fast na chybějící xlsx) ---
-    ingested = {}   # bank_code -> (facts, src_used)
-    todo_all = []
+    # --- 1: ingest strukturovaných zdrojů up-front ---
+    # Chybějící soubor banky se přeskočí (warn), ne crash — prebuilt DB nese data,
+    # rebuild bez souboru postaví, co má. cs (hlavní) ber jako fail-fast.
+    ingested = {}   # bank_code -> (facts, src_used, src_interim)
+    todo_all, skipped = [], []
     for b in banks_cfg:
         src = b.get("source") or {}
         if src.get("kind") != "xlsx":
             continue
         bank_xlsx = Path(src["path"]) if src.get("path") else xlsx
-        facts, todo, src_used = ingest(cfg, src.get("map", b["code"]), bank_xlsx)
-        ingested[b["code"]] = (facts, src_used)
+        if not bank_xlsx.exists():
+            if b["code"] == "cs":
+                raise FileNotFoundError(f"Hlavní zdroj ČS chybí: {bank_xlsx}")
+            print(f"[warn] zdroj banky {b['code']!r} chybí ({bank_xlsx}) — přeskočeno")
+            skipped.append(b["code"])
+            continue
+        facts, todo, src_used, src_interim = ingest(cfg, src.get("map", b["code"]), bank_xlsx)
+        ingested[b["code"]] = (facts, src_used, src_interim)
         todo_all += todo
 
     # --- 2: schéma ---
@@ -109,7 +117,7 @@ def run_build(cfg, xlsx, database_url):
     # --- 4: Q + FY řádky per strukturovaná banka ---
     n = 0
     codes_with_data = set()
-    for bcode, (facts, src_used) in ingested.items():
+    for bcode, (facts, src_used, src_interim) in ingested.items():
         bank_id = bankid[bcode]
         src_id = {}
         for key, meta in src_used.items():
@@ -126,10 +134,13 @@ def run_build(cfg, xlsx, database_url):
                 years.setdefault(y, {})[q] = (v, src)
                 pid = period_id(con, bank_id, y, "Q", q)
                 if typ == "flow":
-                    prev = per.get((y, q - 1))
-                    vq = v if q == 1 else (v - prev[0] if prev else None)
+                    if src_interim.get(src, "ytd_cumulative") == "qtd":
+                        vq, vytd = v, None            # zdroj už dává samostatné čtvrtletí
+                    else:
+                        prev = per.get((y, q - 1))    # YTD kumulativně -> odečti předchozí
+                        vq, vytd = (v if q == 1 else (v - prev[0] if prev else None)), v
                     con.execute("INSERT INTO fact(bank_id,code,period_id,basis,value,value_ytd,source_id) VALUES(?,?,?,?,?,?,?)",
-                                (bank_id, code, pid, "reported", vq, v, src_id[src]))
+                                (bank_id, code, pid, "reported", vq, vytd, src_id[src]))
                 else:
                     con.execute("INSERT INTO fact(bank_id,code,period_id,basis,value,source_id) VALUES(?,?,?,?,?,?)",
                                 (bank_id, code, pid, "reported", v, src_id[src]))
@@ -138,9 +149,15 @@ def run_build(cfg, xlsx, database_url):
                 if 4 not in qs:
                     continue
                 v4, src4 = qs[4]
+                if typ == "flow" and src_interim.get(src4, "ytd_cumulative") == "qtd":
+                    if not all(qq in qs for qq in (1, 2, 3, 4)):
+                        continue                       # FY jen z kompletního roku
+                    fyval = sum(qs[qq][0] for qq in (1, 2, 3, 4))   # FY = součet čtvrtletí
+                else:
+                    fyval = v4                          # YTD: FY = Q4 YTD; stock/ratio: Q4
                 pid = period_id(con, bank_id, y, "FY", None)
                 con.execute("INSERT INTO fact(bank_id,code,period_id,basis,value,source_id) VALUES(?,?,?,?,?,?)",
-                            (bank_id, code, pid, "reported", v4, src_id[src4]))
+                            (bank_id, code, pid, "reported", fyval, src_id[src4]))
                 n += 1
 
     # --- 5: manuální data (všechny CSV v config/manual/, libovolná banka + báze) ---
@@ -191,6 +208,21 @@ def run_build(cfg, xlsx, database_url):
                         (r["bank_id"], "total_liabilities", r["period_id"], "reported", r["ta"] - r["te"], derived_src))
             d1 += 1
     d2 = derive_ratio("loan_to_deposit_ratio", "net_customer_loans", "customer_deposits")
+
+    # operating_result = operating_income - operating_expenses (kde banka nereportuje přímo)
+    d3 = 0
+    for r in con.query("""
+            SELECT fa.bank_id AS bank_id, fa.period_id AS period_id, fa.value AS oi, fb.value AS oe
+            FROM fact fa
+            JOIN fact fb ON fa.period_id=fb.period_id AND fb.code='operating_expenses' AND fb.basis='reported'
+            WHERE fa.code='operating_income' AND fa.basis='reported'"""):
+        if r["oi"] is not None and r["oe"] is not None:
+            con.execute("""INSERT OR IGNORE INTO fact(bank_id,code,period_id,basis,value,source_id,derived)
+                           VALUES(?,?,?,?,?,?,1)""",
+                        (r["bank_id"], "operating_result", r["period_id"], "reported", r["oi"] - r["oe"], derived_src))
+            d3 += 1
+    # cost_income_ratio = operating_expenses / operating_income (kde chybí; jako podíl 0–1)
+    d4 = derive_ratio("cost_income_ratio", "operating_expenses", "operating_income", scale=1.0)
     con.commit()
 
     # --- 7: validace ---
@@ -261,8 +293,11 @@ def run_build(cfg, xlsx, database_url):
 
     return {
         "url": url, "dialect": dialect, "n_facts": n, "n_manual": n_man,
-        "n_metrics": len(codes_with_data), "derived": {"total_liabilities": d1, "loan_to_deposit_ratio": d2},
-        "remaining_gap": remaining, "checks": checks, "all_ok": all_ok, "per_bank": per_bank,
+        "n_metrics": len(codes_with_data),
+        "derived": {"total_liabilities": d1, "loan_to_deposit_ratio": d2,
+                    "operating_result": d3, "cost_income_ratio": d4},
+        "remaining_gap": remaining, "checks": checks, "all_ok": all_ok,
+        "per_bank": per_bank, "skipped_banks": skipped,
     }
 
 
@@ -278,7 +313,11 @@ def main():
     print(f"Načteno (strukturovaně): {r['n_metrics']} metrik, {r['n_facts']} faktů (Q+FY)")
     print(f"Doplněno z CSV (peer/PDF): {r['n_manual']} faktů")
     print(f"Odvozeno: total_liabilities ({r['derived']['total_liabilities']}), "
-          f"loan_to_deposit_ratio ({r['derived']['loan_to_deposit_ratio']})")
+          f"loan_to_deposit_ratio ({r['derived']['loan_to_deposit_ratio']}), "
+          f"operating_result ({r['derived']['operating_result']}), "
+          f"cost_income_ratio ({r['derived']['cost_income_ratio']})")
+    if r.get("skipped_banks"):
+        print(f"Přeskočené banky (chybí zdroj): {r['skipped_banks']}")
     print("Fakty per banka/báze:")
     for pb in r["per_bank"]:
         print(f"  {pb['bank']:6} {pb['basis']:9} {pb['cnt']}")

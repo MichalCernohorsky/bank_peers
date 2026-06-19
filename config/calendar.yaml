@@ -27,9 +27,28 @@ banks:
       - { period: 2026Q2, publish_date: 2026-08-05 }
 
   kb:
-    ir_page: https://www.kb.cz/en/about-the-bank/investor-relations
+    ir_page: https://www.kb.cz/en/about-bank/for-investors
     document:
-      # KB má zatím jen peer/PDF data (config/manual/peer_adjusted.csv) -> není co stahovat.
-      kind: manual
+      kind: local
+      path: KB-Facts-and-Figures-2026-1Q.xlsx
+      basis: reported
     releases:
       - { period: 2026Q1, publish_date: 2026-05-07 }
+
+  csob:
+    ir_page: https://www.csob.cz/portal/o-csob/vztahy-s-investory
+    document:
+      kind: local
+      path: csob-fact-sheet.xlsx
+      basis: reported
+    releases:
+      - { period: 2026Q1, publish_date: 2026-05-14 }
+
+  moneta:
+    ir_page: https://investors.moneta.cz/financial-results
+    document:
+      kind: local
+      path: mmb-1q2026-basic-financial-data.xlsx
+      basis: reported
+    releases:
+      - { period: 2026Q1, publish_date: 2026-04-29 }
