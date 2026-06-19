@@ -61,3 +61,10 @@ def test_root_serves_spa(client):
     r = client.get("/")
     assert r.status_code == 200
     assert "BankPulse" in r.text
+
+
+def test_health(client):
+    r = client.get("/health")
+    assert r.status_code == 200
+    d = r.json()
+    assert d["status"] == "ok" and d["banks"] > 0 and d["db"] == "sqlite"

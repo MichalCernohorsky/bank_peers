@@ -85,6 +85,20 @@ def test_structured_source_is_config_driven(built_db):
     assert any(s.startswith("xlsx_") for s in srcs)
 
 
+def test_seed_copies_snapshot(built_db, tmp_path):
+    """Seed prebuilt SQLite -> cíl: data (vč. kotvy) přežijí kopii."""
+    from pipeline.seed import seed
+    target = f"sqlite:///{tmp_path / 'seeded.db'}"
+    n = seed(str(built_db["db_path"]), target)
+    assert n > 0
+    con = Conn(target)
+    assert con.query_one("SELECT COUNT(*) AS n FROM bank")["n"] >= 1
+    row = con.query_one("""SELECT f.value AS v FROM fact f JOIN period p ON p.id=f.period_id
+                           WHERE f.code='net_profit' AND p.fiscal_year=2026 AND p.quarter=1 AND f.basis='reported'""")
+    con.close()
+    assert row and abs(row["v"] - 7086.0) < 1.0
+
+
 def test_derivation_total_liabilities(built_db):
     """Odvozeno: total_liabilities = total_assets - total_equity (stejné období)."""
     con = Conn(built_db["url"])

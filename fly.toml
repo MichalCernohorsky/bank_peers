@@ -1,0 +1,35 @@
+# Fly.io — API (web) + scheduler (worker) v jednom image (viz Dockerfile).
+# Postup:
+#   fly launch --no-deploy                 # vytvoří app
+#   fly postgres create && fly postgres attach <db>   # nastaví DATABASE_URL
+#   fly deploy
+app = "bankpulse"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[processes]
+  app = "uvicorn api.app:app --host 0.0.0.0 --port 8080"
+  scheduler = "python -m pipeline.scheduler --cron \"0 6 * * *\""
+
+[deploy]
+  release_command = "python -m pipeline.seed --if-empty"
+
+[env]
+  ALLOWED_ORIGINS = "*"
+  LOG_LEVEL = "info"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [http_service.checks]
+    [[http_service.checks.health]]
+      path = "/health"
+      interval = "30s"
+      timeout = "5s"

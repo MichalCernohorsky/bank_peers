@@ -1,0 +1,39 @@
+# Render.com Blueprint — API (web) + scheduler (worker) + PostgreSQL.
+# Nasazení: Render Dashboard -> New -> Blueprint -> vyber repo. Vše ostatní z tohoto souboru.
+databases:
+  - name: bankpulse-db
+    databaseName: bank
+    user: bank
+    plan: free
+
+services:
+  - type: web
+    name: bankpulse-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    # seed čerstvé DB z verzovaného snapshotu (přeskočí, když už data jsou)
+    preDeployCommand: python -m pipeline.seed --if-empty
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: bankpulse-db, property: connectionString }
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: LOG_LEVEL
+        value: info
+      - key: PYTHON_VERSION
+        value: "3.11"
+
+  - type: worker
+    name: bankpulse-scheduler
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m pipeline.scheduler --cron "0 6 * * *"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: bankpulse-db, property: connectionString }
+      - key: SLACK_WEBHOOK_URL
+        sync: false      # nastav v dashboardu (alerty z ingest brány)

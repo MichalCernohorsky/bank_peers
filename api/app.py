@@ -10,26 +10,67 @@ Endpointy:
   GET /api/facts?bank=cs&code=net_profit&period_type=Q&basis=reported
   GET /api/dashboard/{bank}     -> headline KPI + série pro frontend
 """
+import logging
 import sys
+import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from pipeline.db import Conn  # noqa: E402
+from pipeline.db import Conn, dialect_of  # noqa: E402
 from pipeline.settings import allowed_origins_list, get_settings  # noqa: E402
 
+_settings = get_settings()
+logging.basicConfig(level=getattr(logging, _settings.log_level.upper(), logging.INFO),
+                    format="%(asctime)s %(levelname)s %(name)s %(message)s")
+log = logging.getLogger("bankpulse.api")
+
+
+@asynccontextmanager
+async def lifespan(app):
+    log.info("BankPulse API start · db=%s", dialect_of(get_settings().database_url))
+    yield
+
+
 WEB = ROOT / "web"
-app = FastAPI(title="Bank Results API")
+app = FastAPI(title="Bank Results API", lifespan=lifespan)
 # Frontend se servíruje ze stejného originu jako API (StaticFiles níže) -> fetch
 # bez CORS. CORS zůstává pro dev / cross-origin nasazení; originy z ALLOWED_ORIGINS.
 app.add_middleware(CORSMiddleware,
-                   allow_origins=allowed_origins_list(get_settings().allowed_origins),
+                   allow_origins=allowed_origins_list(_settings.allowed_origins),
                    allow_methods=["*"], allow_headers=["*"])
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    t0 = time.perf_counter()
+    resp = await call_next(request)
+    dur = (time.perf_counter() - t0) * 1000
+    if request.url.path != "/health":   # health spamuje load-balancer; neloguj
+        log.info("%s %s -> %s %.0fms", request.method, request.url.path, resp.status_code, dur)
+    return resp
+
+
+@app.get("/health", include_in_schema=False)
+@app.get("/api/health")
+def health():
+    """Health-check pro load-balancer/orchestrátor: ověří DB a vrátí základní stav."""
+    try:
+        banks = q("SELECT COUNT(*) AS n FROM bank")[0]["n"]
+        yr = q("SELECT MAX(p.fiscal_year) AS y FROM period p WHERE p.period_type='Q'")
+        run = q("SELECT status, finished_at FROM ingestion_run ORDER BY id DESC LIMIT 1")
+        return {"status": "ok", "db": dialect_of(get_settings().database_url),
+                "banks": banks, "latest_year": yr[0]["y"] if yr else None,
+                "last_ingest": run[0] if run else None}
+    except Exception as e:
+        log.error("health-check selhal: %s", e)
+        return JSONResponse({"status": "error", "detail": str(e)}, status_code=503)
 
 
 def q(sql, args=()):

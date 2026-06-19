@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{ROOT / 'data' / 'cs_financials.db'}"
     xlsx_path: str = str(ROOT / "key_figures_q1_2026.xlsx")
     allowed_origins: str = "*"
+    log_level: str = "info"
 
     model_config = SettingsConfigDict(
         env_file=str(ROOT / ".env"),
