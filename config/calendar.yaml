@@ -6,6 +6,11 @@ defaults:
   gate:
     require_validation: true     # rekonciliace (run_build) musí projít
     headline_metric: net_profit  # headline metrika musí existovat pro nejnovější období
+    # kontrola kompletnosti: tyhle metriky MUSÍ být pro nejnovější období (jinak ruční nahrání)
+    required_metrics: [net_profit, operating_result, operating_income, net_interest_income,
+                       net_fee_commission_income, total_assets, net_customer_loans, customer_deposits]
+    # a alespoň tolik % očekávaných metrik ze source-mapy banky (záchyt useknutého/špatného souboru)
+    min_coverage: 0.8
 
 banks:
   cs:

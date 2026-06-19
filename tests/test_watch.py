@@ -35,8 +35,11 @@ def env(tmp_path):
 
     return {
         "cal": str(cal_path),
+        "calendar": cal,
+        "cal_path": cal_path,
         "registry": tmp_path / "registry.json",
         "incoming": tmp_path / "incoming",
+        "manual": tmp_path / "manual_drop",
         "target": f"sqlite:///{tmp_path / 'prod.db'}",
         "target_path": tmp_path / "prod.db",
         "alerts": alerts,
@@ -47,7 +50,7 @@ def env(tmp_path):
 def _run(env, **kw):
     return watch.run_once(
         calendar_path=env["cal"], registry_path=env["registry"], incoming_dir=env["incoming"],
-        target_url=env["target"], today=TODAY, notify=env["notify"], **kw)
+        manual_dir=env["manual"], target_url=env["target"], today=TODAY, notify=env["notify"], **kw)
 
 
 def test_due_releases_filter():
@@ -109,6 +112,39 @@ def test_missing_document_alerts(env):
     assert any(r["action"] == "missing-document" for r in out["results"] if r["bank"] == "cs")
     assert any(a["level"] == "alert" for a in env["alerts"])
     assert not env["target_path"].exists()
+
+
+def test_completeness_blocks_when_required_metric_missing(env):
+    # vynuť povinnou metriku, kterou ČS xlsx nemá (rwa je GAP) -> nekompletní -> ruční nahrání
+    cal = env["calendar"]
+    cal["defaults"]["gate"]["required_metrics"] = ["net_profit", "rwa"]
+    env["cal_path"].write_text(json.dumps(cal))
+    out = _run(env)
+    assert any(r["action"] == "rejected" for r in out["results"] if r["bank"] == "cs")
+    assert not env["target_path"].exists()                     # produkce nezměněna
+    alert = [a for a in env["alerts"] if a["level"] == "alert"][0]
+    assert "NAHRAJ RUČNĚ" in alert["subject"]
+    assert "rwa" in alert["body"]                              # řekne přesně co chybí
+    cs = [d for d in json.loads(env["registry"].read_text())["documents"] if d["bank"] == "cs"][0]
+    assert cs["status"] == "rejected" and "rwa" in cs["required_missing"]
+
+
+def test_complete_data_passes_coverage(env):
+    _run(env)                                                 # výchozí required = vše, co ČS má
+    cs = [d for d in json.loads(env["registry"].read_text())["documents"] if d["bank"] == "cs"][0]
+    assert cs["status"] == "accepted"
+    assert cs["coverage"] >= 0.8 and cs["required_missing"] == []
+
+
+def test_manual_drop_fallback(env):
+    # auto-zdroj selže (neexistující cesta), ale ruční drop-folder má kompletní soubor
+    drop = env["manual"] / "cs"
+    drop.mkdir(parents=True)
+    (drop / "key_figures.xlsx").write_bytes(FIXTURE.read_bytes())
+    out = _run(env, source_overrides={"cs": "/does/not/exist.xlsx"})
+    cs = [r for r in out["results"] if r["bank"] == "cs"][0]
+    assert cs["action"] == "promoted" and cs["source_mode"] == "manual"
+    assert env["target_path"].exists()
 
 
 def test_restatement_creates_new_vintage(env):

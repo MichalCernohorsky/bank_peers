@@ -77,6 +77,12 @@ python -m pipeline.scheduler --cron "0 6 * * *"
 Validace je brána: nevalidní data se NEpromotují (exit 1 → alert). Idempotence: stejný
 checksum se přeskočí; restatement téhož období = nový vintage.
 
+**Kontrola kompletnosti + ruční fallback** (gate v `config/calendar.yaml`): před promote se
+ověří, že máme data včetně všech metrik — povinné metriky pro nejnovější období
+(`required_metrics`) a pokrytí očekávané sady ze source-mapy (`min_coverage`). Když to
+neprojde nebo auto-zdroj selže, watcher pošle alert „NAHRAJ RUČNĚ" s výčtem chybějícího a
+data se vezmou z drop-folderu `data/manual_drop/<bank>/` při dalším běhu.
+
 ## Stav
 Hotová datová vrstva pro ČS (2002–Q1 2026), validace prochází (SQLite i PostgreSQL).
 Backend API + sloučený frontend (`web/app.html`) běží ze stejného originu — viz roadmapa v `CLAUDE.md`.
