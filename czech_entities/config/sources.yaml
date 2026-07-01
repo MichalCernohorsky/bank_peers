@@ -22,20 +22,39 @@ ares:
   # k parsování než VREO XML. URL potvrď na csu.gov.cz (dokumentace RES).
   csv_url: "https://csu.gov.cz/registr-ekonomickych-subjektu-otevrena-data/res_data.csv.zip"
   # Mapování sloupců CSV -> tabulka subjekt (case-insensitive, první nalezený
-  # vyhrává). Kandidáti pokrývají obvyklé názvy RES/ARES; potvrď přes
-  # `layer-a --sample 1 --source csv` (vypíše hlavičku CSV).
+  # vyhrává). Ověřeno proti reálnému ČSÚ RES exportu (res_data.csv, comma-sep):
+  #   ICO,OKRESLAU,DDATVZN,DDATZAN,ZPZAN,DDATPAKT,FORMA,ROSFORMA,KATPO,NACE,
+  #   NACE2025,ICZUJ,FIRMA,...,TEXTADR,PSC,OBEC_TEXT,COBCE_TEXT,ULICE_TEXT,...
+  # Kandidáti drží i obecné názvy pro jiné varianty exportu.
   csv_col_map:
     ico:              ["ICO", "ico"]
-    nazev:            ["OBCHODNI_JMENO", "NAZEV", "obchodni_jmeno", "nazev"]
-    pravni_forma:     ["PRAVNI_FORMA", "KOD_PF", "pravni_forma"]
-    sidlo_text:       ["ADRESA", "SIDLO", "textova_adresa"]
-    sidlo_kraj:       ["NAZ_KRAJ", "KRAJ", "nazev_kraje"]
-    sidlo_okres:      ["NAZ_OKRES", "OKRES", "nazev_okresu"]
-    sidlo_obec:       ["NAZ_OBEC", "OBEC", "nazev_obce"]
-    nace:             ["NACE", "CZ_NACE", "nace_hlavni"]
-    datum_vzniku:     ["DATUM_VZNIKU", "DAT_VZNIK", "datum_vzniku"]
-    stav:             ["STAV", "PRAVNI_STAV", "stav_subjektu"]
+    nazev:            ["FIRMA", "OBCHODNI_JMENO", "NAZEV"]
+    pravni_forma:     ["FORMA", "ROSFORMA", "PRAVNI_FORMA", "KOD_PF"]
+    sidlo_text:       ["TEXTADR", "ADRESA", "SIDLO"]
+    sidlo_kraj:       ["NAZ_KRAJ", "KRAJ", "nazev_kraje"]      # v RES není -> odvození z okresu
+    sidlo_okres:      ["OKRESLAU", "NAZ_OKRES", "OKRES"]       # LAU kód okresu (CZ0203)
+    sidlo_obec:       ["OBEC_TEXT", "NAZ_OBEC", "OBEC"]
+    nace:             ["NACE", "CZ_NACE", "NACE2025"]
+    datum_vzniku:     ["DDATVZN", "DATUM_VZNIKU", "DAT_VZNIK"]
+    datum_zaniku:     ["DDATZAN", "DATUM_ZANIKU"]              # -> odvození stavu
+    stav:             ["STAV", "PRAVNI_STAV"]                  # v RES není -> odvození
     datova_schranka:  ["ID_DS", "DATOVA_SCHRANKA"]
+  # Číselník krajů (NUTS3) pro odvození sidlo_kraj z OKRESLAU[:5] (RES nemá kraj).
+  kraj_ciselnik:
+    CZ010: "Hlavní město Praha"
+    CZ020: "Středočeský kraj"
+    CZ031: "Jihočeský kraj"
+    CZ032: "Plzeňský kraj"
+    CZ041: "Karlovarský kraj"
+    CZ042: "Ústecký kraj"
+    CZ051: "Liberecký kraj"
+    CZ052: "Královéhradecký kraj"
+    CZ053: "Pardubický kraj"
+    CZ063: "Kraj Vysočina"
+    CZ064: "Jihomoravský kraj"
+    CZ071: "Olomoucký kraj"
+    CZ072: "Zlínský kraj"
+    CZ080: "Moravskoslezský kraj"
   # REST v3 — JEN na detaily/delty jednotlivých IČO, NIKDY na celý registr.
   rest_base: "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest"
   rest_detail: "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/{ico}"
@@ -55,8 +74,9 @@ ares:
     stav:             ["pravniStav", "stav"]
     datova_schranka:  ["datovaSchranka", "idDatoveSchranky"]
   # Kódy právních forem fyzických osob (OSVČ) — pro odvození je_fo.
-  # 101 = fyzická osoba podnikající dle živnostenského zákona; 100–199 = FO.
-  fo_pravni_forma_prefix: ["10", "11", "12", "13"]
+  # FO jsou kódy 100–109 (101 = živnostník, 105 = zemědělský podnikatel, …).
+  # POZOR: 111 v.o.s., 112 s.r.o., 121 a.s. jsou PRÁVNICKÉ osoby → prefix jen "10".
+  fo_pravni_forma_prefix: ["10"]
 
 # --- Vrstva B: ISIR (insolvence) ---------------------------------------------
 isir:

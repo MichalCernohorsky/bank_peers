@@ -29,7 +29,7 @@ from src.ico import is_valid_ico, normalize_ico
 
 log = logging.getLogger("czech_entities.layer_a")
 
-BATCH = 5000
+BATCH = 100000
 
 
 def _localname(tag: str) -> str:
@@ -162,7 +162,8 @@ def _resolve_csv_cols(header: list[str], col_map: dict) -> dict:
     return resolved
 
 
-def _csv_row_to_row(rec: list[str], cols: dict, fo_prefixes: list[str], source_id: int):
+def _csv_row_to_row(rec: list[str], cols: dict, fo_prefixes: list[str],
+                    source_id: int, kraj_ciselnik: dict | None = None):
     def g(field):
         i = cols.get(field)
         if i is None or i >= len(rec):
@@ -174,26 +175,36 @@ def _csv_row_to_row(rec: list[str], cols: dict, fo_prefixes: list[str], source_i
     if ico is None:
         return None
     pf = g("pravni_forma")
+    okres = g("sidlo_okres")
+
+    # stav: explicitní, jinak odvození z data zániku (RES kraj/stav nemá)
+    stav = g("stav") or ("zaniklý" if g("datum_zaniku") else "aktivní")
+    # kraj: explicitní, jinak odvození z LAU kódu okresu (NUTS3 = OKRESLAU[:5])
+    kraj = g("sidlo_kraj")
+    if kraj is None and okres and kraj_ciselnik:
+        kraj = kraj_ciselnik.get(okres[:5])
+
     return [
         ico, is_valid_ico(ico), g("nazev"), pf, None, _is_fo(pf, fo_prefixes),
-        g("sidlo_kraj"), g("sidlo_okres"), g("sidlo_obec"), g("sidlo_text"),
-        g("nace"), _parse_date(g("datum_vzniku")), g("stav"),
+        kraj, okres, g("sidlo_obec"), g("sidlo_text"),
+        g("nace"), _parse_date(g("datum_vzniku")), stav,
         g("datova_schranka"), source_id, dt.datetime.now(),
     ]
 
 
-def iter_csv_rows(path: Path, col_map: dict, fo_prefixes: list[str], source_id: int):
+def iter_csv_rows(path: Path, col_map: dict, fo_prefixes: list[str], source_id: int,
+                  kraj_ciselnik: dict | None = None):
     import csv as _csv
 
     with _open_text(path) as fh:
-        # autodetekce oddělovače (RES CSV bývá ';')
+        # autodetekce oddělovače (ČSÚ RES je ',', jiné exporty bývají ';')
         sample = fh.read(4096)
         fh.seek(0)
         try:
-            dialect = _csv.Sniffer().sniff(sample, delimiters=";,\t")
+            dialect = _csv.Sniffer().sniff(sample, delimiters=",;\t")
         except _csv.Error:
             class dialect:  # noqa: N801
-                delimiter = ";"
+                delimiter = ","
         reader = _csv.reader(fh, dialect)
         header = next(reader, None)
         if not header:
@@ -204,7 +215,7 @@ def iter_csv_rows(path: Path, col_map: dict, fo_prefixes: list[str], source_id: 
                 "CSV: nenalezen sloupec IČO. Uprav ares.csv_col_map v configu. "
                 f"Hlavička: {header[:12]}")
         for rec in reader:
-            row = _csv_row_to_row(rec, cols, fo_prefixes, source_id)
+            row = _csv_row_to_row(rec, cols, fo_prefixes, source_id, kraj_ciselnik)
             if row is not None:
                 yield row
 
@@ -287,7 +298,8 @@ def ingest(con, config_path: str, cache_dir: str, force: bool = False,
 
     if fmt == "csv":
         col_map = ares["csv_col_map"]
-        rows = iter_csv_rows(src_path, col_map, fo_prefixes, sid)
+        kraj_ciselnik = ares.get("kraj_ciselnik")
+        rows = iter_csv_rows(src_path, col_map, fo_prefixes, sid, kraj_ciselnik)
         _consume_rows(con, rid, rows, "CSV")
     else:
         fmap = ares["vreo_field_map"]
@@ -307,18 +319,38 @@ def _vreo_row_iter(archive_path: Path, fmap, fo_prefixes, sid):
 
 
 def _dump_csv_header(path: Path) -> None:
+    import csv as _csv
     with _open_text(path) as fh:
-        first = fh.readline()
+        sample = fh.read(4096)
+        fh.seek(0)
+        try:
+            dialect = _csv.Sniffer().sniff(sample, delimiters=",;\t")
+        except _csv.Error:
+            class dialect:  # noqa: N801
+                delimiter = ","
+        header = next(_csv.reader(fh, dialect), [])
     print("--- hlavička CSV (uprav ares.csv_col_map dle těchto názvů) ---")
-    for i, col in enumerate(first.replace("﻿", "").strip().split(";")):
-        print(f"    [{i:2}] {col}")
+    for i, col in enumerate(header):
+        print(f"    [{i:2}] {col.replace(chr(0xFEFF), '')}")
+
+
+_SUBJEKT_COLS = [
+    "ico", "ico_valid", "nazev", "pravni_forma", "pravni_forma_txt", "je_fo",
+    "sidlo_kraj", "sidlo_okres", "sidlo_obec", "sidlo_text", "nace",
+    "datum_vzniku", "stav", "datova_schranka", "source_id", "ingest_at",
+]
 
 
 def _flush(con, batch: list[list]) -> None:
-    # INSERT OR REPLACE dle IČO (idempotence při opakovaném běhu)
-    con.execute("DELETE FROM subjekt WHERE ico IN (SELECT ico FROM (VALUES "
-                + ",".join("(?)" for _ in batch) + ") AS t(ico))",
-                [r[0] for r in batch])
-    con.executemany(
-        "INSERT INTO subjekt VALUES (" + ",".join("?" * 16) + ")", batch
-    )
+    """Bulk upsert dávky přes registrovaný DataFrame (řádově rychlejší než
+    executemany). DELETE dle IČO drží idempotenci při opakovaném běhu.
+    """
+    import pandas as pd
+
+    df = pd.DataFrame(batch, columns=_SUBJEKT_COLS)
+    con.register("_batch_df", df)
+    try:
+        con.execute("DELETE FROM subjekt WHERE ico IN (SELECT ico FROM _batch_df)")
+        con.execute("INSERT INTO subjekt SELECT * FROM _batch_df")
+    finally:
+        con.unregister("_batch_df")
