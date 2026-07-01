@@ -42,7 +42,15 @@ def cmd_layer_a(args):
     con = db.connect(args.db)
     db.init_schema(con)
     layer_a_res.ingest(con, args.config, cache_dir=args.cache, force=args.force,
-                       sample=args.sample)
+                       sample=args.sample, file=args.file, source=args.source)
+
+
+def cmd_enrich(args):
+    from src import ares_rest
+    con = db.connect(args.db)
+    db.init_schema(con)
+    ares_rest.enrich(con, args.config, cache_dir=args.cache,
+                     ico_file=args.ico_file, limit=args.limit)
 
 
 def cmd_layer_b(args):
@@ -102,8 +110,17 @@ def main(argv=None):
 
     a = sub.add_parser("layer-a"); a.add_argument("--force", action="store_true")
     a.add_argument("--sample", type=int, default=0, metavar="N",
-                   help="jen vypíše strukturu prvních N záznamů VREO (ladění mapování)")
+                   help="jen vypíše strukturu prvních N záznamů (ladění mapování)")
+    a.add_argument("--file", default=None,
+                   help="lokální bulk soubor (BEZ egressu): .csv/.csv.gz/.zip nebo VREO .tar.gz")
+    a.add_argument("--source", choices=["auto", "vreo", "csv"], default="auto",
+                   help="formát zdroje (auto = dle přípony)")
     a.set_defaults(func=cmd_layer_a)
+    en = sub.add_parser("enrich", help="doplnit atributy k seznamu IČO přes ARES REST v3")
+    en.add_argument("--ico-file", default=None, help="soubor se seznamem IČO (1 na řádek)")
+    en.add_argument("--limit", type=int, default=None)
+    en.set_defaults(func=cmd_enrich)
+
     b = sub.add_parser("layer-b"); b.add_argument("--force", action="store_true"); b.set_defaults(func=cmd_layer_b)
     c = sub.add_parser("coverage"); c.add_argument("--n", type=int, default=500); c.set_defaults(func=cmd_coverage)
     d = sub.add_parser("layer-c"); d.add_argument("--limit", type=int, default=None); d.set_defaults(func=cmd_layer_c)

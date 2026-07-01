@@ -18,6 +18,24 @@ ares:
   vreo_all_url: "https://ares.gov.cz/otevrena-data/ares_vreo_all.tar.gz"
   # Lehký CSV seznam IČO + datum poslední změny (pro detekci delt, ne master data).
   ico_list_url: "https://ares.gov.cz/otevrena-data/seznam-ico.csv"
+  # ČSÚ RES open data jako CSV (kanonický zdroj univerza vč. OSVČ). Robustnější
+  # k parsování než VREO XML. URL potvrď na csu.gov.cz (dokumentace RES).
+  csv_url: "https://csu.gov.cz/registr-ekonomickych-subjektu-otevrena-data/res_data.csv.zip"
+  # Mapování sloupců CSV -> tabulka subjekt (case-insensitive, první nalezený
+  # vyhrává). Kandidáti pokrývají obvyklé názvy RES/ARES; potvrď přes
+  # `layer-a --sample 1 --source csv` (vypíše hlavičku CSV).
+  csv_col_map:
+    ico:              ["ICO", "ico"]
+    nazev:            ["OBCHODNI_JMENO", "NAZEV", "obchodni_jmeno", "nazev"]
+    pravni_forma:     ["PRAVNI_FORMA", "KOD_PF", "pravni_forma"]
+    sidlo_text:       ["ADRESA", "SIDLO", "textova_adresa"]
+    sidlo_kraj:       ["NAZ_KRAJ", "KRAJ", "nazev_kraje"]
+    sidlo_okres:      ["NAZ_OKRES", "OKRES", "nazev_okresu"]
+    sidlo_obec:       ["NAZ_OBEC", "OBEC", "nazev_obce"]
+    nace:             ["NACE", "CZ_NACE", "nace_hlavni"]
+    datum_vzniku:     ["DATUM_VZNIKU", "DAT_VZNIK", "datum_vzniku"]
+    stav:             ["STAV", "PRAVNI_STAV", "stav_subjektu"]
+    datova_schranka:  ["ID_DS", "DATOVA_SCHRANKA"]
   # REST v3 — JEN na detaily/delty jednotlivých IČO, NIKDY na celý registr.
   rest_base: "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest"
   rest_detail: "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/{ico}"

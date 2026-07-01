@@ -20,6 +20,10 @@ syntetických vzorcích (viz `tests/`), a při reálném běhu jen doplnil data 
 sítě. Analytické jádro (parsování úvěru z rozvahy, validace IČO, join, export)
 je ověřeno na reálných PDF/XML fixtures.
 
+**Řešení bloku:** vrstva A umí načíst univerzum z **lokálního bulk souboru**
+(`--file`), takže stačí bulk stáhnout jednou jinde a nahrát sem — pipeline
+pak IČO + atributy zpracuje bez egressu. Viz „Jak získat seznam IČO" níže.
+
 ## Architektura (vrstvy dle obtížnosti a pokrytí)
 
 | Vrstva | Zdroj | Obsah | Pokrytí |
@@ -56,13 +60,45 @@ pip install -r requirements.txt
 #   apt-get install ocrmypdf tesseract-ocr tesseract-ocr-ces
 ```
 
-## Spuštění (pořadí dle SPEC)
+## Jak získat seznam IČO + atributy (3 cesty)
+
+Vrstva A umí univerzum načíst třemi způsoby — vyber podle toho, jestli máš
+přístup k síti a jestli chceš celý registr, nebo jen svůj seznam IČO:
+
+**1) Lokální bulk soubor (BEZ egressu — doporučeno v tomto prostředí).**
+Stáhni RES/ARES bulk jednou jinde (prohlížeč / stroj bez blokace), nahraj sem a
+ukaž na něj. Podporuje CSV (`.csv`, `.csv.gz`, `.zip`) i VREO `.tar.gz`:
+```bash
+python -m src.build layer-a --file data/cache/res_data.csv.zip --source csv
+python -m src.build layer-a --file data/cache/ares_vreo_all.tar.gz  # VREO XML
+```
+
+**2) Stažení bulku (potřebuje síť na ares.gov.cz / csu.gov.cz).**
+```bash
+python -m src.build layer-a --source csv    # ČSÚ RES CSV (kanonické univerzum)
+python -m src.build layer-a                 # ARES VREO tar.gz
+```
+
+**3) Enrich seznamu IČO přes ARES REST v3** (máš-li vlastní seznam IČO; API jen
+na detaily, ne na celý registr):
+```bash
+python -m src.build enrich --ico-file muj_seznam_ico.txt   # 1 IČO na řádek
+```
+
+### Ověření mapování sloupců/tagů před ostrým během
+```bash
+python -m src.build layer-a --file <bulk> --source csv --sample 1   # vypíše hlavičku CSV
+python -m src.build layer-a --file <bulk.tar.gz> --sample 5         # vypíše tagy VREO
+```
+Podle výpisu uprav `ares.csv_col_map` / `ares.vreo_field_map` v
+`config/sources.yaml` — **žádný zásah do kódu**.
+
+## Spuštění (celé pořadí dle SPEC)
 ```bash
 cd czech_entities
 
 python -m src.build init                 # schéma
-python -m src.build layer-a --sample 5   # POZOR: nejdřív ověř XML mapování (viz níže)
-python -m src.build layer-a              # RES/ARES bulk → univerzum (vrstva A)
+python -m src.build layer-a --file <bulk> --source csv   # univerzum (vrstva A)
 python -m src.build layer-b              # ISIR → insolvence (vrstva B)
 python -m src.build coverage --n 500     # MILNÍK: coverage vrstvy C na vzorku
 #   → podle coverage % rozhodni rozsah vrstvy C
@@ -73,14 +109,9 @@ python -m src.build status               # přehled stavu
 Globální přepínače (`--db`, `--config`, `--cache`) se uvádějí **před** názvem
 příkazu, např. `python -m src.build --db data/x.duckdb layer-a`.
 
-### Ověření XML mapování VREO (nutné před vrstvou A na reálných datech)
-Přesné názvy XML tagů ve VREO dumpu je nutné potvrdit proti reálnému vzorku:
-```bash
-python -m src.build layer-a --sample     # vypíše localname→hodnota prvních záznamů
-```
-Podle výpisu případně uprav `ares.vreo_field_map` v `config/sources.yaml`
-(žádný zásah do kódu). Totéž platí pro HTML parsery v `justice_sbirka.py`
-(parametry `subjektId`/`dokument` na or.justice.cz).
+Pozn.: HTML parsery sbírky listin v `justice_sbirka.py` (parametry
+`subjektId`/`dokument` na or.justice.cz) je nutné při reálném běhu potvrdit
+proti živému HTML — jsou izolované za rozhraním `SbirkaClient`.
 
 ## Coverage milník (povinný před plnou vrstvou C)
 `coverage --n 500` vezme náhodný vzorek právnických osob a změří:

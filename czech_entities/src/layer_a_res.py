@@ -131,37 +131,90 @@ def dump_sample_structure(archive_path: Path, n: int = 5) -> None:
             print(f"    {k:28} = {v[:60]}")
 
 
-def ingest(con, config_path: str, cache_dir: str, force: bool = False, sample: int = 0):
-    cfg = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
-    ares = cfg["ares"]
-    rate = cfg.get("rate_limit", {}).get("ares_max_per_min", 300)
+# --- CSV cesta (RES/ARES CSV open data) --------------------------------------
+def _open_text(path: Path):
+    """Otevře .csv, .csv.gz nebo první .csv v .zip jako textový stream (utf-8)."""
+    import gzip
+    import io
+    import zipfile
 
-    with Downloader(cache_dir, max_per_min=rate) as dl:
-        archive = dl.fetch_file(ares["vreo_all_url"], "ares_vreo_all.tar.gz", force=force)
+    name = path.name.lower()
+    if name.endswith(".gz"):
+        return io.TextIOWrapper(gzip.open(path, "rb"), encoding="utf-8", errors="replace")
+    if name.endswith(".zip"):
+        zf = zipfile.ZipFile(path)
+        inner = next((n for n in zf.namelist() if n.lower().endswith(".csv")), None)
+        if inner is None:
+            raise ValueError(f"v {path.name} není žádný .csv")
+        return io.TextIOWrapper(zf.open(inner), encoding="utf-8", errors="replace")
+    return open(path, "r", encoding="utf-8", errors="replace")
 
-    if sample:
-        dump_sample_structure(archive, n=sample)
-        return
 
-    sid = db.register_source(con, "ARES", ares["vreo_all_url"], str(archive),
-                             "VREO kompletní bulk (XML/IČO v tar.gz)")
-    rid = db.start_run(con, "A_master")
+def _resolve_csv_cols(header: list[str], col_map: dict) -> dict:
+    """Namapuje kandidátní názvy sloupců na skutečné indexy (case-insensitive)."""
+    idx = {h.strip().lower(): i for i, h in enumerate(header)}
+    resolved = {}
+    for field, candidates in col_map.items():
+        for c in candidates:
+            if c.lower() in idx:
+                resolved[field] = idx[c.lower()]
+                break
+    return resolved
 
-    fmap = ares["vreo_field_map"]
-    fo_prefixes = ares.get("fo_pravni_forma_prefix", [])
-    inserted, errors, batch = 0, 0, []
+
+def _csv_row_to_row(rec: list[str], cols: dict, fo_prefixes: list[str], source_id: int):
+    def g(field):
+        i = cols.get(field)
+        if i is None or i >= len(rec):
+            return None
+        v = rec[i].strip()
+        return v or None
+
+    ico = normalize_ico(g("ico"))
+    if ico is None:
+        return None
+    pf = g("pravni_forma")
+    return [
+        ico, is_valid_ico(ico), g("nazev"), pf, None, _is_fo(pf, fo_prefixes),
+        g("sidlo_kraj"), g("sidlo_okres"), g("sidlo_obec"), g("sidlo_text"),
+        g("nace"), _parse_date(g("datum_vzniku")), g("stav"),
+        g("datova_schranka"), source_id, dt.datetime.now(),
+    ]
+
+
+def iter_csv_rows(path: Path, col_map: dict, fo_prefixes: list[str], source_id: int):
+    import csv as _csv
+
+    with _open_text(path) as fh:
+        # autodetekce oddělovače (RES CSV bývá ';')
+        sample = fh.read(4096)
+        fh.seek(0)
+        try:
+            dialect = _csv.Sniffer().sniff(sample, delimiters=";,\t")
+        except _csv.Error:
+            class dialect:  # noqa: N801
+                delimiter = ";"
+        reader = _csv.reader(fh, dialect)
+        header = next(reader, None)
+        if not header:
+            return
+        cols = _resolve_csv_cols(header, col_map)
+        if "ico" not in cols:
+            raise ValueError(
+                "CSV: nenalezen sloupec IČO. Uprav ares.csv_col_map v configu. "
+                f"Hlavička: {header[:12]}")
+        for rec in reader:
+            row = _csv_row_to_row(rec, cols, fo_prefixes, source_id)
+            if row is not None:
+                yield row
+
+
+# --- společný zapisovací cyklus ----------------------------------------------
+def _consume_rows(con, rid: int, row_iter, source_desc: str) -> None:
+    inserted, batch = 0, []
     con.execute("BEGIN TRANSACTION")
     try:
-        for root in iter_vreo_records(archive):
-            try:
-                row = _record_to_row(root, fmap, fo_prefixes, sid)
-            except Exception as e:  # robustnost: jeden špatný záznam neshodí běh
-                errors += 1
-                log.debug("chyba záznamu: %s", e)
-                continue
-            if row is None:
-                errors += 1
-                continue
+        for row in row_iter:
             batch.append(row)
             if len(batch) >= BATCH:
                 _flush(con, batch)
@@ -175,11 +228,90 @@ def ingest(con, config_path: str, cache_dir: str, force: bool = False, sample: i
         con.execute("COMMIT")
     except Exception:
         con.execute("ROLLBACK")
-        db.finish_run(con, rid, inserted, errors, "failed")
+        db.finish_run(con, rid, inserted, 0, "failed")
         raise
+    db.finish_run(con, rid, inserted, 0, "ok")
+    log.info("vrstva A hotová (%s): %d subjektů", source_desc, inserted)
 
-    db.finish_run(con, rid, inserted, errors, "ok")
-    log.info("vrstva A hotová: %d subjektů, %d chyb", inserted, errors)
+
+def _detect_format(path: Path) -> str:
+    n = path.name.lower()
+    if n.endswith((".tar.gz", ".tgz", ".tar")):
+        return "vreo"
+    if ".csv" in n or n.endswith((".zip", ".gz")):
+        return "csv"
+    return "vreo"
+
+
+def ingest(con, config_path: str, cache_dir: str, force: bool = False,
+           sample: int = 0, file: str | None = None, source: str = "auto"):
+    """Vrstva A. Zdroj lze zvolit:
+
+      - `file`: lokální bulk soubor (BEZ egressu) — doporučeno v prostředí s blokem.
+                Stáhni bulk jednou jinde, sem nahraj a ukaž na něj.
+      - jinak stáhne dle configu (VREO tar.gz nebo CSV url).
+
+    source: 'auto' | 'vreo' | 'csv'. Při 'auto' se hádá dle přípony.
+    """
+    cfg = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
+    ares = cfg["ares"]
+    rate = cfg.get("rate_limit", {}).get("ares_max_per_min", 300)
+    fo_prefixes = ares.get("fo_pravni_forma_prefix", [])
+
+    # 1) získání zdrojového souboru: lokální (bez sítě) nebo stažení
+    if file:
+        src_path = Path(file)
+        if not src_path.exists():
+            raise FileNotFoundError(f"zdrojový soubor neexistuje: {src_path}")
+        src_url = f"file://{src_path}"
+    else:
+        fmt0 = source if source != "auto" else "vreo"
+        url = ares["csv_url"] if fmt0 == "csv" else ares["vreo_all_url"]
+        fname = "res_data.csv.zip" if fmt0 == "csv" else "ares_vreo_all.tar.gz"
+        with Downloader(cache_dir, max_per_min=rate) as dl:
+            src_path = dl.fetch_file(url, fname, force=force)
+        src_url = url
+
+    fmt = source if source != "auto" else _detect_format(src_path)
+
+    if sample:
+        if fmt == "vreo":
+            dump_sample_structure(src_path, n=sample)
+        else:
+            _dump_csv_header(src_path)
+        return
+
+    sid = db.register_source(con, "ARES/RES", src_url, str(src_path),
+                             f"vrstva A bulk ({fmt})")
+    rid = db.start_run(con, "A_master")
+
+    if fmt == "csv":
+        col_map = ares["csv_col_map"]
+        rows = iter_csv_rows(src_path, col_map, fo_prefixes, sid)
+        _consume_rows(con, rid, rows, "CSV")
+    else:
+        fmap = ares["vreo_field_map"]
+        rows = _vreo_row_iter(src_path, fmap, fo_prefixes, sid)
+        _consume_rows(con, rid, rows, "VREO")
+
+
+def _vreo_row_iter(archive_path: Path, fmap, fo_prefixes, sid):
+    for root in iter_vreo_records(archive_path):
+        try:
+            row = _record_to_row(root, fmap, fo_prefixes, sid)
+        except Exception as e:  # jeden špatný záznam neshodí běh
+            log.debug("chyba záznamu: %s", e)
+            continue
+        if row is not None:
+            yield row
+
+
+def _dump_csv_header(path: Path) -> None:
+    with _open_text(path) as fh:
+        first = fh.readline()
+    print("--- hlavička CSV (uprav ares.csv_col_map dle těchto názvů) ---")
+    for i, col in enumerate(first.replace("﻿", "").strip().split(";")):
+        print(f"    [{i:2}] {col}")
 
 
 def _flush(con, batch: list[list]) -> None:
