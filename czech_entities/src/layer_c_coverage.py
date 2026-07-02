@@ -31,8 +31,10 @@ log = logging.getLogger("czech_entities.coverage")
 
 def sample_po(con, n: int) -> list[str]:
     """Náhodný vzorek n IČO právnických osob (ne OSVČ)."""
+    # POZOR: SAMPLE se aplikuje na scan PŘED WHERE, proto filtr obalit subselectem,
+    # jinak by se vzorkovalo z celé tabulky a filtr by počet zmenšil.
     rows = con.execute(
-        "SELECT ico FROM subjekt WHERE COALESCE(je_fo, FALSE)=FALSE "
+        "SELECT ico FROM (SELECT ico FROM subjekt WHERE COALESCE(je_fo, FALSE)=FALSE) "
         f"USING SAMPLE reservoir({int(n)} ROWS)"
     ).fetchall()
     return [r[0] for r in rows]
