@@ -68,3 +68,12 @@ def test_health(client):
     assert r.status_code == 200
     d = r.json()
     assert d["status"] == "ok" and d["banks"] > 0 and d["db"] == "sqlite"
+
+
+def test_offers(client):
+    r = client.get("/api/offers", params={"product": "savings_account"})
+    assert r.status_code == 200
+    d = r.json()
+    codes = {b["code"] for b in d["banks"]}
+    assert {"cs", "kb", "csob", "moneta"} <= codes
+    assert all(b["rate_label"] for b in d["banks"])

@@ -93,6 +93,19 @@ ověří, že máme data včetně všech metrik — povinné metriky pro nejnov�
 neprojde nebo auto-zdroj selže, watcher pošle alert „NAHRAJ RUČNĚ" s výčtem chybějícího a
 data se vezmou z drop-folderu `data/manual_drop/<bank>/` při dalším běhu.
 
+## Sazby produktů (sekce „Sazby")
+Spotřebitelský přehled aktuálních nabídek (zatím spořicí účet) napříč 4 bankami —
+tabulka logo · banka · sazba + promo + news. Config-driven scraping s **ověřeným
+fallbackem** (`config/products.yaml`): stáhni produktovou stránku a vytáhni sazbu; když
+web nejde (WAF) nebo se sazba nepřečte, použij ověřenou hodnotu z configu a označ ji
+statusem (živě / orientačně). Nikdy se nezobrazí prázdno/špatně potichu.
+```bash
+python -m pipeline.offers --product savings_account   # -> data/offers.json (čte /api/offers)
+```
+Frontend: záložka „Sazby produktů". Scheduler obnovuje sazby vedle ingestu výsledků.
+Pozn.: sazby žijí na marketingových stránkách (WAF, časté změny) — v prostředí za WAF
+scraper spadne na fallback; pro živé stahování je potřeba reálný fetch (headless).
+
 ## Nasazení (deploy)
 API + frontend běží z jednoho originu; scheduler je samostatný worker; data v PostgreSQL.
 

@@ -211,6 +211,36 @@ padding:22px 24px 14px;scroll-margin-top:16px}
 @media(max-width:920px){.grid{grid-template-columns:repeat(2,1fr)}.panels{grid-template-columns:1fr}.spk{display:none}}
 @media(max-width:720px){.rail{display:none}.page{padding:22px 18px 70px}.grid{grid-template-columns:1fr}
 .barrow{grid-template-columns:1fr;gap:8px}.bar .v{min-width:0}}
+
+/* ===== Sazby produktů ===== */
+.ratetable{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+.rhead,.rrow{display:grid;grid-template-columns:minmax(210px,1.4fr) 1.3fr 1.6fr 150px;gap:16px;align-items:center;padding:14px 20px}
+.rhead{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--soft);font-weight:600;background:var(--l2);border-bottom:1px solid var(--line)}
+.rrow{border-bottom:1px solid var(--l2)}
+.rrow:last-child{border-bottom:0}
+.rrow:hover{background:#FAFCFF}
+.rbank{display:flex;align-items:center;gap:12px;min-width:0}
+.rlogo{width:42px;height:42px;flex:none;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;letter-spacing:.3px;font-family:'IBM Plex Sans',sans-serif}
+.rname{font-weight:600;font-size:14.5px;line-height:1.2}
+.rcond{font-size:11.5px;color:var(--soft);margin-top:3px;line-height:1.35}
+.rrate{display:flex;flex-direction:column;gap:6px}
+.rval{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:22px;letter-spacing:-.4px;color:var(--ink)}
+.rbar{height:7px;border-radius:99px;background:var(--l2);overflow:hidden}
+.rbar span{display:block;height:100%;border-radius:99px}
+.rpromo{font-size:12.5px;color:var(--ink-2);line-height:1.4}
+.rpromo.none{color:var(--faint)}
+.rstatus{text-align:right}
+.badge{display:inline-block;font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:99px;border:1px solid}
+.badge.live{color:var(--pos);background:rgba(21,138,90,.08);border-color:rgba(21,138,90,.25)}
+.badge.fallback{color:var(--soft);background:var(--l2);border-color:var(--line)}
+.badge .d{font-weight:400;color:var(--faint);margin-left:5px}
+.newsfeed{display:flex;flex-direction:column;gap:10px}
+.newsitem{display:flex;gap:12px;align-items:center;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.newsitem .ntag{font-size:10.5px;font-weight:700;color:#fff;padding:3px 8px;border-radius:6px;flex:none}
+.newsitem a{color:var(--ink);text-decoration:none;font-size:13.5px;font-weight:500}
+.newsitem a:hover{color:var(--brand-600)}
+.newsempty{color:var(--soft);font-size:13px;padding:14px 4px}
+@media(max-width:720px){.rhead{display:none}.rrow{grid-template-columns:1fr;gap:10px}.rstatus{text-align:left}}
 </style>
 </head>
 <body>
@@ -220,6 +250,7 @@ padding:22px 24px 14px;scroll-margin-top:16px}
 <nav class="viewnav">
 <button data-view="overview" class="on"><span class="vi"></span>Přehled banky</button>
 <button data-view="compare"><span class="vi"></span>Srovnání peerů</button>
+<button data-view="offers"><span class="vi"></span>Sazby produktů</button>
 </nav>
 <div class="railsec" id="banksel"><div class="raillbl">Banka</div><div class="bankbtns" id="bankbtns"></div></div>
 <div class="railsec"><div class="raillbl">Kohorty</div><nav class="kohnav" id="kohnav"></nav></div>
@@ -260,6 +291,18 @@ padding:22px 24px 14px;scroll-margin-top:16px}
 <div class="sec-head"><div><h2>Exhibity podle kohort</h2><div class="sh-note">adjusted · banka vs. peers · Q1 2025 → Q1 2026</div></div><div class="seg" id="cmp-style"></div></div>
 <div class="cats" id="cmp-exhibits"></div>
 <div class="foot"><span>Zdroj: IR jednotlivých bank (reported IFRS, Q1 2026)</span><span class="pill">báze reported</span></div>
+</div>
+</section>
+<section id="off" class="view">
+<div class="page">
+<header class="hero" id="off-hero"></header>
+<section class="exec">
+<div class="sec-head"><div><h2>Přehled sazeb</h2><div class="sh-note" id="off-note">—</div></div><span class="period" id="off-updated">—</span></div>
+<div class="ratetable" id="off-table"></div>
+</section>
+<div class="sec-head"><div><h2>Novinky</h2><div class="sh-note">aktuální zprávy k produktu (RSS)</div></div></div>
+<div class="newsfeed" id="off-news"></div>
+<div class="foot"><span id="off-src">Zdroj: produktové stránky bank · scraping s ověřeným fallbackem</span><span class="pill" id="off-status">—</span></div>
 </div>
 </section>
 </main>
@@ -630,6 +673,43 @@ async function load(){const d=await fetchJSON(['/api/compare?banks=cs,kb,csob,mo
 return {render:render,load:load,afterShow:afterShow};
 })();
 
+const OFFERS = {"product": "savings_account", "label": "Spořicí účet", "unit": "percent", "note": "Nejvyšší nabízená sazba (až), obvykle s podmínkami a limitem vkladu.", "updated_at": "2026-07-02T15:21:22", "banks": [{"code": "cs", "name": "Česká spořitelna", "accent": "#C8102E", "url": "https://www.csas.cz/cs/osobni-finance/sporeni/sporici-ucet", "rate": 0.038, "rate_label": "až 3,80 %", "conditions": "Do 400 tis. Kč · podmínka: pravidelná investice / penzijní spoření ≥ 2 000 Kč/měs. (nad limit 0,01 %).", "promo": "Bonusová sazba za pravidelné investování nebo penzijní spoření.", "as_of": "2026-06", "news": [], "status": "fallback"}, {"code": "csob", "name": "ČSOB", "accent": "#0098D4", "url": "https://www.csob.cz/portal/lide/produkty/sporeni-a-investice/sporici-ucty", "rate": 0.038, "rate_label": "až 3,80 %", "conditions": "Do 250 tis. Kč · příjem ≥ 15 000 Kč/měs + 5× platba kartou (základní sazba 2,75 %).", "promo": "Zvýhodněná sazba 3,80 % p.a. garantovaná do 31. 5. 2026.", "as_of": "2026-06", "news": [], "status": "fallback"}, {"code": "kb", "name": "Komerční banka", "accent": "#A6192E", "url": "https://www.kb.cz/cs/obcane/sporeni-a-investovani/sporici-ucet", "rate": 0.035, "rate_label": "až 3,50 %", "conditions": "Noví klienti · do 1 mil. Kč · platnost limitu 6 měsíců.", "promo": "Zvýhodnění pro nové klienty (limit úročení do 1 mil. Kč).", "as_of": "2026-06", "news": [], "status": "fallback"}, {"code": "moneta", "name": "MONETA Money Bank", "accent": "#6A2C70", "url": "https://www.moneta.cz/sporeni-a-investice/sporici-ucty", "rate": 0.026, "rate_label": "2,60 %", "conditions": "Vklady do 1 mil. Kč · nad limit +0,5 %.", "promo": "—", "as_of": "2026-06", "news": [], "status": "fallback"}]};
+/* ================= Sazby produktů ================= */
+const Offers = (function(){
+const INIT={cs:'ČS',kb:'KB',csob:'ČSOB',moneta:'MON'};
+let _loaded=false;
+function hero(d){const top=d.banks[0];
+return `<div class="hero-grid"><div class="hero-l">`+
+`<div class="kicker">${(d.label||'Produkt').toUpperCase()} · SAZBY</div>`+
+`<h1>Aktuální nabídky<br>${(d.label||'').toLowerCase()}</h1>`+
+`<div class="lead">Nejvyšší sazbu nab\u00edz\u00ed <strong>${top?top.name:'—'}</strong> (${top?top.rate_label:'—'}). Sazby jsou orienta\u010dn\u00ed, s podm\u00ednkami a limitem vkladu \u2014 detail u ka\u017ed\u00e9 banky.</div>`+
+`</div></div>`;}
+function render(d){
+document.getElementById('off-hero').innerHTML=hero(d);
+document.getElementById('off-note').textContent=d.note||'';
+document.getElementById('off-updated').textContent='aktualizováno '+(d.updated_at||'').slice(0,10);
+const max=Math.max(...d.banks.map(b=>b.rate||0),0.001);
+const rows=d.banks.map(b=>{const w=((b.rate||0)/max*100).toFixed(0);
+const promo=(b.promo&&b.promo!=='—')?`<div class="rpromo">${b.promo}</div>`:`<div class="rpromo none">—</div>`;
+const badge=b.status==='live'?`<span class="badge live">živě${b.as_of?`<span class="d">${b.as_of}</span>`:''}</span>`:`<span class="badge fallback">orientačně${b.as_of?`<span class="d">${b.as_of}</span>`:''}</span>`;
+return `<div class="rrow">`+
+`<div class="rbank"><span class="rlogo" style="background:${b.accent}">${INIT[b.code]||b.code.toUpperCase()}</span>`+
+`<div><div class="rname">${b.name}</div><div class="rcond">${b.conditions||''}</div></div></div>`+
+`<div class="rrate"><div class="rval">${b.rate_label}</div><div class="rbar"><span style="width:${w}%;background:${b.accent}"></span></div></div>`+
+promo+
+`<div class="rstatus">${badge}${b.url?` · <a href="${b.url}" target="_blank" rel="noopener" style="font-size:11px">web</a>`:''}</div>`+
+`</div>`;}).join('');
+document.getElementById('off-table').innerHTML=`<div class="rhead"><div>Banka</div><div>Sazba</div><div>Akce / promo</div><div style="text-align:right">Stav</div></div>`+rows;
+const news=d.banks.flatMap(b=>(b.news||[]).map(n=>({title:n.title,url:n.url,bank:b.code,accent:b.accent})));
+const nf=document.getElementById('off-news');
+nf.innerHTML=news.length?news.slice(0,8).map(n=>`<div class="newsitem"><span class="ntag" style="background:${n.accent}">${INIT[n.bank]||n.bank}</span><a href="${n.url||'#'}" target="_blank" rel="noopener">${n.title}</a></div>`).join(''):`<div class="newsempty">Žádné aktuální zprávy — news feed (RSS) se doplní, jakmile bude u banky nakonfigurován.</div>`;
+const live=d.banks.filter(b=>b.status==='live').length;
+document.getElementById('off-status').textContent=live?`${live}/${d.banks.length} živě z webu`:'orientační sazby (ověřený fallback)';
+}
+async function load(){if(_loaded)return;const d=await fetchJSON(['/api/offers?product=savings_account','./offers.json']);render(d||OFFERS);_loaded=true;}
+return {load};
+})();
+
 /* ================= shell / navigace ================= */
 (function init(){
 let curBank=SNAPSHOT.bank.code;const ORDER=['cs','kb'];
@@ -644,9 +724,10 @@ function show(v){view=v;
 document.querySelectorAll('.viewnav button').forEach(x=>x.classList.toggle('on',x.dataset.view===v));
 document.getElementById('ov').classList.toggle('active',v==='overview');
 document.getElementById('cmp').classList.toggle('active',v==='compare');
+document.getElementById('off').classList.toggle('active',v==='offers');
 document.getElementById('banksel').style.display=(v==='overview')?'flex':'none';
 document.getElementById('scroller').scrollTo({top:0});
-if(v==='overview')Overview.afterShow();else Compare.afterShow();}
+if(v==='overview')Overview.afterShow();else if(v==='compare')Compare.afterShow();else Offers.load();}
 document.querySelectorAll('.viewnav button').forEach(btn=>btn.onclick=()=>show(btn.dataset.view));
 Overview.load(curBank);
 Compare.load();

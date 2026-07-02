@@ -10,6 +10,7 @@ Endpointy:
   GET /api/facts?bank=cs&code=net_profit&period_type=Q&basis=reported
   GET /api/dashboard/{bank}     -> headline KPI + série pro frontend
 """
+import json
 import logging
 import sys
 import time
@@ -24,6 +25,7 @@ from fastapi.staticfiles import StaticFiles
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from pipeline.db import Conn, dialect_of  # noqa: E402
+from pipeline.offers import snapshot as offers_snapshot  # noqa: E402
 from pipeline.settings import allowed_origins_list, get_settings  # noqa: E402
 
 _settings = get_settings()
@@ -212,6 +214,21 @@ def compare(banks: str = "cs,kb,csob,moneta", basis: str = "reported", year: int
         "banks": [{**q("SELECT code,name FROM bank WHERE code=?", (c,))[0], "accent": accents.get(c, "#333")} for c in codes],
         "groups": groups, "slope": slope,
     }
+
+
+@app.get("/api/offers")
+def offers(product: str = "savings_account"):
+    """Produktové nabídky (sazby/promo/news). Čte data/offers.json (scraper),
+    jinak sestaví snapshot z configu (fallback, bez sítě)."""
+    f = ROOT / "data" / "offers.json"
+    if f.exists():
+        try:
+            data = json.loads(f.read_text())
+            if data.get("product") == product:
+                return data
+        except Exception:
+            pass
+    return offers_snapshot(product)
 
 
 # --- frontend (stejný origin jako API) ---

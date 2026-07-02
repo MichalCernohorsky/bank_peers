@@ -1,0 +1,51 @@
+# Produktové nabídky (sazby / promo / news) pro sekci „Sazby".
+# JINÁ datová doména než IR výsledky: aktuální marketingová data z webů bank.
+# Scraping: fetch URL -> extrakce (regex) -> při selhání/blokaci se použije `fallback`
+# (reálná, datovaná hodnota) a fakt se označí statusem. Nikdy se nezobrazí prázdno/špatně potichu.
+# Pozn.: sazby se mění; fallback drž aktuální, nebo nech scraper běžet v prostředí s reálným fetch.
+products:
+  savings_account:
+    label_cs: Spořicí účet
+    unit: percent
+    note: 'Nejvyšší nabízená sazba (až), obvykle s podmínkami a limitem vkladu.'
+    banks:
+      cs:
+        url: https://www.csas.cz/cs/osobni-finance/sporeni/sporici-ucet
+        rate_regex: '(\d+[,.]\d+)\s*%'
+        news_rss: null
+        fallback:
+          rate: 0.038
+          rate_label: "až 3,80 %"
+          conditions: "Do 400 tis. Kč · podmínka: pravidelná investice / penzijní spoření ≥ 2 000 Kč/měs. (nad limit 0,01 %)."
+          promo: "Bonusová sazba za pravidelné investování nebo penzijní spoření."
+          as_of: "2026-06"
+      kb:
+        url: https://www.kb.cz/cs/obcane/sporeni-a-investovani/sporici-ucet
+        rate_regex: '(\d+[,.]\d+)\s*%'
+        news_rss: null
+        fallback:
+          rate: 0.035
+          rate_label: "až 3,50 %"
+          conditions: "Noví klienti · do 1 mil. Kč · platnost limitu 6 měsíců."
+          promo: "Zvýhodnění pro nové klienty (limit úročení do 1 mil. Kč)."
+          as_of: "2026-06"
+      csob:
+        url: https://www.csob.cz/portal/lide/produkty/sporeni-a-investice/sporici-ucty
+        rate_regex: '(\d+[,.]\d+)\s*%'
+        news_rss: null
+        fallback:
+          rate: 0.038
+          rate_label: "až 3,80 %"
+          conditions: "Do 250 tis. Kč · příjem ≥ 15 000 Kč/měs + 5× platba kartou (základní sazba 2,75 %)."
+          promo: "Zvýhodněná sazba 3,80 % p.a. garantovaná do 31. 5. 2026."
+          as_of: "2026-06"
+      moneta:
+        url: https://www.moneta.cz/sporeni-a-investice/sporici-ucty
+        rate_regex: '(\d+[,.]\d+)\s*%'
+        news_rss: null
+        fallback:
+          rate: 0.026
+          rate_label: "2,60 %"
+          conditions: "Vklady do 1 mil. Kč · nad limit +0,5 %."
+          promo: "—"
+          as_of: "2026-06"
