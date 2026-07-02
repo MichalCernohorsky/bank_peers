@@ -1,0 +1,117 @@
+# Konfigurace zdrojů — ad-hoc analýza ekonomických subjektů v ČR.
+# Endpointy ověřeny přes web (WebSearch) k 2026-07. V TOMTO prostředí jsou
+# všechny cílové hosty blokované egress-politikou (403 na CONNECT) → reálný běh
+# nutno provést ze stroje bez blokace a potvrdit HTTP 200 + velikosti (HEAD).
+#
+# ZÁSADA: mapování polí je v konfiguraci, ne v kódu (konvence projektu).
+# XML schéma VREO a přesné parametry or.justice.cz je nutné potvrdit proti
+# reálnému vzorku — viz `python -m src.build layer-a --sample`.
+
+rate_limit:
+  ares_max_per_min: 300        # ARES blokuje nad ~500/min → konzervativně
+  justice_max_per_min: 120
+  isir_min_interval_s: 600     # ISIR WS doporučuje min. 10 min mezi dotazy/subjekt
+
+# --- Vrstva A: RES / ARES bulk (univerzum) -----------------------------------
+ares:
+  # Kompletní obraz všech IČO (jeden XML na IČO, zabaleno v tar.gz).
+  vreo_all_url: "https://ares.gov.cz/otevrena-data/ares_vreo_all.tar.gz"
+  # Lehký CSV seznam IČO + datum poslední změny (pro detekci delt, ne master data).
+  ico_list_url: "https://ares.gov.cz/otevrena-data/seznam-ico.csv"
+  # ČSÚ RES open data jako CSV (kanonický zdroj univerza vč. OSVČ). Robustnější
+  # k parsování než VREO XML. URL potvrď na csu.gov.cz (dokumentace RES).
+  csv_url: "https://csu.gov.cz/registr-ekonomickych-subjektu-otevrena-data/res_data.csv.zip"
+  # Mapování sloupců CSV -> tabulka subjekt (case-insensitive, první nalezený
+  # vyhrává). Ověřeno proti reálnému ČSÚ RES exportu (res_data.csv, comma-sep):
+  #   ICO,OKRESLAU,DDATVZN,DDATZAN,ZPZAN,DDATPAKT,FORMA,ROSFORMA,KATPO,NACE,
+  #   NACE2025,ICZUJ,FIRMA,...,TEXTADR,PSC,OBEC_TEXT,COBCE_TEXT,ULICE_TEXT,...
+  # Kandidáti drží i obecné názvy pro jiné varianty exportu.
+  csv_col_map:
+    ico:              ["ICO", "ico"]
+    nazev:            ["FIRMA", "OBCHODNI_JMENO", "NAZEV"]
+    pravni_forma:     ["FORMA", "ROSFORMA", "PRAVNI_FORMA", "KOD_PF"]
+    sidlo_text:       ["TEXTADR", "ADRESA", "SIDLO"]
+    sidlo_kraj:       ["NAZ_KRAJ", "KRAJ", "nazev_kraje"]      # v RES není -> odvození z okresu
+    sidlo_okres:      ["OKRESLAU", "NAZ_OKRES", "OKRES"]       # LAU kód okresu (CZ0203)
+    sidlo_obec:       ["OBEC_TEXT", "NAZ_OBEC", "OBEC"]
+    nace:             ["NACE", "CZ_NACE", "NACE2025"]
+    datum_vzniku:     ["DDATVZN", "DATUM_VZNIKU", "DAT_VZNIK"]
+    datum_zaniku:     ["DDATZAN", "DATUM_ZANIKU"]              # -> odvození stavu
+    stav:             ["STAV", "PRAVNI_STAV"]                  # v RES není -> odvození
+    datova_schranka:  ["ID_DS", "DATOVA_SCHRANKA"]
+  # Číselník krajů (NUTS3) pro odvození sidlo_kraj z OKRESLAU[:5] (RES nemá kraj).
+  kraj_ciselnik:
+    CZ010: "Hlavní město Praha"
+    CZ020: "Středočeský kraj"
+    CZ031: "Jihočeský kraj"
+    CZ032: "Plzeňský kraj"
+    CZ041: "Karlovarský kraj"
+    CZ042: "Ústecký kraj"
+    CZ051: "Liberecký kraj"
+    CZ052: "Královéhradecký kraj"
+    CZ053: "Pardubický kraj"
+    CZ063: "Kraj Vysočina"
+    CZ064: "Jihomoravský kraj"
+    CZ071: "Olomoucký kraj"
+    CZ072: "Zlínský kraj"
+    CZ080: "Moravskoslezský kraj"
+  # REST v3 — JEN na detaily/delty jednotlivých IČO, NIKDY na celý registr.
+  rest_base: "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest"
+  rest_detail: "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/{ico}"
+  # Mapování XML tagů VREO -> sloupce tabulky `subjekt`. Porovnává se localname
+  # (bez namespace), case-insensitive. Kandidátní názvy (první nalezený vyhrává).
+  vreo_field_map:
+    ico:              ["ico"]
+    nazev:            ["obchodniJmeno", "obchodni_firma", "nazev", "jmeno"]
+    pravni_forma:     ["pravniForma", "kodPravniFormy", "pravni_forma"]
+    sidlo_text:       ["sidlo", "adresaDorucovaci", "textovaAdresa"]
+    sidlo_kraj:       ["nazevKraje", "kraj", "nazevOblasti"]
+    sidlo_okres:      ["nazevOkresu", "okres"]
+    sidlo_obec:       ["nazevObce", "obec"]
+    nace:             ["czNace", "nace", "cinnost"]
+    datum_vzniku:     ["datumVzniku", "datum_vzniku"]
+    datum_zaniku:     ["datumZaniku", "datum_zaniku"]
+    stav:             ["pravniStav", "stav"]
+    datova_schranka:  ["datovaSchranka", "idDatoveSchranky"]
+  # Kódy právních forem fyzických osob (OSVČ) — pro odvození je_fo.
+  # FO jsou kódy 100–109 (101 = živnostník, 105 = zemědělský podnikatel, …).
+  # POZOR: 111 v.o.s., 112 s.r.o., 121 a.s. jsou PRÁVNICKÉ osoby → prefix jen "10".
+  fo_pravni_forma_prefix: ["10"]
+
+# --- Vrstva B: ISIR (insolvence) ---------------------------------------------
+isir:
+  wsdl: "https://isir.justice.cz:8443/isir_ws/services/IsirPub001?wsdl"
+  endpoint: "https://isir.justice.cz:8443/isir_ws/services/IsirPub001"
+  # Inkrementální stahování: getIsirPub0012 vrací akce s id > poslední_id,
+  # max 1000 na volání. Stav se drží v DuckDB (pdf_job/ingestion_run styl).
+  method_by_id: "getIsirPub0012"
+  page_size: 1000
+  # Rychlá lustrace podle IČO (druhá služba).
+  cuzk_ws2: "https://isir.justice.cz:8443/isir_ws/services/ISIR_CUZK_WS2"
+
+# --- Vrstva C: sbírka listin (účetní závěrky) --------------------------------
+justice:
+  # Portál otevřených dat OR (CKAN) — zápisy z rejstříku (ne metadata listin).
+  dataor_ckan_package_list: "https://dataor.justice.cz/api/3/action/package_list"
+  dataor_ckan_package_show: "https://dataor.justice.cz/api/3/action/package_show?id={id}"
+  dataor_file: "https://dataor.justice.cz/api/file/{id}.xml.gz"
+  # Sbírka listin je HTML (IAS UI) — nutno parsovat, není REST.
+  or_search: "https://or.justice.cz/ias/ui/rejstrik-firma.vysledky"
+  or_sbirka_firma: "https://or.justice.cz/ias/ui/vypis-sl-firma?subjektId={subjektId}"
+  or_sbirka_detail: "https://or.justice.cz/ias/ui/vypis-sl-detail?dokument={dokument}&subjektId={subjektId}"
+  # Typy listin, které nás zajímají (obsahují rozvahu).
+  typy_listin: ["účetní závěrka", "výroční zpráva", "zpráva o vztazích"]
+
+# --- Vrstva C: extrakce úvěru z rozvahy --------------------------------------
+uver_extrakce:
+  # Poslední dostupný rok (rozhodnutí uživatele). Pro N let zvyš.
+  roky_zpet: 1
+  # Řádky pasiv rozvahy indikující bankovní úvěr. Hledá se case/diakritika-insensitive.
+  polozky_uver:
+    - "Bankovní úvěry a výpomoci"
+    - "Bankovní úvěry"
+    - "Závazky k úvěrovým institucím"
+    - "Dlouhodobé bankovní úvěry"
+    - "Krátkodobé bankovní úvěry"
+  # OCR jen pro skeny (bez textové vrstvy).
+  ocr_jazyk: "ces"

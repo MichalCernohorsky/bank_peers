@@ -1,0 +1,23 @@
+# Ad-hoc analýza ekonomických subjektů v ČR — závislosti
+# Python 3.11+
+
+duckdb>=1.1.0          # sloupcová DB nad miliony řádků, bez serveru
+httpx>=0.27.0          # HTTP klient (bulk stahování, ARES REST)
+pyyaml>=6.0            # konfigurace zdrojů
+tenacity>=8.2.0        # retry/backoff pro síťové chyby
+
+# Vrstva C (PDF účetních závěrek) — potřeba jen pro extrakci úvěrů
+pdfplumber>=0.11.0     # extrakce textu/tabulek ze strojově čitelných PDF
+pypdf>=4.0.0           # fallback čtení PDF, detekce textové vrstvy
+
+# OCR (jen pro skeny; ocrmypdf + tesseract musí být i jako systémové balíčky)
+#   apt-get install ocrmypdf tesseract-ocr tesseract-ocr-ces
+# (nechávám jako volitelnou závislost; import je lazy)
+
+# Export
+openpyxl>=3.1.0        # xlsx export (DuckDB umí i přímo, ale kvůli formátování)
+pandas>=2.0.0          # pomocný export/preview
+pyarrow>=15.0.0        # parquet
+
+# Jen pro testy (generování vzorových PDF v tests/):
+#   fpdf2>=2.7.0
