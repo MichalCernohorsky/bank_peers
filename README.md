@@ -100,7 +100,7 @@ fallbackem** (`config/products.yaml`): stáhni produktovou stránku a vytáhni s
 web nejde (WAF) nebo se sazba nepřečte, použij ověřenou hodnotu z configu a označ ji
 statusem (živě / orientačně). Nikdy se nezobrazí prázdno/špatně potichu.
 ```bash
-python -m pipeline.offers --product savings_account   # -> data/offers.json (čte /api/offers)
+python -m pipeline.offers --product savings_account   # -> data/offers_<product>.json (čte /api/offers)
 ```
 Frontend: záložka „Sazby produktů". Scheduler obnovuje sazby vedle ingestu výsledků.
 
@@ -108,12 +108,23 @@ Frontend: záložka „Sazby produktů". Scheduler obnovuje sazby vedle ingestu 
 + čerstvost. Proto:
 - **Zdroj = oficiální stránka banky**, stahovaná headless prohlížečem: `pipeline/offers_browser.py`
   (Playwright), zapíná `OFFERS_BROWSER=1`. Projde WAF, který blokuje prosté HTTP.
-- **Validace + brána**: sazba musí být v rozsahu 0–6 %, mít podmínky a datum; `refresh()` porovná
-  s minulým snapshotem a **velký skok (> 1 p.b.) označí `needs_review` a pošle alert** — nepublikuje
-  se potichu. Audit v `data/offers_changelog.json`.
+- **Validace + brána (návrh → potvrzení člověkem)**: sazba musí být v rozsahu 0–6 %, mít podmínky
+  a datum. `refresh()` porovná se schváleným snapshotem a rozhodne:
+  - první běh (bootstrap) publikuje rovnou (není s čím porovnat);
+  - malá/žádná změna bez flagů → **auto-publish**;
+  - **velký skok (> 1 p.b.) NEBO validační flag → zadrží do `data/offers_<product>.staging.json`,
+    zapíše `…pending.json`, pošle alert a NEPUBLIKUJE** — čeká na ruční schválení. Do produkce
+    (`/api/offers` čte `data/offers_<product>.json`) se tak nikdy nedostane neověřená změna.
+  - Audit v `data/offers_changelog.json` (publish / approve / reject).
 - **Provenance + čerstvost v UI**: u každé sazby datum platnosti a badge — `živě` / `orientačně` /
   `ověřit` (starší než `fresh_days`) / `zkontrolovat` (validační flag). Disclaimer „ověřte u banky".
-- Doporučený provoz: **návrh → potvrzení člověkem** (automat navrhne změny, člověk odklikne).
+
+Ruční schválení zadrženého návrhu:
+```bash
+python -m pipeline.offers --product savings_account --review    # co čeká + proč
+python -m pipeline.offers --product savings_account --approve   # staging -> published
+python -m pipeline.offers --product savings_account --reject    # zahodí návrh
+```
 
 Pozn.: v tomto prostředí je outbound k doménám bank blokovaný (proxy allowlist), takže scraper
 běží na ověřeném fallbacku; živý sběr poběží v produkci s otevřeným outboundem.

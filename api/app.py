@@ -25,6 +25,7 @@ from fastapi.staticfiles import StaticFiles
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from pipeline.db import Conn, dialect_of  # noqa: E402
+from pipeline.offers import published_path as offers_published_path  # noqa: E402
 from pipeline.offers import snapshot as offers_snapshot  # noqa: E402
 from pipeline.settings import allowed_origins_list, get_settings  # noqa: E402
 
@@ -218,9 +219,10 @@ def compare(banks: str = "cs,kb,csob,moneta", basis: str = "reported", year: int
 
 @app.get("/api/offers")
 def offers(product: str = "savings_account"):
-    """Produktové nabídky (sazby/promo/news). Čte data/offers.json (scraper),
-    jinak sestaví snapshot z configu (fallback, bez sítě)."""
-    f = ROOT / "data" / "offers.json"
+    """Produktové nabídky (sazby/promo/news). Čte publikovaný snapshot
+    (data/offers_<product>.json — jen schválená data), jinak sestaví snapshot
+    z configu (ověřený fallback, bez sítě). Neschválené návrhy se nikdy nevrací."""
+    f = offers_published_path(product)
     if f.exists():
         try:
             data = json.loads(f.read_text())

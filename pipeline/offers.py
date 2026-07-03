@@ -7,9 +7,17 @@ stránku a vytáhnout sazbu (regex). Když fetch selže (WAF/timeout) nebo se sa
 spolehlivě přečíst, použij `fallback` z config/products.yaml a fakt označ statusem:
   live      = staženo a přečteno z webu
   fallback  = použita ověřená hodnota z configu (web nedostupný/neparsovatelný)
-News: volitelně z RSS (news_rss). Výstup: data/offers.json (čte ho /api/offers).
+News: volitelně z RSS (news_rss).
 
-  python -m pipeline.offers --product savings_account [--out data/offers.json]
+Brána (návrh → potvrzení člověkem): refresh() živě sebere data a porovná se
+schváleným snapshotem. Velký skok (> REVIEW_DELTA) nebo validační flag se zadrží
+do staging + pending a NEPUBLIKUJE; publikuje se až po `--approve`. Publikovaný
+stav je per-produkt v data/offers_<product>.json (čte ho /api/offers).
+
+  python -m pipeline.offers --product savings_account            # živý sběr + brána
+  python -m pipeline.offers --product savings_account --review   # co čeká ke schválení
+  python -m pipeline.offers --product savings_account --approve  # staging -> published
+  python -m pipeline.offers --product savings_account --reject   # zahodí návrh
 
 Pozn.: respektuj ToS webů; scraping je best-effort a v prostředí za WAF spadne na fallback.
 """
@@ -29,8 +37,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from pipeline.notify import notify as default_notify  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUT = ROOT / "data" / "offers.json"
-CHANGELOG = ROOT / "data" / "offers_changelog.json"
+DATA_DIR = ROOT / "data"          # adresář se stavem (lze přebít v testech)
 ACCENTS = {"cs": "#C8102E", "kb": "#A6192E", "csob": "#0098D4", "moneta": "#6A2C70"}
 UA = "Mozilla/5.0 (compatible; BankPulseBot/1.0; +https://example.com/bot)"
 
@@ -203,49 +210,162 @@ def snapshot(product, config_dir=None, live=False, notify=default_notify):
     return {**base, "kind": "table", "banks": banks}
 
 
-def refresh(product, config_dir=None, out=DEFAULT_OUT, notify=default_notify):
-    """Živý sběr + důvěryhodnostní brána: velké skoky sazeb označí k ručnímu schválení
-    (needs_review) a pošle alert; audit se zapíše do offers_changelog.json."""
-    out = Path(out)
-    prev = json.loads(out.read_text()) if out.exists() else None
-    snap = snapshot(product, config_dir=config_dir, live=True, notify=notify)
+# --- úložiště stavu (per-produkt): published / staging / pending / changelog ---
+def published_path(product):
+    """Publikovaný snapshot, který čte /api/offers. Nic neověřeného sem nesmí."""
+    return DATA_DIR / f"offers_{product}.json"
+
+
+def _staging_path(product):
+    """Návrh čekající na schválení (živě stažený, ale zadržený bránou)."""
+    return DATA_DIR / f"offers_{product}.staging.json"
+
+
+def _pending_path(product):
+    """Souhrn důvodů zadržení (co přesně je ke schválení)."""
+    return DATA_DIR / f"offers_{product}.pending.json"
+
+
+def _changelog_path():
+    return DATA_DIR / "offers_changelog.json"
+
+
+def _append_changelog(entry):
+    p = _changelog_path()
+    log = json.loads(p.read_text()) if p.exists() else []
+    log.append(entry)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(log, ensure_ascii=False, indent=2))
+
+
+def _publish(product, snap, changes=None, reason="auto"):
+    """Zapíše snapshot do published + zaznamená do changelogu."""
+    p = published_path(product)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(snap, ensure_ascii=False, indent=2))
+    _append_changelog({
+        "at": dt.datetime.now().isoformat(timespec="seconds"),
+        "product": product, "action": "publish", "reason": reason,
+        "changes": changes or [],
+    })
+
+
+def _hold(product, snap, changes, big, flagged_data):
+    """Zadrží návrh do staging + zapíše pending (důvody). Nepublikuje."""
+    for b in snap["banks"]:
+        if b["code"] in {c["bank"] for c in big} or b.get("flags"):
+            b["needs_review"] = True
+    sp, pp = _staging_path(product), _pending_path(product)
+    sp.parent.mkdir(parents=True, exist_ok=True)
+    sp.write_text(json.dumps(snap, ensure_ascii=False, indent=2))
+    pending = {
+        "at": dt.datetime.now().isoformat(timespec="seconds"), "product": product,
+        "big_changes": big, "flagged": flagged_data, "changes": changes,
+    }
+    pp.write_text(json.dumps(pending, ensure_ascii=False, indent=2))
+    return pending
+
+
+def refresh(product, config_dir=None, live=True, notify=default_notify):
+    """Živý sběr + důvěryhodnostní brána (návrh → potvrzení člověkem).
+
+    - první běh (bootstrap): publikuje rovnou (není s čím porovnat);
+    - malá/žádná změna a bez validačních flagů: auto-publikuje;
+    - velký skok (> REVIEW_DELTA) NEBO validační flag: zadrží do staging + pending,
+      pošle alert a NEPUBLIKUJE — čeká na `approve()`.
+    """
+    pub = published_path(product)
+    prev = json.loads(pub.read_text()) if pub.exists() else None
+    snap = snapshot(product, config_dir=config_dir, live=live, notify=notify)
 
     changes = diff_snapshot(prev, snap)
     big = [c for c in changes if c.get("old") is not None and c.get("new") is not None
            and abs(c["new"] - c["old"]) > REVIEW_DELTA]
-    if big:
-        flagged = {c["bank"] for c in big}
-        for b in snap["banks"]:
-            if b["code"] in flagged:
-                b["needs_review"] = True
-        notify(f"Sazby {product}: {len(big)} velkých změn ke schválení",
-               "; ".join(f"{c['bank']} {c.get('term','') } {c['old']}→{c['new']}" for c in big[:6]),
-               level="alert")
-
     flagged_data = [b["code"] for b in snap["banks"] if b.get("flags")]
-    if flagged_data:
-        notify(f"Sazby {product}: validační flagy u {flagged_data}",
-               "zkontroluj rozsah/podmínky/datum", level="alert")
 
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(snap, ensure_ascii=False, indent=2))
-    if changes:
-        log = json.loads(CHANGELOG.read_text()) if CHANGELOG.exists() else []
-        log.append({"at": dt.datetime.now().isoformat(timespec="seconds"), "product": product, "changes": changes})
-        CHANGELOG.write_text(json.dumps(log, ensure_ascii=False, indent=2))
+    if prev is None:                                   # bootstrap: první publikace
+        _publish(product, snap, changes, reason="bootstrap")
+        action = "publikováno (bootstrap)"
+    elif not big and not flagged_data:                 # důvěryhodná změna -> auto-publish
+        _publish(product, snap, changes, reason="auto")
+        action = "publikováno (auto)"
+    else:                                              # zadržet ke schválení
+        _hold(product, snap, changes, big, flagged_data)
+        detail = "; ".join(f"{c['bank']} {c.get('term','')} {c['old']}→{c['new']}" for c in big[:6])
+        notify(f"Sazby {product}: {len(big)} velkých změn / flagy {flagged_data} ke schválení",
+               f"{detail}  —  schval: python -m pipeline.offers --product {product} --approve",
+               level="alert")
+        action = "ZADRŽENO ke schválení (needs_review)"
 
-    live = sum(1 for b in snap["banks"] if b.get("method") in ("http", "browser"))
-    print(f"Sazby {product}: {len(snap['banks'])} subjektů ({live} live, {len(snap['banks']) - live} fallback), "
-          f"{len(changes)} změn, {len(big)} ke schválení -> {out}")
+    live_n = sum(1 for b in snap["banks"] if b.get("method") in ("http", "browser"))
+    print(f"Sazby {product}: {len(snap['banks'])} subjektů ({live_n} live, "
+          f"{len(snap['banks']) - live_n} fallback), {len(changes)} změn, "
+          f"{len(big)} velkých, flagy {flagged_data} -> {action}")
     return snap
 
 
+def pending(product):
+    """Vrátí čekající návrh (staging snapshot + důvody), nebo None když nic nečeká."""
+    pp, sp = _pending_path(product), _staging_path(product)
+    if not pp.exists() or not sp.exists():
+        return None
+    return {"reasons": json.loads(pp.read_text()), "snapshot": json.loads(sp.read_text())}
+
+
+def approve(product, notify=default_notify):
+    """Potvrdí čekající návrh: staging -> published, zapíše audit, uklidí pending."""
+    sp, pp = _staging_path(product), _pending_path(product)
+    if not sp.exists():
+        print(f"Sazby {product}: nic ke schválení.")
+        return None
+    snap = json.loads(sp.read_text())
+    for b in snap["banks"]:
+        b.pop("needs_review", None)
+    reasons = json.loads(pp.read_text()) if pp.exists() else {}
+    _publish(product, snap, reasons.get("changes", []), reason="approved")
+    sp.unlink(missing_ok=True)
+    pp.unlink(missing_ok=True)
+    notify(f"Sazby {product}: schváleno a publikováno", "", level="info")
+    print(f"Sazby {product}: schváleno -> {published_path(product)}")
+    return snap
+
+
+def reject(product):
+    """Zahodí čekající návrh (staging + pending); published zůstává beze změny."""
+    _staging_path(product).unlink(missing_ok=True)
+    _pending_path(product).unlink(missing_ok=True)
+    _append_changelog({"at": dt.datetime.now().isoformat(timespec="seconds"),
+                       "product": product, "action": "reject"})
+    print(f"Sazby {product}: návrh zamítnut, publikovaná data beze změny.")
+
+
 def main():
-    ap = argparse.ArgumentParser(description="Sběr produktových nabídek (sazby/promo/news).")
+    ap = argparse.ArgumentParser(description="Sběr produktových nabídek (sazby/promo/news) + brána schválení.")
     ap.add_argument("--product", default="savings_account")
-    ap.add_argument("--out", default=str(DEFAULT_OUT))
+    ap.add_argument("--review", action="store_true", help="vypíše, co čeká na schválení")
+    ap.add_argument("--approve", action="store_true", help="potvrdí čekající návrh (staging -> published)")
+    ap.add_argument("--reject", action="store_true", help="zahodí čekající návrh")
+    ap.add_argument("--no-live", action="store_true", help="jen z configu, bez sítě")
     args = ap.parse_args()
-    refresh(args.product, out=args.out)
+
+    if args.review:
+        pend = pending(args.product)
+        if not pend:
+            print(f"Sazby {args.product}: nic nečeká na schválení.")
+        else:
+            r = pend["reasons"]
+            print(f"Sazby {args.product} — ke schválení (z {r.get('at')}):")
+            for c in r.get("big_changes", []):
+                print(f"  velký skok: {c['bank']} {c.get('term','')} {c['old']}→{c['new']}")
+            if r.get("flagged"):
+                print(f"  validační flagy: {r['flagged']}")
+            print(f"  schval: python -m pipeline.offers --product {args.product} --approve")
+    elif args.approve:
+        approve(args.product)
+    elif args.reject:
+        reject(args.product)
+    else:
+        refresh(args.product, live=not args.no_live)
 
 
 if __name__ == "__main__":
