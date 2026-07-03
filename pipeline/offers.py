@@ -37,11 +37,6 @@ def _load_products(config_dir):
     return yaml.safe_load((Path(config_dir) / "products.yaml").read_text())["products"]
 
 
-def _bank_names(config_dir):
-    banks = yaml.safe_load((Path(config_dir) / "banks.yaml").read_text())["banks"]
-    return {b["code"]: b["name"] for b in banks}
-
-
 def _fetch(url, timeout=20):
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310 (veřejná produktová URL)
@@ -75,10 +70,12 @@ def _fetch_news(rss_url, limit=3):
         return []
 
 
-def _bank_offer(code, name, cfg, live=True, notify=default_notify):
+def _bank_offer(code, cfg, live=True, notify=default_notify):
     fb = cfg.get("fallback", {})
     offer = {
-        "code": code, "name": name, "accent": ACCENTS.get(code, "#333"),
+        "code": code, "name": cfg.get("name", code.upper()),
+        "short": cfg.get("short", code.upper()[:4]),
+        "accent": cfg.get("accent", ACCENTS.get(code, "#334155")),
         "url": cfg.get("url"),
         "rate": fb.get("rate"), "rate_label": fb.get("rate_label", "—"),
         "conditions": fb.get("conditions", ""), "promo": fb.get("promo", ""),
@@ -106,8 +103,7 @@ def snapshot(product, config_dir=None, live=False, notify=default_notify):
     if product not in products:
         raise ValueError(f"neznámý produkt: {product}")
     p = products[product]
-    names = _bank_names(config_dir)
-    banks = [_bank_offer(code, names.get(code, code.upper()), bcfg, live=live, notify=notify)
+    banks = [_bank_offer(code, bcfg, live=live, notify=notify)
              for code, bcfg in p["banks"].items()]
     banks.sort(key=lambda b: (b["rate"] is None, -(b["rate"] or 0)))   # nejvyšší sazba nahoře
     return {

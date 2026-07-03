@@ -1,51 +1,102 @@
 # Produktové nabídky (sazby / promo / news) pro sekci „Sazby".
-# JINÁ datová doména než IR výsledky: aktuální marketingová data z webů bank.
-# Scraping: fetch URL -> extrakce (regex) -> při selhání/blokaci se použije `fallback`
-# (reálná, datovaná hodnota) a fakt se označí statusem. Nikdy se nezobrazí prázdno/špatně potichu.
-# Pozn.: sazby se mění; fallback drž aktuální, nebo nech scraper běžet v prostředí s reálným fetch.
+# JINÁ datová doména než IR výsledky: aktuální marketingová data napříč CELÝM trhem
+# (ne jen 4 IR banky). Každý subjekt je self-contained: name, short, accent, url, fallback.
+# Scraping: fetch URL -> extrakce (regex) -> při selhání/blokaci `fallback` (reálná, datovaná
+# hodnota) + status (live/fallback). Nikdy prázdno/špatně potichu.
+# Sazby k ~2026-06 (zdroj: srovnávače finance.cz / e15 / měšec / usetreno). Drž aktuální.
 products:
   savings_account:
     label_cs: Spořicí účet
     unit: percent
-    note: 'Nejvyšší nabízená sazba (až), obvykle s podmínkami a limitem vkladu.'
+    note: 'Nejvyšší nabízená sazba (až), obvykle s podmínkami a limitem vkladu. Celý trh ČR.'
     banks:
+      artesa:
+        name: Artesa, spořitelní družstvo
+        short: ART
+        accent: "#1E7A54"
+        url: https://www.artesa.cz/sporici-ucet
+        fallback: { rate: 0.0425, rate_label: "4,25 %", conditions: "Spořitelní družstvo · bez stropu vkladu · podmínka členství/základního vkladu.", promo: "Bez limitu výše vkladu.", as_of: "2026-06" }
+      raiffeisenbank:
+        name: Raiffeisenbank
+        short: RB
+        accent: "#1F1F1F"
+        url: https://www.rb.cz/osobni/sporeni-a-investice/sporeni/sporici-ucet
+        fallback: { rate: 0.042, rate_label: "až 4,20 %", conditions: "Do 500 tis. Kč · s pravidelným investováním.", promo: "Bonus pro investující klienty.", as_of: "2026-06" }
+      mbank:
+        name: mBank
+        short: mB
+        accent: "#E4002B"
+        url: https://www.mbank.cz/osobni/sporeni/sporici-ucet/
+        fallback: { rate: 0.0401, rate_label: "4,01 %", conditions: "mSpořicí účet Plus · do 500 tis. Kč (pásmové úročení).", promo: "Dětský mSpořicí až 5,01 %.", as_of: "2026-06" }
+      creditas:
+        name: Banka Creditas
+        short: CRE
+        accent: "#5B2A86"
+        url: https://www.creditas.cz/sporeni/sporici-ucet
+        fallback: { rate: 0.04, rate_label: "4,00 %", conditions: "S pravidelným investováním.", promo: "Vyšší sazba při pravidelném investování.", as_of: "2026-06" }
       cs:
+        name: Česká spořitelna
+        short: ČS
+        accent: "#C8102E"
         url: https://www.csas.cz/cs/osobni-finance/sporeni/sporici-ucet
-        rate_regex: '(\d+[,.]\d+)\s*%'
-        news_rss: null
-        fallback:
-          rate: 0.038
-          rate_label: "až 3,80 %"
-          conditions: "Do 400 tis. Kč · podmínka: pravidelná investice / penzijní spoření ≥ 2 000 Kč/měs. (nad limit 0,01 %)."
-          promo: "Bonusová sazba za pravidelné investování nebo penzijní spoření."
-          as_of: "2026-06"
-      kb:
-        url: https://www.kb.cz/cs/obcane/sporeni-a-investovani/sporici-ucet
-        rate_regex: '(\d+[,.]\d+)\s*%'
-        news_rss: null
-        fallback:
-          rate: 0.035
-          rate_label: "až 3,50 %"
-          conditions: "Noví klienti · do 1 mil. Kč · platnost limitu 6 měsíců."
-          promo: "Zvýhodnění pro nové klienty (limit úročení do 1 mil. Kč)."
-          as_of: "2026-06"
+        fallback: { rate: 0.038, rate_label: "až 3,80 %", conditions: "Do 400 tis. Kč · podmínka: pravidelná investice / penzijní spoření ≥ 2 000 Kč/měs. (nad limit 0,01 %).", promo: "Bonusová sazba za pravidelné investování / penzi.", as_of: "2026-06" }
       csob:
+        name: ČSOB
+        short: ČSOB
+        accent: "#0098D4"
         url: https://www.csob.cz/portal/lide/produkty/sporeni-a-investice/sporici-ucty
-        rate_regex: '(\d+[,.]\d+)\s*%'
-        news_rss: null
-        fallback:
-          rate: 0.038
-          rate_label: "až 3,80 %"
-          conditions: "Do 250 tis. Kč · příjem ≥ 15 000 Kč/měs + 5× platba kartou (základní sazba 2,75 %)."
-          promo: "Zvýhodněná sazba 3,80 % p.a. garantovaná do 31. 5. 2026."
-          as_of: "2026-06"
+        fallback: { rate: 0.038, rate_label: "až 3,80 %", conditions: "Do 250 tis. Kč · příjem ≥ 15 000 Kč/měs + 5× platba kartou (základní sazba 2,75 %).", promo: "Zvýhodněná sazba 3,80 % p.a. do 31. 5. 2026.", as_of: "2026-06" }
+      kb:
+        name: Komerční banka
+        short: KB
+        accent: "#A6192E"
+        url: https://www.kb.cz/cs/obcane/sporeni-a-investovani/sporici-ucet
+        fallback: { rate: 0.035, rate_label: "až 3,50 %", conditions: "Noví klienti · do 1 mil. Kč · platnost limitu 6 měsíců.", promo: "Zvýhodnění pro nové klienty.", as_of: "2026-06" }
+      unicredit:
+        name: UniCredit Bank
+        short: UCB
+        accent: "#E2001A"
+        url: https://www.unicreditbank.cz/cs/obcane/sporeni-investice/sporeni.html
+        fallback: { rate: 0.035, rate_label: "až 3,50 %", conditions: "Akce od června 2026 · do 500 tis. Kč · bonusy za platby kartou a vklad/investice.", promo: "Nová akce od června 2026.", as_of: "2026-06" }
+      trinity:
+        name: Trinity Bank
+        short: TB
+        accent: "#14476B"
+        url: https://www.trinitybank.cz/sporeni/sporici-ucet/
+        fallback: { rate: 0.033, rate_label: "3,30 %", conditions: "Narozeninový spořicí účet · bez pásem a limitů.", promo: "Garantováno do 31. 8. 2026.", as_of: "2026-06" }
+      fio:
+        name: Fio banka
+        short: FIO
+        accent: "#C4122F"
+        url: https://www.fio.cz/bankovni-sluzby/sporici-ucet
+        fallback: { rate: 0.0325, rate_label: "3,25 %", conditions: "Do 200 tis. Kč (nad limit 0,10 %).", promo: "—", as_of: "2026-06" }
+      jt:
+        name: J&T Banka
+        short: J&T
+        accent: "#8A6D3B"
+        url: https://www.jtbank.cz/sporeni/
+        fallback: { rate: 0.0325, rate_label: "3,25 %", conditions: "Bez limitu maximálního vkladu.", promo: "—", as_of: "2026-06" }
+      partners:
+        name: Partners Banka
+        short: PB
+        accent: "#0093D0"
+        url: https://www.partnersbanka.cz/sporeni
+        fallback: { rate: 0.032, rate_label: "3,20 %", conditions: "Spořicí účet Partners Banky.", promo: "—", as_of: "2026-06" }
+      oberbank:
+        name: Oberbank
+        short: OB
+        accent: "#B0132B"
+        url: https://www.oberbank.cz/sporici-ucet
+        fallback: { rate: 0.03, rate_label: "3,00 %", conditions: "Vklady 1–2 mil. Kč (nad 2 mil. Kč sazba 3,20 %).", promo: "—", as_of: "2026-06" }
       moneta:
+        name: MONETA Money Bank
+        short: MON
+        accent: "#6A2C70"
         url: https://www.moneta.cz/sporeni-a-investice/sporici-ucty
-        rate_regex: '(\d+[,.]\d+)\s*%'
-        news_rss: null
-        fallback:
-          rate: 0.026
-          rate_label: "2,60 %"
-          conditions: "Vklady do 1 mil. Kč · nad limit +0,5 %."
-          promo: "—"
-          as_of: "2026-06"
+        fallback: { rate: 0.026, rate_label: "2,60 %", conditions: "Vklady do 1 mil. Kč · nad limit +0,5 %.", promo: "—", as_of: "2026-06" }
+      airbank:
+        name: Air Bank
+        short: AIR
+        accent: "#EF7D00"
+        url: https://www.airbank.cz/produkty/sporici-ucet/
+        fallback: { rate: 0.026, rate_label: "2,60 %", conditions: "Do 300 tis. Kč (5× platba kartou); do 500 tis. Kč při příjmu ≥ 25 000 Kč/měs.", promo: "—", as_of: "2026-06" }

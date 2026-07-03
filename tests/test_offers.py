@@ -6,11 +6,14 @@ def test_snapshot_from_config():
     s = snapshot("savings_account")   # live=False -> jen config, žádná síť
     assert s["product"] == "savings_account" and s["label"]
     codes = {b["code"] for b in s["banks"]}
-    assert codes == {"cs", "kb", "csob", "moneta"}
+    # celý retailový trh, ne jen 4 IR banky
+    assert {"cs", "kb", "csob", "moneta"} <= codes
+    assert {"airbank", "raiffeisenbank", "mbank"} <= codes
+    assert len(codes) >= 12
     for b in s["banks"]:
         assert b["status"] == "fallback"          # bez sítě = ověřený fallback
         assert b["rate"] is not None and b["rate_label"]
-        assert b["accent"].startswith("#")
+        assert b["accent"].startswith("#") and b["short"] and b["name"]
 
 
 def test_snapshot_sorted_by_rate_desc():
