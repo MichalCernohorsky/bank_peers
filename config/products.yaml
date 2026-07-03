@@ -159,6 +159,46 @@ products:
         url: https://www.rb.cz/osobni/zhodnoceni-uspor/sporeni/terminovany-vklad
         fallback: { rates: {12: 0.025}, conditions: "Min. vklad od 10 000 Kč (až do 30 mil. Kč) · garantovaný úrok.", promo: "—", as_of: "2026-06" }
 
+  building_savings:
+    label_cs: Stavební spoření
+    unit: percent
+    group: Spoření a vklady
+    better: high
+    rate_max: 0.06
+    note: 'Úrok z vkladů (p.a.) u stavebních spořitelen; k tomu státní podpora. Celý trh ČR (5 spořitelen).'
+    banks:
+      csob:
+        name: ČSOB Stavební spořitelna
+        short: ČSOB
+        accent: "#0098D4"
+        url: https://www.csobstavebni.cz/
+        fallback: { rate: 0.025, rate_label: "až 2,50 %", conditions: "Úrok z vkladů (akční tarif) · plus státní podpora.", promo: "Akční zvýhodnění úroku pro nové smlouvy.", as_of: "2026-06" }
+      kb:
+        name: Modrá pyramida (KB)
+        short: MP
+        accent: "#A6192E"
+        url: https://www.modrapyramida.cz/
+        fallback: { rate: 0.02, rate_label: "až 2,00 %", conditions: "Úrok z vkladů · plus státní podpora.", promo: "—", as_of: "2026-06" }
+      moneta:
+        name: MONETA Stavební Spořitelna
+        short: MSS
+        accent: "#6A2C70"
+        url: https://www.monetastavebni.cz/
+        fallback: { rate: 0.018, rate_label: "1,80 %", conditions: "Úrok z vkladů · plus státní podpora.", promo: "—", as_of: "2026-06" }
+      cs:
+        name: Stavební spořitelna ČS (Buřinka)
+        short: ČS
+        accent: "#1A3A5C"
+        highlight: true
+        url: https://www.burinka.cz/
+        fallback: { rate: 0.015, rate_label: "1,50 %", conditions: "Úrok z vkladů · plus státní podpora · úvěr ze stavebního spoření.", promo: "—", as_of: "2026-06" }
+      raiffeisenbank:
+        name: Raiffeisen stavební spořitelna
+        short: RSTS
+        accent: "#1F1F1F"
+        url: https://www.rsts.cz/
+        fallback: { rate: 0.01, rate_label: "1,00 %", conditions: "Úrok z vkladů · plus státní podpora.", promo: "—", as_of: "2026-06" }
+
   # ---------------- ÚVĚRY A KARTY (nižší sazba = lepší) ----------------
   consumer_loan:
     label_cs: Spotřebitelský úvěr

@@ -100,9 +100,10 @@ fallbackem** (`config/products.yaml`): stáhni produktovou stránku a vytáhni s
 web nejde (WAF) nebo se sazba nepřečte, použij ověřenou hodnotu z configu a označ ji
 statusem (živě / orientačně). Nikdy se nezobrazí prázdno/špatně potichu.
 
-**Produkty** (přidání = jen řádek do configu, ne kódu) ve dvou skupinách, levá vertikální
-navigace v UI:
-- *Spoření a vklady*: **spořicí účet** (tabulka), **termínovaný vklad** (matice dle lhůty).
+**Produkty** (přidání = jen řádek do configu, ne kódu) ve dvou skupinách; výběr je
+pod-menu v hlavním levém rail pod položkou „Sazby produktů":
+- *Spoření a vklady*: **spořicí účet** (tabulka), **termínovaný vklad** (matice dle lhůty),
+  **stavební spoření** (5 stavebních spořitelen; ČS = Buřinka).
 - *Úvěry a karty*: **spotřebitelský úvěr** (nezajištěný, tabulka), **kreditní karta** (tabulka),
   **hypotéka** (matice dle délky fixace).
 
@@ -119,7 +120,7 @@ tintovaný řádek, „★ domácí", accent shodný s peer comparison `#1A3A5C`
 ```bash
 python -m pipeline.offers --product mortgage   # -> data/offers_<product>.json (čte /api/offers)
 ```
-Frontend: záložka „Sazby produktů", vlevo výběr produktu. Scheduler obnovuje sazby vedle ingestu výsledků.
+Frontend: záložka „Sazby produktů", produkty jako pod-menu v levém rail. Scheduler obnovuje sazby vedle ingestu výsledků.
 
 **Správnost dat (trust layer).** Sazby jsou marketingová data — správnost = číslo *i podmínky*,
 + čerstvost. Proto:
