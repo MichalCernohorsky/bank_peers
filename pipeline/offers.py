@@ -96,21 +96,40 @@ def _bank_offer(code, cfg, live=True, notify=default_notify):
     return offer
 
 
+def _matrix_offer(code, cfg):
+    """Nabídka pro produkt s více lhůtami (termínovaný vklad): sazba per délka."""
+    fb = cfg.get("fallback", {})
+    rates = {str(k): v for k, v in (fb.get("rates") or {}).items()}
+    return {
+        "code": code, "name": cfg.get("name", code.upper()),
+        "short": cfg.get("short", code.upper()[:4]),
+        "accent": cfg.get("accent", ACCENTS.get(code, "#334155")),
+        "url": cfg.get("url"), "rates": rates,
+        "conditions": fb.get("conditions", ""), "promo": fb.get("promo", ""),
+        "as_of": fb.get("as_of"), "news": [], "status": "fallback",
+    }
+
+
 def snapshot(product, config_dir=None, live=False, notify=default_notify):
-    """Sestaví snapshot nabídek. live=False -> jen z configu (bez sítě)."""
+    """Sestaví snapshot nabídek. live=False -> jen z configu (bez sítě).
+    Produkt s klíčem `terms` = maticový (banka × délka), jinak tabulka (jedna sazba)."""
     config_dir = Path(config_dir or (ROOT / "config"))
     products = _load_products(config_dir)
     if product not in products:
         raise ValueError(f"neznámý produkt: {product}")
     p = products[product]
-    banks = [_bank_offer(code, bcfg, live=live, notify=notify)
-             for code, bcfg in p["banks"].items()]
-    banks.sort(key=lambda b: (b["rate"] is None, -(b["rate"] or 0)))   # nejvyšší sazba nahoře
-    return {
+    base = {
         "product": product, "label": p.get("label_cs", product), "unit": p.get("unit", "percent"),
         "note": p.get("note", ""), "updated_at": dt.datetime.now().isoformat(timespec="seconds"),
-        "banks": banks,
     }
+    if p.get("terms"):   # maticový produkt (termínovaný vklad)
+        banks = [_matrix_offer(code, bcfg) for code, bcfg in p["banks"].items()]
+        banks.sort(key=lambda b: -max([v for v in b["rates"].values() if v is not None], default=0))
+        return {**base, "kind": "matrix", "terms": p["terms"],
+                "term_labels": p.get("term_labels", [f"{t}M" for t in p["terms"]]), "banks": banks}
+    banks = [_bank_offer(code, bcfg, live=live, notify=notify) for code, bcfg in p["banks"].items()]
+    banks.sort(key=lambda b: (b["rate"] is None, -(b["rate"] or 0)))   # nejvyšší sazba nahoře
+    return {**base, "kind": "table", "banks": banks}
 
 
 def refresh(product, config_dir=None, out=DEFAULT_OUT, notify=default_notify):

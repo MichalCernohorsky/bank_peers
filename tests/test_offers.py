@@ -2,9 +2,22 @@
 from pipeline.offers import snapshot
 
 
+def test_term_deposit_matrix():
+    s = snapshot("term_deposit")
+    assert s["kind"] == "matrix" and s["terms"] and s["term_labels"]
+    for b in s["banks"]:
+        assert isinstance(b["rates"], dict) and b["short"] and b["name"]
+
+    def maxr(b):
+        vals = [v for v in b["rates"].values() if v is not None]
+        return max(vals) if vals else 0
+    ms = [maxr(b) for b in s["banks"]]
+    assert ms == sorted(ms, reverse=True)   # nejvyšší sazba nahoře
+
+
 def test_snapshot_from_config():
     s = snapshot("savings_account")   # live=False -> jen config, žádná síť
-    assert s["product"] == "savings_account" and s["label"]
+    assert s["product"] == "savings_account" and s["label"] and s["kind"] == "table"
     codes = {b["code"] for b in s["banks"]}
     # celý retailový trh, ne jen 4 IR banky
     assert {"cs", "kb", "csob", "moneta"} <= codes
