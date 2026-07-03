@@ -62,6 +62,16 @@ def test_snapshot_from_config():
         assert b["accent"].startswith("#") and b["short"] and b["name"]
 
 
+def test_cs_present_and_highlighted_in_all_products():
+    """Česká spořitelna musí být v každém produktu a vždy zvýrazněná (domácí banka)."""
+    for product in ("savings_account", "term_deposit"):
+        s = snapshot(product)
+        cs = next((b for b in s["banks"] if b["code"] == "cs"), None)
+        assert cs is not None, f"ČS chybí v {product}"
+        assert cs["highlight"] is True
+        assert cs["accent"] == "#1A3A5C"        # shodné s peer comparison
+
+
 def test_snapshot_sorted_by_rate_desc():
     s = snapshot("savings_account")
     rates = [b["rate"] for b in s["banks"]]

@@ -38,7 +38,7 @@ from pipeline.notify import notify as default_notify  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"          # adresář se stavem (lze přebít v testech)
-ACCENTS = {"cs": "#C8102E", "kb": "#A6192E", "csob": "#0098D4", "moneta": "#6A2C70"}
+ACCENTS = {"cs": "#1A3A5C", "kb": "#A6192E", "csob": "#0098D4", "moneta": "#6A2C70"}  # shodné s peer comparison
 UA = "Mozilla/5.0 (compatible; BankPulseBot/1.0; +https://example.com/bot)"
 
 # --- důvěryhodnostní vrstva: rozsah, čerstvost, změny ---
@@ -146,6 +146,7 @@ def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_noti
         "code": code, "name": cfg.get("name", code.upper()),
         "short": cfg.get("short", code.upper()[:4]),
         "accent": cfg.get("accent", ACCENTS.get(code, "#334155")),
+        "highlight": bool(cfg.get("highlight")),
         "url": cfg.get("url"),
         "rate": fb.get("rate"), "rate_label": fb.get("rate_label", "—"),
         "conditions": fb.get("conditions", ""), "promo": fb.get("promo", ""),
@@ -177,6 +178,7 @@ def _matrix_offer(code, cfg, fresh_days=FRESH_DAYS):
         "code": code, "name": cfg.get("name", code.upper()),
         "short": cfg.get("short", code.upper()[:4]),
         "accent": cfg.get("accent", ACCENTS.get(code, "#334155")),
+        "highlight": bool(cfg.get("highlight")),
         "url": cfg.get("url"), "rates": rates,
         "conditions": fb.get("conditions", ""), "promo": fb.get("promo", ""),
         "as_of": fb.get("as_of"), "news": [], "status": "fallback", "method": "fallback",

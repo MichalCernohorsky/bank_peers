@@ -31,7 +31,8 @@ products:
       cs:
         name: Česká spořitelna
         short: ČS
-        accent: "#C8102E"
+        accent: "#1A3A5C"   # shodná barva jako v peer comparison
+        highlight: true      # domácí banka — vždy zvýraznit
         url: https://www.csas.cz/cs/osobni-finance/sporeni/sporici-ucet
         fallback: { rate: 0.038, rate_label: "až 3,80 %", conditions: "Do 400 tis. Kč · podmínka: pravidelná investice / penzijní spoření ≥ 2 000 Kč/měs. (nad limit 0,01 %).", promo: "Bonusová sazba za pravidelné investování / penzi.", as_of: "2026-06" }
       csob:
@@ -102,6 +103,13 @@ products:
     term_labels: ["1 měs.", "3 měs.", "6 měs.", "12 měs.", "24 měs."]
     note: 'Sazby dle délky uložení (p.a.). Prázdné pole = banka lhůtu nenabízí / sazba nezveřejněna. Celý trh ČR.'
     banks:
+      cs:
+        name: Česká spořitelna
+        short: ČS
+        accent: "#1A3A5C"   # shodná barva jako v peer comparison
+        highlight: true      # domácí banka — vždy zvýraznit
+        url: https://www.csas.cz/cs/osobni-finance/sporeni/terminovany-vklad
+        fallback: { rates: {3: 0.018, 6: 0.02, 12: 0.024, 24: 0.025}, conditions: "Termínovaný vklad · orientační sazby velké banky (nižší než u malých hráčů); potvrdit v ČS.", promo: "—", as_of: "2026-06" }
       jt:
         name: J&T Banka
         short: J&T
