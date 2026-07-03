@@ -103,8 +103,20 @@ statusem (živě / orientačně). Nikdy se nezobrazí prázdno/špatně potichu.
 python -m pipeline.offers --product savings_account   # -> data/offers.json (čte /api/offers)
 ```
 Frontend: záložka „Sazby produktů". Scheduler obnovuje sazby vedle ingestu výsledků.
-Pozn.: sazby žijí na marketingových stránkách (WAF, časté změny) — v prostředí za WAF
-scraper spadne na fallback; pro živé stahování je potřeba reálný fetch (headless).
+
+**Správnost dat (trust layer).** Sazby jsou marketingová data — správnost = číslo *i podmínky*,
++ čerstvost. Proto:
+- **Zdroj = oficiální stránka banky**, stahovaná headless prohlížečem: `pipeline/offers_browser.py`
+  (Playwright), zapíná `OFFERS_BROWSER=1`. Projde WAF, který blokuje prosté HTTP.
+- **Validace + brána**: sazba musí být v rozsahu 0–6 %, mít podmínky a datum; `refresh()` porovná
+  s minulým snapshotem a **velký skok (> 1 p.b.) označí `needs_review` a pošle alert** — nepublikuje
+  se potichu. Audit v `data/offers_changelog.json`.
+- **Provenance + čerstvost v UI**: u každé sazby datum platnosti a badge — `živě` / `orientačně` /
+  `ověřit` (starší než `fresh_days`) / `zkontrolovat` (validační flag). Disclaimer „ověřte u banky".
+- Doporučený provoz: **návrh → potvrzení člověkem** (automat navrhne změny, člověk odklikne).
+
+Pozn.: v tomto prostředí je outbound k doménám bank blokovaný (proxy allowlist), takže scraper
+běží na ověřeném fallbacku; živý sběr poběží v produkci s otevřeným outboundem.
 
 ## Nasazení (deploy)
 API + frontend běží z jednoho originu; scheduler je samostatný worker; data v PostgreSQL.

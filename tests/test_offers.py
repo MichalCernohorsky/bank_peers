@@ -1,5 +1,34 @@
 """Testy produktových nabídek (pipeline.offers) — snapshot z configu, bez sítě."""
-from pipeline.offers import snapshot
+import datetime as dt
+
+from pipeline.offers import diff_snapshot, is_stale, snapshot, validate_rate
+
+
+def test_provenance_fields():
+    s = snapshot("savings_account")
+    assert s["disclaimer"] and s["fresh_days"]
+    for b in s["banks"]:
+        assert b["method"] == "fallback" and b["checked_at"]
+        assert "stale" in b and "flags" in b
+
+
+def test_validate_rate_range():
+    assert validate_rate(0.038) and validate_rate(None)
+    assert not validate_rate(0.09) and not validate_rate(-0.01)   # mimo rozsah
+
+
+def test_staleness():
+    today = dt.date(2026, 7, 3)
+    assert is_stale("2026-01", 45, today=today) is True    # staré -> ověřit
+    assert is_stale("2026-06", 45, today=today) is False   # čerstvé
+    assert is_stale(None, 45, today=today) is True         # chybí datum -> ber jako staré
+
+
+def test_change_detection_diff():
+    prev = {"kind": "table", "banks": [{"code": "cs", "rate": 0.038}]}
+    new = {"kind": "table", "banks": [{"code": "cs", "rate": 0.030}]}
+    d = diff_snapshot(prev, new)
+    assert d == [{"bank": "cs", "old": 0.038, "new": 0.030}]
 
 
 def test_term_deposit_matrix():

@@ -14,3 +14,4 @@ data/ingest_registry.json
 data/offers.json
 # data/cs_financials.db is intentionally tracked: it is the prebuilt data source
 # used when the upstream IR xlsx is not available locally.
+data/offers_changelog.json
