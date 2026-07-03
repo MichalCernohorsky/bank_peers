@@ -7,7 +7,9 @@ stránku a vytáhnout sazbu (regex). Když fetch selže (WAF/timeout) nebo se sa
 spolehlivě přečíst, použij `fallback` z config/products.yaml a fakt označ statusem:
   live      = staženo a přečteno z webu
   fallback  = použita ověřená hodnota z configu (web nedostupný/neparsovatelný)
-News: volitelně z RSS (news_rss).
+News: automaticky z Google News RSS (dotaz per produkt + per banka v `news:` sekci configu)
+a z oficiálních RSS bank (`news_rss`, kde existuje). Jen titulek+odkaz+zdroj+datum, filtr
+klíčových slov, čerstvost, dedupe — nedostupný feed se přeskočí potichu.
 
 Brána (návrh → potvrzení člověkem): refresh() živě sebere data a porovná se
 schváleným snapshotem. Velký skok (> REVIEW_DELTA) nebo validační flag se zadrží
@@ -27,8 +29,10 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import yaml
@@ -86,8 +90,12 @@ def diff_snapshot(prev, new):
     return changes
 
 
+def _load_cfg(config_dir):
+    return yaml.safe_load((Path(config_dir) / "products.yaml").read_text())
+
+
 def _load_products(config_dir):
-    return yaml.safe_load((Path(config_dir) / "products.yaml").read_text())["products"]
+    return _load_cfg(config_dir)["products"]
 
 
 def _fetch(url, timeout=20):
@@ -109,22 +117,70 @@ def _extract_rate(html, rate_regex):
     return num / 100.0, f"{m.group(1)} %"
 
 
-def _fetch_news(rss_url, limit=3):
-    if not rss_url:
-        return []
-    try:
-        xml = _fetch(rss_url)
-        root = ET.fromstring(xml)
-        items = root.findall(".//item")[:limit]
-        out = []
-        for it in items:
-            title = (it.findtext("title") or "").strip()
-            link = (it.findtext("link") or "").strip()
-            if title:
-                out.append({"title": title, "url": link})
-        return out
-    except Exception:
-        return []
+# --- novinky: Google News RSS (páteř) + oficiální RSS bank (kde existuje) ---
+GNEWS_URL = "https://news.google.com/rss/search?q={q}&hl=cs&gl=CZ&ceid=CZ:cs"
+
+
+def _news_key(title):
+    """Normalizovaný klíč titulku pro dedupe (napříč zdroji)."""
+    return re.sub(r"\W+", "", title.lower())[:80]
+
+
+def _parse_rss_news(xml_text, limit=6, max_age_days=60, exclude=(), today=None):
+    """RSS (Google News i klasický feed) -> [{title, url, source, published}].
+    Trust vrstva: jen titulek+odkaz (žádný obsah), filtr klíčových slov,
+    čerstvost max_age_days, dedupe titulků."""
+    out, seen = [], set()
+    for it in ET.fromstring(xml_text).findall(".//item"):
+        title = (it.findtext("title") or "").strip()
+        link = (it.findtext("link") or "").strip()
+        src = (it.findtext("source") or "").strip()
+        if src and title.endswith(" - " + src):     # Google News: "Titulek - Médium"
+            title = title[: -len(" - " + src)].rstrip()
+        if not title or not link:
+            continue
+        published = ""
+        pd = it.findtext("pubDate")
+        if pd:
+            try:
+                d = parsedate_to_datetime(pd).date()
+                if max_age_days and ((today or dt.date.today()) - d).days > max_age_days:
+                    continue                          # příliš staré -> pryč
+                published = d.isoformat()
+            except Exception:
+                pass
+        low = title.lower()
+        if any(x.lower() in low for x in exclude or ()):
+            continue                                  # nerelevantní (inzerce, soutěže…)
+        key = _news_key(title)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append({"title": title, "url": link, "source": src, "published": published})
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _fetch_news(rss_url=None, query=None, limit=6, max_age_days=60, exclude=(), today=None):
+    """Novinky z oficiálního RSS banky (přednost) a/nebo Google News dotazu.
+    Best-effort: nedostupný feed -> přeskočí se potichu (news nejsou brána)."""
+    urls = [u for u in (rss_url, GNEWS_URL.format(q=urllib.parse.quote(query)) if query else None) if u]
+    items = []
+    for url in urls:
+        try:
+            items += _parse_rss_news(_fetch(url), limit=limit, max_age_days=max_age_days,
+                                     exclude=exclude, today=today)
+        except Exception:
+            pass
+    seen, out = set(), []
+    for n in items:                                   # dedupe napříč zdroji
+        k = _news_key(n["title"])
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append(n)
+    return out[:limit]
 
 
 def _provenance(offer, fresh_days, rate_max=RATE_MAX):
@@ -142,7 +198,8 @@ def _provenance(offer, fresh_days, rate_max=RATE_MAX):
     return offer
 
 
-def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_notify, rate_max=RATE_MAX):
+def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_notify, rate_max=RATE_MAX,
+                news=None):
     fb = cfg.get("fallback", {})
     offer = {
         "code": code, "name": cfg.get("name", code.upper()),
@@ -165,7 +222,10 @@ def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_noti
         except Exception as e:
             notify(f"Sazby {code}: web nedostupný — použit fallback",
                    f"{cfg.get('url')} ({e.__class__.__name__})", level="info")
-    offer["news"] = _fetch_news(cfg.get("news_rss")) if live else []
+    n = news or {}
+    offer["news"] = _fetch_news(cfg.get("news_rss"), query=n.get("query"), limit=n.get("limit", 6),
+                                max_age_days=n.get("max_age_days", 60),
+                                exclude=n.get("exclude") or ()) if live else []
     return _provenance(offer, fresh_days, rate_max)
 
 
@@ -193,18 +253,24 @@ def snapshot(product, config_dir=None, live=False, notify=default_notify):
     """Sestaví snapshot nabídek. live=False -> jen z configu (bez sítě).
     Produkt s klíčem `terms` = maticový (banka × délka), jinak tabulka (jedna sazba)."""
     config_dir = Path(config_dir or (ROOT / "config"))
-    products = _load_products(config_dir)
+    cfg = _load_cfg(config_dir)
+    products = cfg["products"]
     if product not in products:
         raise ValueError(f"neznámý produkt: {product}")
     p = products[product]
     fresh_days = p.get("fresh_days", FRESH_DAYS)
     rate_max = p.get("rate_max", RATE_MAX)
     better = p.get("better", "high")   # high=vyšší lepší (vklady), low=nižší lepší (úvěry)
+    ncfg = cfg.get("news") or {}       # zdroje novinek (Google News dotazy, limity)
+    n_opts = {"limit": ncfg.get("limit", 6), "max_age_days": ncfg.get("max_age_days", 60),
+              "exclude": p.get("news_exclude")}
     base = {
         "product": product, "label": p.get("label_cs", product), "unit": p.get("unit", "percent"),
         "group": p.get("group", ""), "better": better,
         "note": p.get("note", ""), "updated_at": dt.datetime.now().isoformat(timespec="seconds"),
         "fresh_days": fresh_days, "disclaimer": "Sazby jsou orientační; před uzavřením ověřte u banky.",
+        # novinky k produktu (trh) — plní se jen při živém sběru
+        "news": _fetch_news(query=p.get("news_query"), **n_opts) if live else [],
     }
     if p.get("terms"):   # maticový produkt (termínovaný vklad / hypotéka dle fixace)
         banks = [_matrix_offer(code, bcfg, fresh_days, rate_max) for code, bcfg in p["banks"].items()]
@@ -217,7 +283,9 @@ def snapshot(product, config_dir=None, live=False, notify=default_notify):
         banks.sort(key=mkey)
         return {**base, "kind": "matrix", "terms": p["terms"],
                 "term_labels": p.get("term_labels", [f"{t}M" for t in p["terms"]]), "banks": banks}
-    banks = [_bank_offer(code, bcfg, live=live, fresh_days=fresh_days, notify=notify, rate_max=rate_max)
+    bank_queries = ncfg.get("banks") or {}   # per banka dotaz (jen vybrané, např. domácí 4)
+    banks = [_bank_offer(code, bcfg, live=live, fresh_days=fresh_days, notify=notify, rate_max=rate_max,
+                         news={**n_opts, "query": bank_queries.get(code)})
              for code, bcfg in p["banks"].items()]
     if better == "low":
         banks.sort(key=lambda b: (b["rate"] is None, b["rate"] or float("inf")))   # nejnižší sazba nahoře

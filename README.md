@@ -117,6 +117,15 @@ Každý produkt má v configu:
 
 **Česká spořitelna je v každém produktu vždy přítomná a zvýrazněná** (`highlight: true` →
 tintovaný řádek, „★ domácí", accent shodný s peer comparison `#1A3A5C`).
+
+**Novinky (automatické).** Sekce Novinky se plní při živém sběru, config-driven (`news:`
+v `products.yaml`): páteř = **Google News RSS** (dotaz `news_query` per produkt = tržní
+položky se štítkem „trh"; dotazy per banka pro domácí 4 = štítek banky), plus **oficiální
+RSS banky** (`news_rss`, kde existuje — má přednost). Trust vrstva: jen titulek + odkaz +
+zdroj + datum (žádné přebírání obsahu), filtr `news_exclude`, čerstvost `max_age_days`
+(default 60 dní), dedupe titulků, limit; nedostupný feed se přeskočí potichu (news nejsou
+brána). Proč ne scraping bankovních webů: tiskové zprávy nemají RSS, jsou za WAF a
+údržba by rostla per banka — agregátor pokryje celý trh jedním dotazem.
 ```bash
 python -m pipeline.offers --product mortgage   # -> data/offers_<product>.json (čte /api/offers)
 ```

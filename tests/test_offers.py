@@ -116,6 +116,52 @@ def test_unknown_product_raises():
         snapshot("neexistuje")
 
 
+# --- novinky: parser RSS (Google News formát), filtr, čerstvost, dedupe ---
+RSS_FIXTURE = """<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>
+<item><title>Banka XY zvyšuje sazby na spořicím účtu - Peníze.cz</title>
+  <link>https://x/1</link><pubDate>Wed, 01 Jul 2026 08:00:00 GMT</pubDate>
+  <source url="https://penize.cz">Peníze.cz</source></item>
+<item><title>SOUTĚŽ o nejlepší spořicí účet</title>
+  <link>https://x/2</link><pubDate>Wed, 01 Jul 2026 08:00:00 GMT</pubDate></item>
+<item><title>Starý článek o sazbách</title>
+  <link>https://x/3</link><pubDate>Thu, 01 Jan 2026 08:00:00 GMT</pubDate></item>
+<item><title>Banka XY zvyšuje sazby na spořicím účtu - Peníze.cz</title>
+  <link>https://x/4</link><pubDate>Wed, 01 Jul 2026 09:00:00 GMT</pubDate>
+  <source url="https://penize.cz">Peníze.cz</source></item>
+</channel></rss>"""
+
+
+def test_news_parse_filter_dedupe():
+    today = dt.date(2026, 7, 3)
+    items = O._parse_rss_news(RSS_FIXTURE, limit=6, max_age_days=60,
+                              exclude=["soutěž"], today=today)
+    assert len(items) == 1                      # exclude + staré + duplikát pryč
+    n = items[0]
+    assert n["title"] == "Banka XY zvyšuje sazby na spořicím účtu"   # bez „ - Médium"
+    assert n["source"] == "Peníze.cz" and n["published"] == "2026-07-01"
+    assert n["url"] == "https://x/1"
+
+
+def test_fetch_news_builds_gnews_query(monkeypatch):
+    calls = []
+    monkeypatch.setattr(O, "_fetch", lambda url, timeout=20: (calls.append(url), RSS_FIXTURE)[1])
+    items = O._fetch_news(query='"spořicí účet" sazba', exclude=["soutěž"],
+                          today=dt.date(2026, 7, 3))
+    assert calls and "news.google.com/rss/search" in calls[0]
+    assert "hl=cs" in calls[0] and "%22" in calls[0]    # česky, quotovaný dotaz
+    assert items and items[0]["source"] == "Peníze.cz"
+
+
+def test_fetch_news_broken_feed_is_silent(monkeypatch):
+    monkeypatch.setattr(O, "_fetch", lambda url, timeout=20: "tohle není XML <<<")
+    assert O._fetch_news(query="cokoli") == []          # best-effort, žádná výjimka
+
+
+def test_snapshot_offline_has_no_news():
+    s = snapshot("savings_account")                     # live=False -> bez sítě
+    assert s["news"] == [] and all(b["news"] == [] for b in s["banks"])
+
+
 # --- brána schválení (návrh → potvrzení člověkem): stav v izolovaném DATA_DIR ---
 @pytest.fixture
 def data_dir(tmp_path, monkeypatch):

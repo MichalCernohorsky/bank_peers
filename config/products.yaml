@@ -4,6 +4,19 @@
 # Scraping: fetch URL -> extrakce (regex) -> při selhání/blokaci `fallback` (reálná, datovaná
 # hodnota) + status (live/fallback). Nikdy prázdno/špatně potichu.
 # Sazby k ~2026-06 (zdroj: srovnávače finance.cz / e15 / měšec / usetreno). Drž aktuální.
+
+# Novinky — config-driven zdroje. Páteř = Google News RSS (dotaz per produkt `news_query`
+# + per banka níže); oficiální RSS banky (`news_rss` u banky) má přednost, kde existuje.
+# Trust vrstva: jen titulek+odkaz+zdroj+datum, filtr `news_exclude`, čerstvost, dedupe.
+news:
+  limit: 6            # max položek na feed
+  max_age_days: 60    # starší články se zahodí
+  banks:              # dotaz per banka (štítek banky u položky) — domácí 4
+    cs: '"Česká spořitelna"'
+    kb: '"Komerční banka"'
+    csob: '"ČSOB"'
+    moneta: '"MONETA Money Bank"'
+
 products:
   savings_account:
     label_cs: Spořicí účet
@@ -12,6 +25,8 @@ products:
     better: high          # vyšší sazba = lepší (řadí sestupně, „nejvyšší")
     rate_max: 0.06        # validační strop; sazba nad = flag „zkontrolovat"
     note: 'Nejvyšší nabízená sazba (až), obvykle s podmínkami a limitem vkladu. Celý trh ČR.'
+    news_query: '"spořicí účet" sazba'
+    news_exclude: [soutěž, sleva na]
     banks:
       raiffeisenbank:
         name: Raiffeisenbank
@@ -67,6 +82,7 @@ products:
         short: FIO
         accent: "#C4122F"
         url: https://www.fio.cz/bankovni-sluzby/sporici-ucet
+        news_rss: https://www.fio.cz/rss  # oficiální feed (ověřit URL v produkci; selhání -> potichu bez news)
         fallback: { rate: 0.0325, rate_label: "3,25 %", conditions: "Do 200 tis. Kč (nad limit 0,10 %).", promo: "—", as_of: "2026-06" }
       jt:
         name: J&T Banka
@@ -108,6 +124,8 @@ products:
     terms: [1, 3, 6, 12, 24]
     term_labels: ["1 měs.", "3 měs.", "6 měs.", "12 měs.", "24 měs."]
     note: 'Sazby dle délky uložení (p.a.). Prázdné pole = banka lhůtu nenabízí / sazba nezveřejněna. Celý trh ČR.'
+    news_query: '"termínovaný vklad" sazba'
+    news_exclude: [soutěž]
     banks:
       cs:
         name: Česká spořitelna
@@ -166,6 +184,8 @@ products:
     better: high
     rate_max: 0.06
     note: 'Úrok z vkladů (p.a.) u stavebních spořitelen; k tomu státní podpora. Celý trh ČR (5 spořitelen).'
+    news_query: '"stavební spoření"'
+    news_exclude: [soutěž]
     banks:
       csob:
         name: ČSOB Stavební spořitelna
@@ -207,6 +227,8 @@ products:
     better: low           # nižší sazba = lepší (řadí vzestupně, „nejnižší")
     rate_max: 0.30        # úvěry mají vyšší sazby než vklady
     note: 'Nezajištěný spotřebitelský úvěr — úroková sazba od (p.a.), dle bonity a výše. Celý trh ČR.'
+    news_query: '"spotřebitelský úvěr" OR "půjčka" sazba banka'
+    news_exclude: [soutěž, nebankovní]
     banks:
       airbank:
         name: Air Bank
@@ -271,6 +293,8 @@ products:
     better: low
     rate_max: 0.40        # úrok kreditních karet je vysoký
     note: 'Úroková sazba revolvingu (p.a.) — nižší je lepší. V podmínkách bezúročné období a roční poplatek. Celý trh ČR.'
+    news_query: '"kreditní karta" banka'
+    news_exclude: [soutěž]
     banks:
       fio:
         name: Fio banka
@@ -331,6 +355,8 @@ products:
     terms: [3, 5, 7, 10]
     term_labels: ["fix 3 roky", "fix 5 let", "fix 7 let", "fix 10 let"]
     note: 'Sazba nové hypotéky dle délky fixace (p.a.) — nižší je lepší. Orientačně, LTV do 80 %, dle bonity. Celý trh ČR.'
+    news_query: 'hypotéka sazba fixace'
+    news_exclude: [soutěž, "americká hypotéka"]
     banks:
       fio:
         name: Fio banka
