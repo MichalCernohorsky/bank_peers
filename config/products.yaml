@@ -8,6 +8,9 @@ products:
   savings_account:
     label_cs: Spořicí účet
     unit: percent
+    group: Spoření a vklady
+    better: high          # vyšší sazba = lepší (řadí sestupně, „nejvyšší")
+    rate_max: 0.06        # validační strop; sazba nad = flag „zkontrolovat"
     note: 'Nejvyšší nabízená sazba (až), obvykle s podmínkami a limitem vkladu. Celý trh ČR.'
     banks:
       raiffeisenbank:
@@ -99,6 +102,9 @@ products:
   term_deposit:
     label_cs: Termínovaný vklad
     unit: percent
+    group: Spoření a vklady
+    better: high
+    rate_max: 0.06
     terms: [1, 3, 6, 12, 24]
     term_labels: ["1 měs.", "3 měs.", "6 měs.", "12 měs.", "24 měs."]
     note: 'Sazby dle délky uložení (p.a.). Prázdné pole = banka lhůtu nenabízí / sazba nezveřejněna. Celý trh ČR.'
@@ -152,3 +158,186 @@ products:
         accent: "#1F1F1F"
         url: https://www.rb.cz/osobni/zhodnoceni-uspor/sporeni/terminovany-vklad
         fallback: { rates: {12: 0.025}, conditions: "Min. vklad od 10 000 Kč (až do 30 mil. Kč) · garantovaný úrok.", promo: "—", as_of: "2026-06" }
+
+  # ---------------- ÚVĚRY A KARTY (nižší sazba = lepší) ----------------
+  consumer_loan:
+    label_cs: Spotřebitelský úvěr
+    unit: percent
+    group: Úvěry a karty
+    better: low           # nižší sazba = lepší (řadí vzestupně, „nejnižší")
+    rate_max: 0.30        # úvěry mají vyšší sazby než vklady
+    note: 'Nezajištěný spotřebitelský úvěr — úroková sazba od (p.a.), dle bonity a výše. Celý trh ČR.'
+    banks:
+      airbank:
+        name: Air Bank
+        short: AIR
+        accent: "#EF7D00"
+        url: https://www.airbank.cz/produkty/pujcka/
+        fallback: { rate: 0.059, rate_label: "od 5,90 %", conditions: "Půjčka bez poplatků · sazba od dle bonity.", promo: "Sleva za sjednání online.", as_of: "2026-06" }
+      mbank:
+        name: mBank
+        short: mB
+        accent: "#E4002B"
+        url: https://www.mbank.cz/osobni/pujcky/pujcka/
+        fallback: { rate: 0.0599, rate_label: "od 5,99 %", conditions: "mPůjčka · bez poplatku za sjednání.", promo: "—", as_of: "2026-06" }
+      fio:
+        name: Fio banka
+        short: FIO
+        accent: "#C4122F"
+        url: https://www.fio.cz/bankovni-sluzby/uvery/spotrebitelske-uvery
+        fallback: { rate: 0.064, rate_label: "od 6,40 %", conditions: "Osobní půjčka · bez poplatku za vedení.", promo: "—", as_of: "2026-06" }
+      cs:
+        name: Česká spořitelna
+        short: ČS
+        accent: "#1A3A5C"
+        highlight: true
+        url: https://www.csas.cz/cs/osobni-finance/pujcky/pujcka
+        fallback: { rate: 0.069, rate_label: "od 6,90 %", conditions: "Půjčka · sazba od dle bonity a výše úvěru.", promo: "Sleva ze sazby pro klienty s příjmem na účet.", as_of: "2026-06" }
+      csob:
+        name: ČSOB
+        short: ČSOB
+        accent: "#0098D4"
+        url: https://www.csob.cz/portal/lide/produkty/uvery/pujcky
+        fallback: { rate: 0.069, rate_label: "od 6,90 %", conditions: "Půjčka na cokoli · sazba od dle bonity.", promo: "—", as_of: "2026-06" }
+      kb:
+        name: Komerční banka
+        short: KB
+        accent: "#A6192E"
+        url: https://www.kb.cz/cs/obcane/pujcky/osobni-uver
+        fallback: { rate: 0.069, rate_label: "od 6,90 %", conditions: "Osobní úvěr · sazba od dle bonity.", promo: "—", as_of: "2026-06" }
+      raiffeisenbank:
+        name: Raiffeisenbank
+        short: RB
+        accent: "#1F1F1F"
+        url: https://www.rb.cz/osobni/pujcky/rychla-pujcka
+        fallback: { rate: 0.0699, rate_label: "od 6,99 %", conditions: "Rychlá půjčka · online sjednání.", promo: "—", as_of: "2026-06" }
+      unicredit:
+        name: UniCredit Bank
+        short: UCB
+        accent: "#E2001A"
+        url: https://www.unicreditbank.cz/cs/obcane/pujcky-uvery/presto-pujcka.html
+        fallback: { rate: 0.071, rate_label: "od 7,10 %", conditions: "PRESTO půjčka · sazba od dle bonity.", promo: "—", as_of: "2026-06" }
+      moneta:
+        name: MONETA Money Bank
+        short: MON
+        accent: "#6A2C70"
+        url: https://www.moneta.cz/pujcky-a-uvery/osobni-pujcka
+        fallback: { rate: 0.079, rate_label: "od 7,90 %", conditions: "Osobní půjčka · sazba od dle bonity.", promo: "—", as_of: "2026-06" }
+
+  credit_card:
+    label_cs: Kreditní karta
+    unit: percent
+    group: Úvěry a karty
+    better: low
+    rate_max: 0.40        # úrok kreditních karet je vysoký
+    note: 'Úroková sazba revolvingu (p.a.) — nižší je lepší. V podmínkách bezúročné období a roční poplatek. Celý trh ČR.'
+    banks:
+      fio:
+        name: Fio banka
+        short: FIO
+        accent: "#C4122F"
+        url: https://www.fio.cz/bankovni-sluzby/platebni-karty/kreditni-karty
+        fallback: { rate: 0.199, rate_label: "19,9 %", conditions: "Bezúročné období až 45 dní · bez ročního poplatku.", promo: "—", as_of: "2026-06" }
+      airbank:
+        name: Air Bank
+        short: AIR
+        accent: "#EF7D00"
+        url: https://www.airbank.cz/produkty/kreditni-karta/
+        fallback: { rate: 0.199, rate_label: "19,9 %", conditions: "Bezúročné období až 45 dní · vedení zdarma při obratu.", promo: "—", as_of: "2026-06" }
+      csob:
+        name: ČSOB
+        short: ČSOB
+        accent: "#0098D4"
+        url: https://www.csob.cz/portal/lide/produkty/karty/kreditni-karty
+        fallback: { rate: 0.219, rate_label: "21,9 %", conditions: "Bezúročné období až 45 dní · roční poplatek dle typu.", promo: "—", as_of: "2026-06" }
+      cs:
+        name: Česká spořitelna
+        short: ČS
+        accent: "#1A3A5C"
+        highlight: true
+        url: https://www.csas.cz/cs/osobni-finance/karty/kreditni-karta
+        fallback: { rate: 0.229, rate_label: "22,9 %", conditions: "Bezúročné období až 45 dní · roční poplatek dle programu.", promo: "—", as_of: "2026-06" }
+      kb:
+        name: Komerční banka
+        short: KB
+        accent: "#A6192E"
+        url: https://www.kb.cz/cs/obcane/karty/kreditni-karty
+        fallback: { rate: 0.229, rate_label: "22,9 %", conditions: "Bezúročné období až 45 dní · roční poplatek dle typu.", promo: "—", as_of: "2026-06" }
+      unicredit:
+        name: UniCredit Bank
+        short: UCB
+        accent: "#E2001A"
+        url: https://www.unicreditbank.cz/cs/obcane/karty/kreditni-karty.html
+        fallback: { rate: 0.229, rate_label: "22,9 %", conditions: "Bezúročné období až 45 dní.", promo: "—", as_of: "2026-06" }
+      raiffeisenbank:
+        name: Raiffeisenbank
+        short: RB
+        accent: "#1F1F1F"
+        url: https://www.rb.cz/osobni/karty/kreditni-karty
+        fallback: { rate: 0.239, rate_label: "23,9 %", conditions: "Bezúročné období až 45 dní.", promo: "—", as_of: "2026-06" }
+      moneta:
+        name: MONETA Money Bank
+        short: MON
+        accent: "#6A2C70"
+        url: https://www.moneta.cz/karty/kreditni-karty
+        fallback: { rate: 0.249, rate_label: "24,9 %", conditions: "Bezúročné období až 40 dní.", promo: "—", as_of: "2026-06" }
+
+  mortgage:
+    label_cs: Hypotéka
+    unit: percent
+    group: Úvěry a karty
+    better: low
+    rate_max: 0.10
+    terms: [3, 5, 7, 10]
+    term_labels: ["fix 3 roky", "fix 5 let", "fix 7 let", "fix 10 let"]
+    note: 'Sazba nové hypotéky dle délky fixace (p.a.) — nižší je lepší. Orientačně, LTV do 80 %, dle bonity. Celý trh ČR.'
+    banks:
+      fio:
+        name: Fio banka
+        short: FIO
+        accent: "#C4122F"
+        url: https://www.fio.cz/bankovni-sluzby/uvery/hypotecni-uvery
+        fallback: { rates: {3: 0.045, 5: 0.044, 7: 0.046}, conditions: "Hypotéka · LTV do 80 % · bez poplatku za sjednání.", promo: "—", as_of: "2026-06" }
+      raiffeisenbank:
+        name: Raiffeisenbank
+        short: RB
+        accent: "#1F1F1F"
+        url: https://www.rb.cz/osobni/hypoteky
+        fallback: { rates: {3: 0.047, 5: 0.046, 7: 0.048, 10: 0.05}, conditions: "Hypotéka · sazba od dle fixace a LTV.", promo: "—", as_of: "2026-06" }
+      csob:
+        name: ČSOB
+        short: ČSOB
+        accent: "#0098D4"
+        url: https://www.csob.cz/portal/lide/produkty/hypoteky
+        fallback: { rates: {3: 0.048, 5: 0.046, 7: 0.049, 10: 0.051}, conditions: "ČSOB Hypotéka · LTV do 80 %.", promo: "—", as_of: "2026-06" }
+      cs:
+        name: Česká spořitelna
+        short: ČS
+        accent: "#1A3A5C"
+        highlight: true
+        url: https://www.csas.cz/cs/osobni-finance/bydleni/hypoteka
+        fallback: { rates: {3: 0.049, 5: 0.047, 7: 0.049, 10: 0.051}, conditions: "Hypotéka ČS · LTV do 80 % · sazba od dle fixace a bonity.", promo: "Sleva ze sazby při aktivním využívání účtu.", as_of: "2026-06" }
+      unicredit:
+        name: UniCredit Bank
+        short: UCB
+        accent: "#E2001A"
+        url: https://www.unicreditbank.cz/cs/obcane/bydleni/hypoteka.html
+        fallback: { rates: {3: 0.049, 5: 0.047}, conditions: "Hypotéka · LTV do 80 %.", promo: "—", as_of: "2026-06" }
+      kb:
+        name: Komerční banka
+        short: KB
+        accent: "#A6192E"
+        url: https://www.kb.cz/cs/obcane/bydleni/hypoteky
+        fallback: { rates: {3: 0.049, 5: 0.048, 7: 0.05, 10: 0.052}, conditions: "Hypoteční úvěr · LTV do 80 %.", promo: "—", as_of: "2026-06" }
+      moneta:
+        name: MONETA Money Bank
+        short: MON
+        accent: "#6A2C70"
+        url: https://www.moneta.cz/uvery-a-hypoteky/hypoteka
+        fallback: { rates: {3: 0.05, 5: 0.049}, conditions: "Hypotéka · LTV do 80 %.", promo: "—", as_of: "2026-06" }
+      oberbank:
+        name: Oberbank
+        short: OB
+        accent: "#B0132B"
+        url: https://www.oberbank.cz/hypoteky
+        fallback: { rates: {5: 0.048, 10: 0.05}, conditions: "Hypotéka · delší fixace.", promo: "—", as_of: "2026-06" }

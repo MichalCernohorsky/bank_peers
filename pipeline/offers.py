@@ -63,8 +63,10 @@ def is_stale(as_of, fresh_days=FRESH_DAYS, today=None):
     return ((today or dt.date.today()) - d).days > fresh_days
 
 
-def validate_rate(v):
-    return v is None or (0 < v <= RATE_MAX)
+def validate_rate(v, rate_max=RATE_MAX):
+    """Věrohodná sazba: kladná a v očekávaném rozsahu produktu (vklady ≤ 6 %,
+    úvěry/karty víc — strop per produkt v config `rate_max`)."""
+    return v is None or (0 < v <= rate_max)
 
 
 def diff_snapshot(prev, new):
@@ -125,10 +127,10 @@ def _fetch_news(rss_url, limit=3):
         return []
 
 
-def _provenance(offer, fresh_days):
+def _provenance(offer, fresh_days, rate_max=RATE_MAX):
     """Doplní důvěryhodnostní metadata: flags (validace), stale (čerstvost), checked_at."""
     flags = []
-    if not validate_rate(offer.get("rate")):
+    if not validate_rate(offer.get("rate"), rate_max):
         flags.append("sazba mimo očekávaný rozsah")
     if not offer.get("conditions"):
         flags.append("chybí podmínky")
@@ -140,7 +142,7 @@ def _provenance(offer, fresh_days):
     return offer
 
 
-def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_notify):
+def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_notify, rate_max=RATE_MAX):
     fb = cfg.get("fallback", {})
     offer = {
         "code": code, "name": cfg.get("name", code.upper()),
@@ -156,7 +158,7 @@ def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_noti
         try:
             html = _fetch(cfg["url"])
             got = _extract_rate(html, cfg.get("rate_regex", r"(\d+[,.]\d+)\s*%"))
-            if got and validate_rate(got[0]):     # publikuj jen věrohodnou hodnotu
+            if got and validate_rate(got[0], rate_max):     # publikuj jen věrohodnou hodnotu
                 offer["rate"], offer["rate_label"] = got[0], "až " + got[1]
                 offer["status"], offer["method"] = "live", "http"
                 offer["as_of"] = dt.date.today().isoformat()
@@ -164,14 +166,14 @@ def _bank_offer(code, cfg, live=True, fresh_days=FRESH_DAYS, notify=default_noti
             notify(f"Sazby {code}: web nedostupný — použit fallback",
                    f"{cfg.get('url')} ({e.__class__.__name__})", level="info")
     offer["news"] = _fetch_news(cfg.get("news_rss")) if live else []
-    return _provenance(offer, fresh_days)
+    return _provenance(offer, fresh_days, rate_max)
 
 
-def _matrix_offer(code, cfg, fresh_days=FRESH_DAYS):
-    """Nabídka pro produkt s více lhůtami (termínovaný vklad): sazba per délka."""
+def _matrix_offer(code, cfg, fresh_days=FRESH_DAYS, rate_max=RATE_MAX):
+    """Nabídka pro produkt s více lhůtami (termín. vklad / fixace hypotéky): sazba per klíč."""
     fb = cfg.get("fallback", {})
     rates = {str(k): v for k, v in (fb.get("rates") or {}).items()}
-    flags = [] if all(validate_rate(v) for v in rates.values()) else ["sazba mimo očekávaný rozsah"]
+    flags = [] if all(validate_rate(v, rate_max) for v in rates.values()) else ["sazba mimo očekávaný rozsah"]
     if not fb.get("as_of"):
         flags.append("chybí datum platnosti")
     return {
@@ -196,19 +198,31 @@ def snapshot(product, config_dir=None, live=False, notify=default_notify):
         raise ValueError(f"neznámý produkt: {product}")
     p = products[product]
     fresh_days = p.get("fresh_days", FRESH_DAYS)
+    rate_max = p.get("rate_max", RATE_MAX)
+    better = p.get("better", "high")   # high=vyšší lepší (vklady), low=nižší lepší (úvěry)
     base = {
         "product": product, "label": p.get("label_cs", product), "unit": p.get("unit", "percent"),
+        "group": p.get("group", ""), "better": better,
         "note": p.get("note", ""), "updated_at": dt.datetime.now().isoformat(timespec="seconds"),
         "fresh_days": fresh_days, "disclaimer": "Sazby jsou orientační; před uzavřením ověřte u banky.",
     }
-    if p.get("terms"):   # maticový produkt (termínovaný vklad)
-        banks = [_matrix_offer(code, bcfg, fresh_days) for code, bcfg in p["banks"].items()]
-        banks.sort(key=lambda b: -max([v for v in b["rates"].values() if v is not None], default=0))
+    if p.get("terms"):   # maticový produkt (termínovaný vklad / hypotéka dle fixace)
+        banks = [_matrix_offer(code, bcfg, fresh_days, rate_max) for code, bcfg in p["banks"].items()]
+
+        def mkey(b):   # nejlepší nabídka nahoře: nejnižší (better=low) / nejvyšší (high)
+            vals = [v for v in b["rates"].values() if v is not None]
+            if not vals:
+                return (1, 0)   # bez sazby -> na konec
+            return (0, min(vals)) if better == "low" else (0, -max(vals))
+        banks.sort(key=mkey)
         return {**base, "kind": "matrix", "terms": p["terms"],
                 "term_labels": p.get("term_labels", [f"{t}M" for t in p["terms"]]), "banks": banks}
-    banks = [_bank_offer(code, bcfg, live=live, fresh_days=fresh_days, notify=notify)
+    banks = [_bank_offer(code, bcfg, live=live, fresh_days=fresh_days, notify=notify, rate_max=rate_max)
              for code, bcfg in p["banks"].items()]
-    banks.sort(key=lambda b: (b["rate"] is None, -(b["rate"] or 0)))   # nejvyšší sazba nahoře
+    if better == "low":
+        banks.sort(key=lambda b: (b["rate"] is None, b["rate"] or float("inf")))   # nejnižší sazba nahoře
+    else:
+        banks.sort(key=lambda b: (b["rate"] is None, -(b["rate"] or 0)))            # nejvyšší sazba nahoře
     return {**base, "kind": "table", "banks": banks}
 
 

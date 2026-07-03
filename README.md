@@ -94,15 +94,32 @@ neprojde nebo auto-zdroj selže, watcher pošle alert „NAHRAJ RUČNĚ" s výč
 data se vezmou z drop-folderu `data/manual_drop/<bank>/` při dalším běhu.
 
 ## Sazby produktů (sekce „Sazby")
-Spotřebitelský přehled aktuálních nabídek (zatím spořicí účet) napříč 4 bankami —
+Spotřebitelský přehled aktuálních nabídek napříč **celým retailovým trhem ČR** —
 tabulka logo · banka · sazba + promo + news. Config-driven scraping s **ověřeným
 fallbackem** (`config/products.yaml`): stáhni produktovou stránku a vytáhni sazbu; když
 web nejde (WAF) nebo se sazba nepřečte, použij ověřenou hodnotu z configu a označ ji
 statusem (živě / orientačně). Nikdy se nezobrazí prázdno/špatně potichu.
+
+**Produkty** (přidání = jen řádek do configu, ne kódu) ve dvou skupinách, levá vertikální
+navigace v UI:
+- *Spoření a vklady*: **spořicí účet** (tabulka), **termínovaný vklad** (matice dle lhůty).
+- *Úvěry a karty*: **spotřebitelský úvěr** (nezajištěný, tabulka), **kreditní karta** (tabulka),
+  **hypotéka** (matice dle délky fixace).
+
+Každý produkt má v configu:
+- `better: high|low` — u vkladů je lepší **vyšší** sazba (řadí sestupně, „nejvyšší"),
+  u úvěrů/karet/hypoték **nižší** (řadí vzestupně, „nejnižší"; nejlepší proužek/buňka i hero
+  se řídí tímto směrem).
+- `rate_max` — validační strop rozsahu (vklady 6 %, úvěry 30 %, karty 40 %, hypotéka 10 %);
+  sazba mimo → flag „zkontrolovat".
+- `group` — skupina v levé navigaci.
+
+**Česká spořitelna je v každém produktu vždy přítomná a zvýrazněná** (`highlight: true` →
+tintovaný řádek, „★ domácí", accent shodný s peer comparison `#1A3A5C`).
 ```bash
-python -m pipeline.offers --product savings_account   # -> data/offers_<product>.json (čte /api/offers)
+python -m pipeline.offers --product mortgage   # -> data/offers_<product>.json (čte /api/offers)
 ```
-Frontend: záložka „Sazby produktů". Scheduler obnovuje sazby vedle ingestu výsledků.
+Frontend: záložka „Sazby produktů", vlevo výběr produktu. Scheduler obnovuje sazby vedle ingestu výsledků.
 
 **Správnost dat (trust layer).** Sazby jsou marketingová data — správnost = číslo *i podmínky*,
 + čerstvost. Proto:

@@ -18,7 +18,9 @@ def test_provenance_fields():
 
 def test_validate_rate_range():
     assert validate_rate(0.038) and validate_rate(None)
-    assert not validate_rate(0.09) and not validate_rate(-0.01)   # mimo rozsah
+    assert not validate_rate(0.09) and not validate_rate(-0.01)   # mimo default rozsah (6 %)
+    assert validate_rate(0.09, rate_max=0.30)     # úvěr: strop 30 % -> 9 % je OK
+    assert not validate_rate(0.5, rate_max=0.30)  # i tak nad stropem
 
 
 def test_staleness():
@@ -62,14 +64,45 @@ def test_snapshot_from_config():
         assert b["accent"].startswith("#") and b["short"] and b["name"]
 
 
+def _all_products():
+    import yaml
+
+    from pipeline.offers import ROOT
+    return list(yaml.safe_load((ROOT / "config" / "products.yaml").read_text())["products"])
+
+
 def test_cs_present_and_highlighted_in_all_products():
-    """Česká spořitelna musí být v každém produktu a vždy zvýrazněná (domácí banka)."""
-    for product in ("savings_account", "term_deposit"):
+    """Česká spořitelna musí být v KAŽDÉM produktu a vždy zvýrazněná (domácí banka)."""
+    products = _all_products()
+    assert {"consumer_loan", "credit_card", "mortgage"} <= set(products)   # nové produkty
+    for product in products:
         s = snapshot(product)
         cs = next((b for b in s["banks"] if b["code"] == "cs"), None)
         assert cs is not None, f"ČS chybí v {product}"
         assert cs["highlight"] is True
         assert cs["accent"] == "#1A3A5C"        # shodné s peer comparison
+
+
+def test_loan_sorted_lowest_first_and_no_range_flag():
+    """Úvěr: nižší sazba = lepší -> vzestupně; sazba ~7 % NENÍ mimo rozsah (strop 30 %)."""
+    s = snapshot("consumer_loan")
+    assert s["better"] == "low" and s["group"] == "Úvěry a karty"
+    rates = [b["rate"] for b in s["banks"] if b["rate"] is not None]
+    assert rates == sorted(rates)                       # nejnižší nahoře
+    for b in s["banks"]:
+        assert "sazba mimo očekávaný rozsah" not in b["flags"]   # 6–8 % je pro úvěr v pořádku
+
+
+def test_mortgage_matrix_lowest_fixation_on_top():
+    """Hypotéka: maticový produkt dle fixace, nejnižší sazba nahoře."""
+    s = snapshot("mortgage")
+    assert s["kind"] == "matrix" and s["better"] == "low"
+
+    def minr(b):
+        vals = [v for v in b["rates"].values() if v is not None]
+        return min(vals) if vals else float("inf")
+    mins = [minr(b) for b in s["banks"]]
+    assert mins == sorted(mins)                         # nejnižší sazba nahoře
 
 
 def test_snapshot_sorted_by_rate_desc():
