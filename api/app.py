@@ -15,7 +15,10 @@ import logging
 import sys
 import time
 from contextlib import asynccontextmanager
+from functools import lru_cache
 from pathlib import Path
+
+import yaml
 
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -85,6 +88,14 @@ def q(sql, args=()):
         con.close()
 
 
+@lru_cache
+def metric_polarity():
+    """Polarita metrik z katalogu (config/metrics.yaml): code -> 'high'|'low'.
+    'low' = nižší hodnota je lepší (náklady, C/I, NPL) — UI podle toho barví r/r delty."""
+    ms = yaml.safe_load((ROOT / "config" / "metrics.yaml").read_text())["metrics"]
+    return {m["code"]: m.get("good_when", "high") for m in ms}
+
+
 @app.get("/api/banks")
 def banks():
     return q("SELECT code,name,parent_group FROM bank ORDER BY name")
@@ -136,12 +147,14 @@ def dashboard(bank: str = "cs"):
         return (v - pv) * 100 if typ == "ratio" else (v / pv - 1) * 100
 
     mets = q("SELECT code,label_cs,unit,type,category,headline FROM metric")
+    pol = metric_polarity()
     kpis = []
     for m in [x for x in mets if x["headline"]]:
         v = val(m["code"], yr, qt)
         if v is None:
             continue
         kpis.append({"code": m["code"], "label_cs": m["label_cs"], "unit": m["unit"], "type": m["type"],
+                     "good": pol.get(m["code"], "high"),
                      "value": v, "yoy": yoy(m["code"], m["type"], v, yr, qt)})
 
     CATS = [("income_statement", "Výsledovka"), ("balance_sheet", "Rozvaha"), ("capital", "Kapitál"),
@@ -155,6 +168,7 @@ def dashboard(bank: str = "cs"):
                 continue
             last = ser[-1]
             rows.append({"code": m["code"], "label": m["label_cs"], "unit": m["unit"], "type": m["type"],
+                         "good": pol.get(m["code"], "high"),
                          "headline": m["headline"], "latest": last["v"], "ly": last["y"], "lq": last["q"],
                          "yoy": yoy(m["code"], m["type"], last["v"], last["y"], last["q"]),
                          "spark": ser[-13:]})
@@ -190,8 +204,11 @@ def compare(banks: str = "cs,kb,csob,moneta", basis: str = "reported", year: int
               (bank, code, y, qq, basis))
         return r[0]["v"] if r else None
 
+    pol = metric_polarity()
+
     def pair(code):
-        out = {"code": code, "label": meta[code]["label_cs"], "unit": meta[code]["unit"]}
+        out = {"code": code, "label": meta[code]["label_cs"], "unit": meta[code]["unit"],
+               "good": pol.get(code, "high")}
         for bk in codes:
             v, pv = val(bk, code, year, quarter), val(bk, code, year - 1, quarter)
             yoy = None
@@ -212,6 +229,7 @@ def compare(banks: str = "cs,kb,csob,moneta", basis: str = "reported", year: int
                             {"t": "Q1 2026", "v": val(bk, "roe", year, quarter)}] for bk in codes}}
     return {
         "period": {"year": year, "quarter": quarter},
+        "basis": basis,   # báze dat (reported/adjusted) — UI z ní odvozuje labely, žádný hardcode
         "banks": [{**q("SELECT code,name FROM bank WHERE code=?", (c,))[0], "accent": accents.get(c, "#333")} for c in codes],
         "groups": groups, "slope": slope,
     }

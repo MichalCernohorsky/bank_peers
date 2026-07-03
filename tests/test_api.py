@@ -28,6 +28,11 @@ def test_dashboard_cs(client):
     assert len(d["categories"]) == 6
     np = [k for k in d["kpis"] if k["code"] == "net_profit"]
     assert np and abs(np[0]["value"] - 7086.0) < 1.0
+    # polarita metrik z katalogu: C/I je „nižší = lepší" (UI barví r/r delty dle úsudku)
+    good = {k["code"]: k["good"] for k in d["kpis"]}
+    assert good["cost_income_ratio"] == "low" and good["net_profit"] == "high"
+    rows = {m["code"]: m for c in d["categories"] for m in c["metrics"]}
+    assert rows["operating_expenses"]["good"] == "low"   # náklady: růst = špatný
 
 
 def test_dashboard_kb_empty(client):
@@ -47,6 +52,8 @@ def test_compare(client):
     pairs = {m["code"]: m for g in d["groups"] for m in g["metrics"]}
     assert "net_profit" in pairs
     assert pairs["net_profit"]["cs"]["v"] is not None
+    assert d["basis"] == "adjusted"                      # báze v odpovědi -> labely v UI z dat
+    assert pairs["cost_income_ratio"]["good"] == "low"   # polarita i ve srovnání
 
 
 def test_facts_endpoint(client):

@@ -26,7 +26,10 @@ web/                    frontend dashboard — TODO
   - `stock` (rozvaha) — stav k datu, nikdy se neodečítá.
   - `ratio` — přebírá se (NIM, NPL, kap. přiměřenost) nebo dopočítává (LTD, C/I); interim poměry vyžadují anualizaci (`annualize` flag).
 - **basis**: `reported` (z xlsx, kanonické) vs `adjusted` (peer-comparable z PDF). Most je na slide 51 peer PDF.
+  UI labely báze se odvozují z API odpovědi (`basis`), nikdy natvrdo.
 - **provenance**: každý fakt má `source_id`; `derived=1` = dopočítáno.
+- **good_when** (metrics.yaml): polarita metriky `high|low` — u nákladů/C/I/NPL je `low`
+  (pokles = zlepšení). API ji posílá jako `good`, UI podle ní barví r/r delty (šipka = směr, barva = úsudek).
 
 ## Zdroj dat ČS
 `key_figures_q1_2026.xlsx` (IR, reported IFRS, wide time series). Tři listy:

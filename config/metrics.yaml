@@ -105,6 +105,7 @@ metrics:
     annual_calc: sum_quarters
 
   - code: operating_expenses
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Provozní náklady
     label_en: Operating expenses
     category: income_statement
@@ -117,6 +118,7 @@ metrics:
     note: Obvykle vykazováno se záporným znaménkem — sjednoť konvenci znamének při ingestion.
 
   - code: personnel_expenses
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Osobní náklady
     label_en: Personnel expenses
     category: income_statement
@@ -127,6 +129,7 @@ metrics:
     annual_calc: sum_quarters
 
   - code: other_admin_expenses
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Ostatní správní náklady
     label_en: Other administrative expenses
     category: income_statement
@@ -137,6 +140,7 @@ metrics:
     annual_calc: sum_quarters
 
   - code: depreciation_amortization
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Odpisy hmotného a nehmotného majetku
     label_en: Depreciation & amortization
     category: income_statement
@@ -160,6 +164,7 @@ metrics:
     note: U ČS Q1/2026 = 8,8 mld. Kč (+12,8 % r/r). Validuj proti operating_income − operating_expenses.
 
   - code: impairment_result
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Ztráty ze znehodnocení finančních nástrojů (náklady na riziko)
     label_en: Impairment result / risk costs
     category: income_statement
@@ -366,6 +371,7 @@ metrics:
 
   # ─────────────────────────────  KVALITA PORTFOLIA  ─────────────────────────
   - code: npl_ratio
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Podíl nevýkonných úvěrů (NPL)
     label_en: NPL ratio
     category: asset_quality
@@ -388,6 +394,7 @@ metrics:
     annual_calc: as_reported
 
   - code: npl_volume
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Objem nevýkonných úvěrů
     label_en: NPL volume
     category: asset_quality
@@ -408,6 +415,7 @@ metrics:
     annual_calc: year_end
 
   - code: cost_of_risk_bps
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Náklady na riziko (v bazických bodech)
     label_en: Cost of risk
     category: asset_quality
@@ -434,6 +442,7 @@ metrics:
     note: U ČS Q1/2026 = 2,11 %. Banka vykazuje přímo; vlastní přepočet vyžaduje průměrná úročená aktiva, která nemusíme mít.
 
   - code: cost_income_ratio
+    good_when: low   # nižší = lepší (barva r/r delty v UI)
     label_cs: Poměr nákladů k výnosům (C/I)
     label_en: Cost/income ratio
     category: ratios
