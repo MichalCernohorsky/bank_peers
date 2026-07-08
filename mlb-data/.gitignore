@@ -1,0 +1,7 @@
+# database + raw caches are rebuilt from public sources, not versioned
+data/*.db
+data/statcast_cache/
+logs/*.log
+__pycache__/
+*.pyc
+.pytest_cache/

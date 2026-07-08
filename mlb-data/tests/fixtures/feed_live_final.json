@@ -1,0 +1,55 @@
+{
+  "gamePk": 745804,
+  "gameData": {
+    "game": {"pk": 745804, "type": "R", "season": "2024", "gameNumber": 1, "doubleHeader": "N"},
+    "datetime": {"dateTime": "2024-06-15T23:10:00Z", "officialDate": "2024-06-15", "dayNight": "night"},
+    "status": {"abstractGameState": "Final", "codedGameState": "F", "detailedState": "Final"},
+    "teams": {
+      "away": {"id": 147, "name": "New York Yankees", "abbreviation": "NYY"},
+      "home": {"id": 111, "name": "Boston Red Sox", "abbreviation": "BOS"}
+    },
+    "players": {
+      "ID543037": {"id": 543037, "fullName": "Gerrit Cole", "birthDate": "1990-09-08", "pitchHand": {"code": "R"}},
+      "ID656756": {"id": 656756, "fullName": "Yankees Reliever One", "birthDate": "1994-04-02", "pitchHand": {"code": "R"}},
+      "ID621244": {"id": 621244, "fullName": "Yankees Reliever Two", "birthDate": "1992-12-11", "pitchHand": {"code": "L"}},
+      "ID601713": {"id": 601713, "fullName": "Nick Pivetta", "birthDate": "1993-02-14", "pitchHand": {"code": "R"}},
+      "ID670102": {"id": 670102, "fullName": "Red Sox Reliever One", "birthDate": "1996-06-20", "pitchHand": {"code": "L"}}
+    },
+    "venue": {"id": 3, "name": "Fenway Park"},
+    "weather": {"condition": "Partly Cloudy", "temp": "68", "wind": "11 mph, Out To CF"},
+    "probablePitchers": {
+      "away": {"id": 543037, "fullName": "Gerrit Cole"},
+      "home": {"id": 601713, "fullName": "Nick Pivetta"}
+    }
+  },
+  "liveData": {
+    "linescore": {"teams": {"home": {"runs": 3}, "away": {"runs": 5}}},
+    "boxscore": {
+      "teams": {
+        "away": {
+          "team": {"id": 147},
+          "pitchers": [543037, 656756, 621244],
+          "teamStats": {
+            "batting": {"runs": 5, "hits": 9, "homeRuns": 2, "baseOnBalls": 4, "strikeOuts": 8, "leftOnBase": 6, "atBats": 33}
+          },
+          "players": {
+            "ID543037": {"stats": {"pitching": {"inningsPitched": "6.2", "battersFaced": 26, "hits": 5, "runs": 2, "earnedRuns": 2, "baseOnBalls": 1, "strikeOuts": 9, "homeRuns": 1, "numberOfPitches": 101, "strikes": 68, "groundOuts": 6, "airOuts": 5}}},
+            "ID656756": {"stats": {"pitching": {"inningsPitched": "1.1", "battersFaced": 5, "hits": 1, "runs": 1, "earnedRuns": 1, "baseOnBalls": 0, "strikeOuts": 2, "homeRuns": 0, "numberOfPitches": 22, "strikes": 15, "groundOuts": 1, "airOuts": 1}}},
+            "ID621244": {"stats": {"pitching": {"inningsPitched": "1.0", "battersFaced": 3, "hits": 0, "runs": 0, "earnedRuns": 0, "baseOnBalls": 0, "strikeOuts": 1, "homeRuns": 0, "numberOfPitches": 12, "strikes": 9, "groundOuts": 1, "airOuts": 1}}}
+          }
+        },
+        "home": {
+          "team": {"id": 111},
+          "pitchers": [601713, 670102],
+          "teamStats": {
+            "batting": {"runs": 3, "hits": 7, "homeRuns": 1, "baseOnBalls": 2, "strikeOuts": 12, "leftOnBase": 5, "atBats": 32}
+          },
+          "players": {
+            "ID601713": {"stats": {"pitching": {"inningsPitched": "7.0", "battersFaced": 28, "hits": 7, "runs": 4, "earnedRuns": 4, "baseOnBalls": 3, "strikeOuts": 7, "homeRuns": 2, "numberOfPitches": 98, "strikes": 63, "groundOuts": 7, "airOuts": 6}}},
+            "ID670102": {"stats": {"pitching": {"inningsPitched": "2.0", "battersFaced": 8, "hits": 2, "runs": 1, "earnedRuns": 1, "baseOnBalls": 1, "strikeOuts": 3, "homeRuns": 0, "numberOfPitches": 31, "strikes": 20, "groundOuts": 2, "airOuts": 1}}}
+          }
+        }
+      }
+    }
+  }
+}
