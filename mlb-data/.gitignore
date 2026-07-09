@@ -1,5 +1,8 @@
 # database + raw caches are rebuilt from public sources, not versioned
 data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
 data/statcast_cache/
 logs/*.log
 __pycache__/
