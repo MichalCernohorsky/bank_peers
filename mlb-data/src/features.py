@@ -73,7 +73,7 @@ def _pitcher_window_stats(window: pd.DataFrame, suffix: str) -> dict:
                     "velo", "whiff", "csw"):
             out[f"{col}_{suffix}"] = None
         return out
-    s = window[_PITCHER_SUM_COLS].sum(min_count=1)
+    s = window[_PITCHER_SUM_COLS].sum()  # NaN-safe: skips missing, all-NaN -> 0
     outs = s["outs_recorded"] or 0
     ip = outs / 3.0
     out[f"k9_{suffix}"] = _safe_div(9 * s["strikeouts"], ip)
@@ -190,7 +190,9 @@ def _bullpen_daily(engine) -> tuple[dict, dict]:
     pitches: dict = defaultdict(int)
     who: dict = defaultdict(set)
     for r in df.itertuples(index=False):
-        pitches[(r.team_id, r.game_date)] += int(r.pitches_thrown or 0)
+        # rare boxscore gaps -> NULL pitch counts; count them as 0
+        n = int(r.pitches_thrown) if pd.notna(r.pitches_thrown) else 0
+        pitches[(r.team_id, r.game_date)] += n
         who[(r.team_id, r.game_date)].add(r.pitcher_id)
     return dict(pitches), dict(who)
 
