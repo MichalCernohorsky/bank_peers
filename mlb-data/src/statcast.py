@@ -43,6 +43,7 @@ SWING_DESCRIPTIONS = {
 }
 WHIFF_DESCRIPTIONS = {"swinging_strike", "swinging_strike_blocked", "missed_bunt"}
 CSW_DESCRIPTIONS = {"called_strike", "swinging_strike", "swinging_strike_blocked"}
+NON_PITCH_DESCRIPTIONS = {"automatic_ball", "automatic_strike", "intent_ball"}
 
 
 # ---------------------------------------------------------------------------
@@ -56,7 +57,10 @@ def aggregate_pitcher_games(pitches: pd.DataFrame) -> pd.DataFrame:
     if missing:
         raise ValueError(f"Statcast extrakt postrádá sloupce: {sorted(missing)}")
 
-    df = pitches.copy()
+    # automatic balls/strikes (post-2017 no-pitch intentional walks, pitch-clock
+    # violations) are logged by Savant as rows but no pitch was thrown -> drop,
+    # otherwise pitch counts and CSW denominators disagree with the boxscore
+    df = pitches[~pitches["description"].isin(NON_PITCH_DESCRIPTIONS)].copy()
     df["is_swing"] = df["description"].isin(SWING_DESCRIPTIONS)
     df["is_whiff"] = df["description"].isin(WHIFF_DESCRIPTIONS)
     df["is_csw"] = df["description"].isin(CSW_DESCRIPTIONS)

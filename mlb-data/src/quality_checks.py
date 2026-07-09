@@ -129,12 +129,13 @@ def run_checks(db_path=DEFAULT_DB_PATH, check_season_counts: bool = True) -> int
     """)
     rep.check("startér s IP mimo rozsah 0-11", bad_ip["game_pk"].tolist())
 
+    # lower bound 80: legitimate soft-tossers (Vargas, late Wainwright) sit ~83
     bad_velo = q("""
         SELECT game_pk FROM pitcher_starts_statcast
         WHERE avg_velocity_fastball IS NOT NULL
-          AND (avg_velocity_fastball < 85 OR avg_velocity_fastball > 105)
+          AND (avg_velocity_fastball < 80 OR avg_velocity_fastball > 105)
     """)
-    rep.check("rychlost fastballu mimo 85-105 mph", bad_velo["game_pk"].tolist())
+    rep.check("rychlost fastballu mimo 80-105 mph", bad_velo["game_pk"].tolist())
 
     bad_totals = q("""
         SELECT game_pk FROM games

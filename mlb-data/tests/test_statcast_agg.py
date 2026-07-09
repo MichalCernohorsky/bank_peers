@@ -39,6 +39,20 @@ def test_aggregate_basic_rates():
     assert row["xslg_against"] == 0.95  # mean(1.8, 0.1)
 
 
+def test_automatic_balls_are_not_pitches():
+    """Intentional walks (automatic_ball) are Savant rows but no pitch was
+    thrown - they must not count into pitch_count nor dilute CSW."""
+    pitches = pd.DataFrame([
+        _pitch("called_strike"),
+        _pitch("automatic_ball", pitch_type=None, speed=None),
+        _pitch("automatic_ball", pitch_type=None, speed=None),
+    ])
+    agg = aggregate_pitcher_games(pitches)
+    row = agg.iloc[0]
+    assert row["pitch_count"] == 1
+    assert row["csw_rate"] == 1.0
+
+
 def test_aggregate_groups_by_game_and_pitcher():
     rows = [_pitch("called_strike"), _pitch("ball")]
     other = dict(_pitch("swinging_strike"), pitcher=601713)
