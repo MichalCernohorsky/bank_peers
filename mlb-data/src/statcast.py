@@ -1,7 +1,10 @@
-"""Statcast enrichment via pybaseball (pitch-level data -> per-start metrics).
+"""Statcast enrichment (pitch-level data -> per-start metrics).
 
-Downloads month by month with pauses (Baseball Savant rate limits) and caches
-raw monthly extracts in data/statcast_cache/, so re-runs do not re-download.
+Downloads straight from the Baseball Savant CSV endpoint day by day - only
+days that actually have final games in our DB - with retries and response
+validation (Savant occasionally returns an HTML error page instead of CSV,
+which is also why we don't go through pybaseball here). Raw daily extracts
+are cached in data/statcast_cache/, so re-runs never re-download.
 
 Metric definitions (documented approximations):
 - avg_velocity_fastball: mean release_speed of four-seamers (FF); if a pitcher
@@ -15,12 +18,14 @@ Metric definitions (documented approximations):
 from __future__ import annotations
 
 import datetime
+import io
 import logging
 import time
 from pathlib import Path
 
 import pandas as pd
-from sqlalchemy import select
+import requests
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from .schema import PitcherStart, PitcherStartStatcast, get_engine, upsert
@@ -28,7 +33,9 @@ from .schema import PitcherStart, PitcherStartStatcast, get_engine, upsert
 log = logging.getLogger("statcast")
 
 CACHE_DIR = Path(__file__).resolve().parent.parent / "data" / "statcast_cache"
-PAUSE_BETWEEN_MONTHS_S = 20
+SAVANT_CSV_URL = "https://baseballsavant.mlb.com/statcast_search/csv"
+PAUSE_BETWEEN_DAYS_S = 2
+MAX_RETRIES = 5
 
 SWING_DESCRIPTIONS = {
     "swinging_strike", "swinging_strike_blocked", "foul", "foul_tip",
@@ -95,35 +102,49 @@ def aggregate_pitcher_games(pitches: pd.DataFrame) -> pd.DataFrame:
 # download with cache
 # ---------------------------------------------------------------------------
 
-def _fetch_range(start: datetime.date, end: datetime.date) -> pd.DataFrame:
-    """Download one date range from Baseball Savant, cached on disk."""
+def _fetch_day(date: datetime.date) -> pd.DataFrame:
+    """Download all pitches of one date from Baseball Savant, cached on disk.
+
+    A single day is ~4-5k rows, safely under Savant's per-query row cap.
+    Retries with backoff and rejects non-CSV (HTML error page) responses.
+    """
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file = CACHE_DIR / f"statcast_{start:%Y-%m-%d}_{end:%Y-%m-%d}.csv.gz"
+    cache_file = CACHE_DIR / f"statcast_{date:%Y-%m-%d}.csv.gz"
     if cache_file.exists():
-        log.info("Cache hit: %s", cache_file.name)
         return pd.read_csv(cache_file, compression="gzip", low_memory=False)
 
-    from pybaseball import statcast  # lazy import - heavy dependency
+    params = {
+        "all": "true", "type": "details", "player_type": "pitcher",
+        "game_date_gt": str(date), "game_date_lt": str(date),
+    }
+    last_err: Exception | None = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = requests.get(SAVANT_CSV_URL, params=params, timeout=180,
+                                headers={"User-Agent": "mlb-data-pipeline/1.0"})
+            resp.raise_for_status()
+            header = resp.text.partition("\n")[0]
+            if "game_pk" not in header and "pitch_type" not in header:
+                raise ValueError(f"odpověď není CSV (začíná: {resp.text[:80]!r})")
+            df = pd.read_csv(io.StringIO(resp.text), low_memory=False)
+            df.to_csv(cache_file, index=False, compression="gzip")
+            return df
+        except Exception as err:  # noqa: BLE001 - retry any fetch/parse hiccup
+            last_err = err
+            wait = 5 * 2 ** attempt
+            log.warning("Statcast %s selhal (%s), pokus %d/%d, čekám %ds",
+                        date, err, attempt + 1, MAX_RETRIES, wait)
+            time.sleep(wait)
+    raise RuntimeError(f"Statcast pro {date} se nepodařilo stáhnout: {last_err}")
 
-    log.info("Stahuji Statcast %s až %s ...", start, end)
-    df = statcast(start_dt=str(start), end_dt=str(end), verbose=False)
-    if df is None:
-        df = pd.DataFrame()
-    df.to_csv(cache_file, index=False, compression="gzip")
-    log.info("Staženo %d nadhozů, uloženo do %s", len(df), cache_file.name)
-    return df
 
-
-def _season_months(season: int) -> list[tuple[datetime.date, datetime.date]]:
-    """Month windows covering the season (2020 started in July)."""
-    first_month = 7 if season == 2020 else 3
-    ranges = []
-    for month in range(first_month, 12):
-        start = datetime.date(season, month, 1)
-        end = (datetime.date(season, month + 1, 1) - datetime.timedelta(days=1)
-               if month < 12 else datetime.date(season, 12, 31))
-        ranges.append((start, end))
-    return ranges
+def _season_game_dates(session: Session, season: int) -> list[datetime.date]:
+    """Only days that actually have final games -> no wasted off-day requests."""
+    rows = session.execute(text(
+        "SELECT DISTINCT game_date FROM games "
+        "WHERE season = :s AND status = 'final' ORDER BY game_date"),
+        {"s": season}).scalars().all()
+    return [datetime.date.fromisoformat(str(d)[:10]) for d in rows]
 
 
 def _store_aggregates(session: Session, agg: pd.DataFrame) -> int:
@@ -144,20 +165,26 @@ def backfill_statcast(db_path, seasons: list[int]) -> None:
     engine = get_engine(db_path)
     with Session(engine) as session:
         for season in seasons:
+            dates = _season_game_dates(session, season)
             total = 0
-            for start, end in _season_months(season):
-                df = _fetch_range(start, end)
-                if df.empty:
-                    continue
-                total += _store_aggregates(session, aggregate_pitcher_games(df))
-                time.sleep(PAUSE_BETWEEN_MONTHS_S)
-            log.info("Statcast sezóna %d: uloženo %d řádků pro startéry.", season, total)
+            for i, date in enumerate(dates, start=1):
+                was_cached = (CACHE_DIR / f"statcast_{date:%Y-%m-%d}.csv.gz").exists()
+                df = _fetch_day(date)
+                if not df.empty:
+                    total += _store_aggregates(session, aggregate_pitcher_games(df))
+                if i % 20 == 0 or i == len(dates):
+                    log.info("Statcast sezóna %d: %d/%d dnů, %d řádků startérů",
+                             season, i, len(dates), total)
+                if not was_cached:
+                    time.sleep(PAUSE_BETWEEN_DAYS_S)
+            log.info("Statcast sezóna %d hotová: uloženo %d řádků pro startéry.",
+                     season, total)
 
 
 def update_statcast_for_date(db_path, date: datetime.date) -> int:
     """Daily refresh: yesterday's pitches -> pitcher_starts_statcast."""
     engine = get_engine(db_path)
-    df = _fetch_range(date, date)
+    df = _fetch_day(date)
     if df.empty:
         log.info("Statcast %s: žádná data.", date)
         return 0
