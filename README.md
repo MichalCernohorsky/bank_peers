@@ -87,6 +87,21 @@ python -m pipeline.scheduler --cron "0 6 * * *"
 Validace je brána: nevalidní data se NEpromotují (exit 1 → alert). Idempotence: stejný
 checksum se přeskočí; restatement téhož období = nový vintage.
 
+**Zapojení automatického stahování (per banka).** `config/calendar.yaml` nese u každé banky
+`ir_page` (odkud brát) a `document`:
+1. na `ir_page` najdi přímý odkaz na strukturovaný xlsx posledního kvartálu,
+2. odvoď `url_pattern` — placeholdery `{year}` `{yyyy}` `{quarter}` `{q}`,
+3. přepni `kind: local` → `kind: http` a vzor odkomentuj.
+
+Dokud vzor není **ověřený**, nech `kind: local` a soubor nahraj ručně. Když fetch selže nebo
+dokument neprojde bránou, ingest se NEPROVEDE, produkce zůstane beze změny a přijde alert
+„NAHRAJ RUČNĚ" — data se nikdy nepokazí potichu. Termíny zveřejnění (`releases`) odpovídají
+IR kalendářům bank; jednorázově lze zdroj přebít přes `--source <bank>=<cesta>`.
+
+Ingest jedné banky staví DB z **kompletní sady zdrojů** — stažený dokument se předá jen té
+bance, jejíž release se zpracovává (`run_build(..., bank_sources={bank: soubor})`); zdroje
+ostatních bank zůstávají z `banks.yaml`.
+
 **Kontrola kompletnosti + ruční fallback** (gate v `config/calendar.yaml`): před promote se
 ověří, že máme data včetně všech metrik — povinné metriky pro nejnovější období
 (`required_metrics`) a pokrytí očekávané sady ze source-mapy (`min_coverage`). Když to

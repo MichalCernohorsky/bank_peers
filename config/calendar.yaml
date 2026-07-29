@@ -12,28 +12,39 @@ defaults:
     # a alespoň tolik % očekávaných metrik ze source-mapy banky (záchyt useknutého/špatného souboru)
     min_coverage: 0.8
 
+# JAK ZAPOJIT AUTOMATICKÉ STAHOVÁNÍ (per banka):
+#   1. na `ir_page` najdi přímý odkaz na strukturovaný xlsx pro poslední kvartál,
+#   2. odvoď z něj `url_pattern` — placeholdery {year} {yyyy} {quarter} {q},
+#   3. přepni `kind: local` -> `kind: http` a vzor odkomentuj.
+# Dokud vzor není OVĚŘENÝ, nech kind: local. Když fetch selže nebo dokument neprojde
+# bránou, ingest se NEPROVEDE a přijde alert „NAHRAJ RUČNĚ" (data/manual_drop/<bank>/)
+# — data se nikdy nepokazí potichu. Vzory se mezi kvartály mění, proto raději opatrně.
 banks:
   cs:
-    ir_page: https://www.csas.cz/cs/o-nas/pro-investory
+    ir_page: https://www.erstegroup.com/en/investors/reports/financial-reports
     document:
       # V produkci: kind: http + url_pattern (IR zveřejní strukturovaný xlsx).
       # Zde kind: local (offline, běží i v CI). Cestu lze přebít přes --source cs=<path>.
       kind: local
       path: key_figures_q1_2026.xlsx
       basis: reported
-      # url_pattern: https://www.csas.cz/.../key_figures_q{quarter}_{year}.xlsx
+      # url_pattern: https://www.erstegroup.com/.../key_figures_q{quarter}_{year}.xlsx
     releases:
-      - { period: 2026Q1, publish_date: 2026-05-06 }
-      - { period: 2026Q2, publish_date: 2026-08-05 }
+      - { period: 2026Q1, publish_date: 2026-04-30 }
+      - { period: 2026Q2, publish_date: 2026-07-30 }   # H1 2026 (ověřeno v IR kalendáři Erste)
+      - { period: 2026Q3, publish_date: 2026-10-30 }
 
   kb:
-    ir_page: https://www.kb.cz/en/about-bank/for-investors
+    ir_page: https://www.kb.cz/en/about-bank/for-investors/financial-results
     document:
       kind: local
       path: KB-Facts-and-Figures-2026-1Q.xlsx
       basis: reported
+      # url_pattern: https://www.kb.cz/.../KB-Facts-and-Figures-{year}-{q}Q.xlsx
     releases:
-      - { period: 2026Q1, publish_date: 2026-05-07 }
+      - { period: 2026Q1, publish_date: 2026-04-30 }
+      - { period: 2026Q2, publish_date: 2026-07-30 }   # 1H/2Q 2026 (ověřeno v IR kalendáři KB)
+      - { period: 2026Q3, publish_date: 2026-11-05 }
 
   csob:
     ir_page: https://www.csob.cz/portal/o-csob/vztahy-s-investory
@@ -43,6 +54,9 @@ banks:
       basis: reported
     releases:
       - { period: 2026Q1, publish_date: 2026-05-14 }
+      - { period: 2026Q2, publish_date: 2026-08-06 }   # 2Q/1H 2026 dle kalendáře KBC Group
+    gate:
+      min_coverage: 0.5    # fact sheet nese užší sadu metrik než plný výkaz
 
   moneta:
     ir_page: https://investors.moneta.cz/financial-results
@@ -50,5 +64,9 @@ banks:
       kind: local
       path: mmb-1q2026-basic-financial-data.xlsx
       basis: reported
+      # Reálný vzor dokumentů MONETA: .../mmb-{q}q{year}-results-en.pdf (xlsx analogicky).
+      # url_pattern: https://investors.moneta.cz/documents/12270853/31400207/mmb-{q}q{year}-basic-financial-data.xlsx
     releases:
-      - { period: 2026Q1, publish_date: 2026-04-29 }
+      - { period: 2026Q1, publish_date: 2026-04-24 }
+      - { period: 2026Q2, publish_date: 2026-07-24 }   # H1 2026 — vydáno, čeká na zdrojový xlsx
+      - { period: 2026Q3, publish_date: 2026-10-23 }

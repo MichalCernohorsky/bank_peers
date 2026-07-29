@@ -51,13 +51,19 @@ def _schema_sql(dialect):
     return (ROOT / "schema" / name).read_text()
 
 
-def run_build(cfg, xlsx, database_url):
-    """Postaví databázi a vrátí dict s výsledky (vč. validačních checků)."""
+def run_build(cfg, xlsx, database_url, bank_sources=None):
+    """Postaví databázi a vrátí dict s výsledky (vč. validačních checků).
+
+    bank_sources: {bank_code: path} — přebije `source.path` z banks.yaml pro danou
+    banku. Používá watcher: čerstvě stažený dokument patří TÉ bance, jejíž release
+    se zpracovává (jinak by se stavěla ze starého souboru a nové období by chybělo).
+    """
     import csv as _csv
 
     import yaml as _yaml
 
     cfg, xlsx = Path(cfg), Path(xlsx)
+    bank_sources = {k: Path(v) for k, v in (bank_sources or {}).items()}
     url = normalize_url(database_url)
     dialect = dialect_of(url)
     t0 = dt.datetime.now()
@@ -75,7 +81,7 @@ def run_build(cfg, xlsx, database_url):
         src = b.get("source") or {}
         if src.get("kind") != "xlsx":
             continue
-        bank_xlsx = Path(src["path"]) if src.get("path") else xlsx
+        bank_xlsx = bank_sources.get(b["code"]) or (Path(src["path"]) if src.get("path") else xlsx)
         if not bank_xlsx.exists():
             if b["code"] == "cs":
                 raise FileNotFoundError(f"Hlavní zdroj ČS chybí: {bank_xlsx}")

@@ -217,6 +217,9 @@ def run_once(*, config_dir=None, calendar_path=DEFAULT_CALENDAR, registry_path=D
     target_url = target_url or get_settings().database_url
     source_overrides = source_overrides or {}
 
+    # globální zdroj (ČS) pro banky bez vlastní `source.path` v banks.yaml
+    base_xlsx = Path(get_settings().xlsx_path)
+
     cal = load_calendar(calendar_path)
     reg = load_registry(registry_path)
     accepted_sha = {d["sha256"] for d in reg["documents"] if d["status"] == "accepted"}
@@ -267,7 +270,10 @@ def run_once(*, config_dir=None, calendar_path=DEFAULT_CALENDAR, registry_path=D
         staging_url = f"sqlite:///{staging}"
         comp = {"complete_ok": False, "required_missing": required, "coverage": 0.0, "coverage_missing": []}
         try:
-            r = run_build(config_dir, incoming, staging_url)
+            # Stažený dokument patří TÉTO bance; globální xlsx (ČS) i zdroje ostatních
+            # bank zůstávají z konfigurace — staging se staví z KOMPLETNÍ sady, jinak by
+            # ostatní banky vypadly a validační kotva by spadla.
+            r = run_build(config_dir, base_xlsx, staging_url, bank_sources={bank: incoming})
             checks_ok = bool(r["all_ok"])
             headline_ok = _headline_present(staging_url, bank, headline_metric) if checks_ok else False
             comp = completeness(staging_url, bank, config_dir, required, min_cov)
@@ -282,7 +288,7 @@ def run_once(*, config_dir=None, calendar_path=DEFAULT_CALENDAR, registry_path=D
                       "coverage_missing": comp["coverage_missing"]})
 
         if gate_ok:
-            run_build(config_dir, incoming, target_url)   # promote do produkce
+            run_build(config_dir, base_xlsx, target_url, bank_sources={bank: incoming})   # promote do produkce
             entry["status"] = "accepted"
             accepted_sha.add(sha)
             notify(f"Ingest {bank} {period_str}: OK (vintage {vintage}, zdroj {src_mode})",

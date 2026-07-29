@@ -158,3 +158,38 @@ def test_restatement_creates_new_vintage(env):
     reg = json.loads(env["registry"].read_text())
     cs = [d for d in reg["documents"] if d["bank"] == "cs"]
     assert {d["vintage"] for d in cs} == {1, 2}   # restatement = nový vintage, historie zachována
+
+
+def test_peer_bank_ingest_keeps_other_sources(env, monkeypatch):
+    """Regrese: stažený dokument peer banky se NESMÍ použít jako globální (ČS) zdroj.
+
+    Watcher dřív předával stažený soubor jako globální xlsx — u release peer banky
+    tím přepsal zdroj ČS, validační kotva spadla a brána zamítla i korektní data.
+    """
+    calls = []
+    real_build = watch.run_build
+
+    def spy_build(cfg, xlsx, url, bank_sources=None):
+        calls.append({"xlsx": Path(xlsx), "bank_sources": dict(bank_sources or {})})
+        return real_build(cfg, xlsx, url, bank_sources=bank_sources)
+
+    monkeypatch.setattr(watch, "run_build", spy_build)
+    # KB potřebuje VLASTNÍ kopii souboru — shodný checksum by spustil idempotentní skip
+    kb_doc = env["cal_path"].parent / "kb_source.xlsx"
+    kb_doc.write_bytes(FIXTURE.read_bytes() + b"\0")   # jiný sha256, stejný obsah listů
+    env["calendar"]["banks"]["kb"] = {
+        "document": {"kind": "local", "path": str(kb_doc)},
+        "releases": [{"period": "2026Q1", "publish_date": "2026-05-07"}],
+    }
+    env["cal_path"].write_text(json.dumps(env["calendar"]))
+    _run(env)
+
+    incoming_files = {p.resolve() for p in env["incoming"].glob("*")}
+    assert incoming_files, "žádný dokument nebyl stažen"
+    assert any("kb" in c["bank_sources"] for c in calls), "build pro KB se nespustil"
+    for c in calls:
+        # ŽÁDNÝ build (staging ani promote) nesmí dostat stažený dokument jako globální
+        # xlsx — ten patří výhradně do bank_sources dané banky.
+        assert c["xlsx"].resolve() not in incoming_files, (
+            f"stažený dokument {c['xlsx'].name} použit jako globální zdroj (přepsal by ČS)")
+        assert set(c["bank_sources"]) <= {"cs", "kb"} and c["bank_sources"]
