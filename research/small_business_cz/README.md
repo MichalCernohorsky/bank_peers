@@ -14,6 +14,7 @@ Konkurenční benchmark Česká spořitelna vs. trh. Zpracováno 8.–9. 9. 2026
 | `05_ws4.md` | WS4 – trendy a disruptory, heat-map |
 | `06_swot.md` | WS5 – SWOT, TOWS, big bets, no-regret moves |
 | `07_glosar.md` | Glosář |
+| `08_zadani_claude_design_deck.md` | Zadání pro Claude Design – HBR-style deck (35 slidů, texty + data) |
 | `data/*.md` | Datové tabulky per workstream (vč. extraktů z lokálních IR fact sheetů KB, ČSOB, Moneta, ČS) |
 | `BRIEF_common.md` | Společný brief pro research agenty |
 
