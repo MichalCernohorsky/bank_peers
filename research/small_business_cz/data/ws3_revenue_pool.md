@@ -26,7 +26,7 @@ Bez pojištění, leasingu, investic (mimo bankovní účet a úvěr).
 | (3) Poplatky | 0,9 × 2,0 = **1,8** | 1,1 × 3,5 = **3,9** | 1,3 × 5,0 = **6,5** |
 | **Revenue pool celkem** | **≈ 8** | **≈ 15** | **≈ 25** |
 | Struktura (střední) | | úvěry 41 % / vklady 34 % / poplatky 25 % | |
-Kontrola řádu `[EST]`: střední scénář 15 mld. Kč ≈ 6–7 % součtu provozních výnosů čtyř největších bank (ČS 59,2 + ČSOB 48,4 + KB ≈ 37 + Moneta 12,9 = ≈ 157 mld. Kč, FY 2025 `[FACT]` z fact sheetů; ČSOB FY 2025 provozní výnosy 48,4 mld. Kč, list P&L Ytd.) a ≈ 3× provozní výnosy celého Commercial segmentu Moneta (4,8 mld. Kč FY 2024 `[FACT]`, který zahrnuje i SME a korporace). Řád je konzistentní; přesnost ± 40 %.
+Kontrola řádu `[EST]`: střední scénář 15 mld. Kč ≈ 6–7 % součtu provozních výnosů čtyř největších bank (ČS 59,2 + ČSOB 48,4 + KB 36,9 + Moneta 13,8 = ≈ 158 mld. Kč, FY 2025 `[FACT]` z fact sheetů: ČS key figures; ČSOB list P&L Ytd.; KB „Net banking income" součet čtvrtletí 2025; Moneta „Total operating income" součet čtvrtletí 2025) a ≈ 3× provozní výnosy celého Commercial segmentu Moneta (4,8 mld. Kč FY 2024 `[FACT]`, který zahrnuje i SME a korporace). Řád je konzistentní; přesnost ± 40 %.
 Citlivost: ±1 pb depozitní marže = ±3,5 mld. Kč (střední); ±50 mld. Kč úvěrů = ±1,75 mld. Kč; ±1 tis. Kč fee-ARPU = ±1,1 mld. Kč. **Největší páka = vklady (cena peněz) – v prostředí repo 3,75 % je depozitní marže podnikatelských běžných účtů největší jednotlivá složka poolu.**
 
 ## Log odhadů
