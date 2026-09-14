@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MichalCernohorsky/bank_peers/mgm-cz/schema/mgm-program.schema.json",
+  "title": "MGM program record",
+  "description": "Jeden zaznam = jeden program / varianta programu. 18 poli ze zadani je zavazny kontrakt; pole oznacena 'extension: true' jsou doplnky navrzene ve Fazi 0.",
+  "type": "object",
+  "required": [
+    "record_id", "subject", "subject_type", "status",
+    "source_date", "confidence"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?$",
+      "description": "EXTENSION. Stabilni klic, napr. 'air-bank__pozvete-pratele'. Explicitni, NE odvozeny z program_name - prejmenovani programu nesmi osirit historii."
+    },
+    "subject": { "type": "string", "minLength": 1, "description": "Nazev instituce." },
+    "subject_type": { "enum": ["bank", "neobank"], "description": "bank = ceska bankovni licence / pobocka zahranicni banky; neobank = fintech / EMI / zahranicni licence." },
+    "in_original_scope": {
+      "type": "boolean",
+      "default": true,
+      "description": "EXTENSION. false = subjekt 'doplneno' behem researche (viz zadani)."
+    },
+    "program_name": { "type": ["string", "null"], "description": "Oficialni nazev programu. null, kdyz program neexistuje nebo nema vlastni nazev." },
+    "status": {
+      "enum": ["active", "paused", "ended", "unknown", "none"],
+      "description": "active/paused/ended/unknown dle zadani. 'none' je EXTENSION: program prokazatelne neexistuje ('nenalezeno' jako platna informace). 'unknown' = program mozna existuje, ale stav se neda urcit."
+    },
+    "product_scope": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Produkty, na ktere se program vztahuje (bezny ucet, sporici, hypoteka, karta, investice...)."
+    },
+    "reward_referrer": { "type": ["string", "null"], "description": "Odmena pro doporucujiciho - citelny text vcetne formy." },
+    "reward_referee": { "type": ["string", "null"], "description": "Odmena pro doporuceneho - citelny text vcetne formy." },
+    "reward_referrer_value": { "type": ["number", "null"], "description": "EXTENSION. Ciselna headline castka pro razeni/srovnani. U tiered odmen = nejvyssi dosazitelna." },
+    "reward_referrer_currency": { "type": ["string", "null"], "pattern": "^[A-Z]{3}$", "description": "EXTENSION. ISO 4217. Puvodni mena subjektu, NE prepocet." },
+    "reward_referee_value": { "type": ["number", "null"], "description": "EXTENSION. Viz reward_referrer_value." },
+    "reward_referee_currency": { "type": ["string", "null"], "pattern": "^[A-Z]{3}$", "description": "EXTENSION. Viz reward_referrer_currency." },
+    "reward_tiered": { "type": "boolean", "default": false, "description": "EXTENSION. true = odmena je stupnovita/gamifikovana; detail patri do notes." },
+    "reward_type": {
+      "type": ["string", "null"],
+      "enum": ["cash", "voucher", "points", "fee_waiver", "other", null],
+      "description": "null, kdyz program neexistuje."
+    },
+    "conditions": { "type": ["string", "null"], "description": "Kvalifikacni podminky (aktivni ucet, min. pocet transakci, prichozi platba, doba trvani...)." },
+    "channel": {
+      "type": "array",
+      "items": { "enum": ["code", "link", "app", "branch", "web", "other"] },
+      "description": "Jak se doporucuje."
+    },
+    "limits": { "type": ["string", "null"], "description": "Max. pocet doporuceni, max. odmena za obdobi." },
+    "timing": { "type": ["string", "null"], "description": "Lhuta pro splneni podminek, lhuta pro vyplatu." },
+    "campaign_period": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": ["string", "null"], "format": "date" },
+        "to": { "type": ["string", "null"], "format": "date" },
+        "note": { "type": ["string", "null"] }
+      },
+      "description": "Platnost kampane. null = neomezeno / bez uvedeneho konce."
+    },
+    "eligibility": { "type": ["string", "null"], "description": "Kdo muze doporucovat / byt doporucen." },
+    "source_url": { "type": ["string", "null"], "format": "uri", "description": "Primarni zdroj. Preferuj T&C pred marketingovou strankou." },
+    "source_date": { "type": "string", "format": "date", "description": "Datum overeni informace." },
+    "confidence": {
+      "enum": ["high", "medium", "low"],
+      "description": "high = oficialni T&C; medium = oficialni marketing bez T&C; low = sekundarni zdroj."
+    },
+    "field_confidence": {
+      "type": "object",
+      "additionalProperties": { "enum": ["high", "medium", "low"] },
+      "description": "EXTENSION. Override jen tam, kde se confidence konkretniho pole lisi od zaznamove."
+    },
+    "sources": {
+      "type": "array",
+      "description": "EXTENSION. Vsechny zdroje k zaznamu; z nich se generuje Priloha reportu.",
+      "items": {
+        "type": "object",
+        "required": ["url", "type", "date", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "type": { "enum": ["tc", "marketing", "press", "secondary", "archive"] },
+          "date": { "type": "string", "format": "date" },
+          "confidence": { "enum": ["high", "medium", "low"] },
+          "title": { "type": ["string", "null"] },
+          "retrieved_via": { "enum": ["websearch", "webfetch", "manual", "tracker"] }
+        }
+      }
+    },
+    "last_checked": { "type": ["string", "null"], "format": "date", "description": "EXTENSION. Posledni beh trackeru, ktery zdroj uspesne stahl. Jedine pole, ktere tracker prepisuje automaticky." },
+    "notes": { "type": "string", "default": "", "description": "Zvlastnosti, gamifikace, tiered odmeny, rozpory mezi zdroji." }
+  }
+}
