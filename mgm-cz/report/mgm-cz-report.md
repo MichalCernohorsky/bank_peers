@@ -38,7 +38,7 @@
 |---|---|---|---|---|---|---|---|---|
 | **Air Bank** | banka | aktivní | 500 Kč za každého doporučeného | 500 Kč | Doporučující pošle odkaz z mobilní aplikace (Menu / Nastavení a banka / Pozvat přátele). Doporučený… | max. 10 doporučených přátel ročně (tj. max. 5 000 Kč ročně… | střední | [odkaz](https://www.airbank.cz/file-download/pravidla-akce-pozvani-pratel-doporucujici) |
 | **Banka CREDITAS** | banka | aktivní | 500 Kč za doporučeného | 250 Kč | Doporučený uvede při založení produktu jméno, příjmení a členské číslo doporučujícího. U spořicího… | nepodařilo se ověřit | střední | [odkaz](https://www2020.creditas.cz/doporucte-a-ziskejte) |
-| **Česká spořitelna** | banka | aktivní | až 6 000 Kč celkem (až 1 200 Kč za každého z max. 5 doporučených) | až 1 200 Kč | Doporučený si přes George sjedná účet Plus, Standard, Premier nebo Erste Private Banking a následně… | max. 5 doporučených přátel (6 000 Kč pro doporučujícího) | střední | [odkaz](https://www.e15.cz/finexpert/banky-a-ucty/ceska-sporitelna-prodlouzila-odmenovani-za-doporuceni-uctu-ziskat-muzete-az-6-000-korun-1430070) |
+| **Česká spořitelna** | banka | aktivní | až 6 000 Kč celkem (až 1 200 Kč za každého z max. 5 doporučených) | až 1 200 Kč | Doporučený si přes George sjedná účet Plus, Standard, Premier nebo Erste Private Banking a následně… | max. 5 doporučených přátel (6 000 Kč pro doporučujícího) | střední | [odkaz](https://www.csas.cz/static_grg/cs/MGM/Prilohy/pravidla_marketingove_akce_doporucte_george.pdf) |
 | **ČSOB (vč. Poštovní spořitelny)** | banka | neověřeno | nejednoznačné: sekundární zdroje uvádějí 500 Kč i 1 000 Kč za doporučeného | nejednoznačné: jeden zdroj uvádí 500 Kč pro obě strany, jiný pouze odměnu pro d… | Nepodařilo se ověřit. Nalezené oficiální PDF s pravidly ČSOB se týkají akvizičních kampaní (Plus ko… | — | nízká | [odkaz](https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite) |
 | **Fio banka** | banka | nemá MGM | — | — | — | — | nízká | [odkaz](https://www.finparada.cz/3524-Banky-zkouseji-ziskat-nove-klienty-odmenou-za-doporuceni.aspx) |
 | **Komerční banka** | banka | nemá MGM | — | — | — | — | střední | [odkaz](https://www.kb.cz/cs/obcane/bonus-az-4-000-kc-pro-nove-klienty) |
@@ -119,10 +119,10 @@
 | Odměna doporučující | až 6 000 Kč celkem (až 1 200 Kč za každého z max. 5 doporučených) |
 | Odměna doporučený | až 1 200 Kč |
 | Typ odměny | cash |
-| Podmínky | Doporučený si přes George sjedná účet Plus, Standard, Premier nebo Erste Private Banking a následně zaplatí alespoň 4× kartou v každém ze 3 měsíců následujících po měsíci založení účtu. Odměna 1 200 Kč se vyplácí rozděleně do 3 měsíců. |
+| Podmínky | Doporučený si přes George sjedná účet Plus, Standard, Premier nebo Erste Private Banking a následně zaplatí alespoň 4× kartou v každém ze 3 měsíců následujících po měsíci založení účtu. Odměna 1 200 Kč se vyplácí po 400 Kč měsíčně za každý ze 3 měsíců, ve kterých je podmínka splněna. Akci nelze kombinovat s jinými akcemi pořadatele na založení osobního účtu s odměnou ani s akcí „Účet s výhodami“… |
 | Kanál | app; link |
 | Limity | max. 5 doporučených přátel (6 000 Kč pro doporučujícího) |
-| Lhůty | podmínka aktivity ve 3 měsících po založení účtu; odměna rozdělena do 3 měsíčních plateb |
+| Lhůty | podmínka 4 plateb kartou v každém ze 3 měsíců po založení účtu; odměna se vyplácí po 400 Kč měsíčně, celkem 1 200 Kč |
 | Platnost kampaně | ? – ? (Program byl prodloužen a pokračuje i v roce 2026; konkrétní datum konce se nepodařilo ověřit.) |
 | Kdo se může účastnit | doporučující = klient ČS s George; doporučený = nový klient sjednávající účet přes George |
 | Confidence | střední |
@@ -130,7 +130,7 @@
 
 *Nižší jistota u jednotlivých polí:* `campaign_period`: nízká
 
-**Poznámky.** Největší odměna pro doporučujícího mezi velkými bankami. Odměna je strukturovaná per-doporučený (1 200 Kč), ne jako jedna částka. Dřívější komunikace banky uváděla 1 200 Kč pro obě strany — viz FB post ČS. Oficiální T&C se nepodařilo dohledat (egress blokován), proto medium.
+**Poznámky.** Největší odměna pro doporučujícího mezi velkými bankami. Odměna je strukturovaná per-doporučený (1 200 Kč) a dále drobená na 3× 400 Kč měsíčně — ČS tak platí až po třech měsících prokázané aktivity, což je nejdelší kvalifikační období v přehledu. Oficiální PDF s pravidly existuje (URL obsahuje přímo segment /MGM/), ale jeho obsah nebyl přečten (egress blokován); nalezené útržky zmiňují připsání odměny do 30. 11. 2025, takže dohledaná verze pravidel může být starší než aktuální kampaň. Dřívější komunikace banky uváděla 1 200 Kč pro obě strany.
 
 #### ČSOB (vč. Poštovní spořitelny)
 
@@ -258,7 +258,7 @@
 | Confidence | nízká |
 | Ověřeno dne | 2026-09-15 |
 
-**Poznámky.** Program prokazatelně existuje (banka pro něj vydává vlastní PDF s pravidly a komunikuje „obě strany dostanou odměnu“), ale aktuální výši odměny se nepodařilo z veřejných zdrojů ověřit. Historicky 100 Kč, od 15. 9. 2018 zvýšeno na 300 Kč — pouze fórový zdroj, confidence low, do historie nezařazeno. Nezaměňovat s „Program Odměny“, což je cashback u obchodníků, ne MGM.
+**Poznámky.** Program prokazatelně existuje (banka pro něj vydává vlastní PDF s pravidly a komunikuje „obě strany dostanou odměnu“), ale aktuální výši odměny se nepodařilo z veřejných zdrojů ověřit. VÝZNAMNÁ INDICIE: nalezené verze podmínek kampaně jsou účinné od 4. 3. 2019, 20. 8. 2019, 1. 11. 2019 a 14. 6. 2020 — žádná novější. Sedm let bez aktualizace pravidel naznačuje, že program je spíše spící nebo doběhlý než aktivně provozovaný, ale bez přečtení dokumentů to nelze tvrdit. Historicky 100 Kč, od 15. 9. 2018 zvýšeno na 300 Kč — pouze fórový zdroj, do historie nezařazeno. Nezaměňovat s „Program Odměny“, což je cashback u obchodníků, ne MGM.
 
 #### Oberbank
 
@@ -732,6 +732,7 @@ a založí základ pro sledování změn v čase.
 
 **Česká spořitelna**
 
+- [Pravidla marketingové akce Doporučte George (ČS, PDF)](https://www.csas.cz/static_grg/cs/MGM/Prilohy/pravidla_marketingove_akce_doporucte_george.pdf) — T&C, jistota střední, ověřeno 2026-09-15
 - [ČS prodlužuje bonus za doporučení až 6 000 Kč (e15)](https://www.e15.cz/finexpert/banky-a-ucty/ceska-sporitelna-prodlouzila-odmenovani-za-doporuceni-uctu-ziskat-muzete-az-6-000-korun-1430070) — sekundární, jistota střední, ověřeno 2026-09-15
 - [Spořitelna dá klientům odměnu až 6000 Kč (Peníze.cz)](https://www.penize.cz/osobni-ucty/480388-sporitelna-da-klientum-odmenu-az-6000-korun-mysli-i-na-novacky) — sekundární, jistota střední, ověřeno 2026-09-15
 

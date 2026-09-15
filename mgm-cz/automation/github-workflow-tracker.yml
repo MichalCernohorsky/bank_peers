@@ -1,0 +1,64 @@
+# Týdenní běh trackeru MGM programů — ŠABLONA, NE ŽIVÝ WORKFLOW.
+#
+# GitHub načítá workflows VÝHRADNĚ z .github/workflows/ v KOŘENI repozitáře.
+# Tento soubor leží v mgm-cz/automation/, takže se sám od sebe nikdy nespustí.
+#
+# Aktivace (dva kroky, oba vědomé):
+#   1) cp mgm-cz/automation/github-workflow-tracker.yml \
+#         .github/workflows/mgm-tracker.yml     # z kořene repozitáře
+#   2) odkomentovat blok `schedule` níže
+#
+# Dokud neuděláš krok 1, workflow neexistuje. Po kroku 1 a před krokem 2 jde
+# spustit jen ručně přes Actions -> Run workflow.
+name: MGM tracker
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 6 * * 1"   # každé pondělí v 6:00 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mgm-cz
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: mgm-cz/requirements.txt
+
+      - name: Instalace závislostí
+        run: pip install -r requirements.txt
+
+      - name: Testy
+        run: python -m pytest tests/ -q
+
+      - name: Běh trackeru
+        run: python tracker/run.py
+
+      - name: Validace dat
+        run: python tracker/validate.py data/mgm-programs.json
+
+      - name: Přegenerování reportu
+        run: python tracker/report.py
+
+      - name: Commit změn
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Žádné změny — nic ke commitu."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "mgm-cz: automatický běh trackeru $(date -u +%Y-%m-%d)"
+          git push

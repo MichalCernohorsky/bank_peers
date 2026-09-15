@@ -1,0 +1,240 @@
+# Zdroje pro tracker MGM programů.
+#
+# Sledují se POUZE oficiální zdroje subjektů (T&C, marketingové stránky, tiskové
+# zprávy na vlastní doméně). Zpravodajské a srovnávací weby se nesledují — mění
+# se denně z důvodů nesouvisejících s programem a generovaly by jen šum.
+#
+# Přidání subjektu: viz README.md, sekce „Jak přidat nový subjekt".
+
+defaults:
+  user_agent: "mgm-cz-tracker/1.0 (+https://github.com/MichalCernohorsky/bank_peers)"
+  timeout_seconds: 30
+  delay_seconds: 3.0        # prodleva mezi requesty na tentýž host
+  max_retries: 2
+  backoff_seconds: 2.0      # exponenciálně: 2s, 4s
+  respect_robots: true
+
+subjects:
+  - record_id: air-bank__pozvete-pratele
+    subject: Air Bank
+    sources:
+      - url: https://www.airbank.cz/file-download/pravidla-akce-pozvani-pratel-doporucujici
+        type: pdf
+        anchors: ["doporuč", "odměn"]
+        note: "Pravidla akce pro doporučujícího — primární T&C."
+      - url: https://www.airbank.cz/co-vas-nejvic-zajima/jak-doporucit-air-bank-priteli/
+        type: html
+        selector: "main"
+        anchors: ["doporuč", "Kč"]
+        note: "Marketingová stránka — nese aktuální částku."
+
+  - record_id: ceska-sporitelna__doporucte-george
+    subject: Česká spořitelna
+    sources:
+      - url: https://www.csas.cz/static_grg/cs/MGM/Prilohy/pravidla_marketingove_akce_doporucte_george.pdf
+        type: pdf
+        anchors: ["Doporučte George", "odměn"]
+        note: "Oficiální pravidla marketingové akce. URL obsahuje segment /MGM/."
+
+  - record_id: raiffeisenbank__odmena-za-doporuceni
+    subject: Raiffeisenbank
+    sources:
+      - url: https://www.rb.cz/podpora/podminky-akci/odmena-za-doporuceni
+        type: html
+        selector: "main"
+        anchors: ["doporučen", "odměn"]
+        note: "Podmínky akce — rozcestník."
+      - url: https://www.rb.cz/attachments/pi/pravidla-reklamni-akce/pravidla-reklamni-akce-financni-odmena-za-doporuceni.pdf
+        type: pdf
+        anchors: ["odměn", "doporuč"]
+        note: "Varianta „Finanční odměna za doporučení“."
+      - url: https://www.rb.cz/attachments/pi/pravidla-reklamni-akce/pravidla-reklamni-akce-odmena-za-doporuceni-final.pdf
+        type: pdf
+        anchors: ["odměn", "doporuč"]
+        note: "Varianta „Odměna za doporučení“ (final). Vztah tří PDF je neobjasněný — sledovat všechna."
+      - url: https://www.rb.cz/osobni/ucty/doporuceni/odmena-za-doporuceni
+        type: html
+        selector: "main"
+        anchors: ["doporuč"]
+        note: "Marketingová stránka."
+
+  - record_id: mbank__doporucte-mbank
+    subject: mBank
+    sources:
+      - url: https://www.mbank.cz/informace-k-produktum/dokumenty-ke-stazeni/dokumenty/akce/doporucte-mbank_pravidla-unor2026.pdf
+        type: pdf
+        anchors: ["Doporučte mBank", "odměn"]
+        note: "Dodatek č. 2. POZOR: mBank verzuje pravidla v názvu souboru (leden2026, unor2026) — při vydání dodatku č. 3 vznikne NOVÁ URL a tato přestane být aktuální. Viz README, sekce o verzovaných URL."
+      - url: https://www.mbank.cz/blog/post,550,caste-dotazy-odmeny-za-doporuceni-a-zalozeni-mkonta.html
+        type: html
+        selector: "main"
+        anchors: ["doporuč", "Kč"]
+        note: "FAQ — stabilní URL, dobrý kanárek pro změnu podmínek."
+
+  - record_id: partners-banka__doporuc-a-ziskej
+    subject: Partners Banka
+    sources:
+      - url: https://www.partnersbanka.cz/userfiles/podminky-doporuc-a-ziskej-5e249b95.pdf
+        type: pdf
+        anchors: ["Doporuč a získej"]
+        note: "Pravidla klientské akce. Hash v názvu souboru se při aktualizaci pravděpodobně změní."
+      - url: https://www.partnersbanka.cz/urok-sporici-ucet
+        type: html
+        selector: "main"
+        anchors: ["%", "doporuč"]
+        note: "Sazby spořicího účtu — odměnou je zde úrok, takže změna sazby = změna odměny."
+
+  - record_id: creditas__doporucte-a-ziskejte
+    subject: Banka CREDITAS
+    sources:
+      - url: https://www2020.creditas.cz/doporucte-a-ziskejte
+        type: html
+        selector: "main"
+        anchors: ["doporuč", "Kč"]
+        note: "Doména www2020 naznačuje starou stránku — zvýšené riziko, že zdroj zmizí nebo se přesune."
+
+  - record_id: unicredit__doporuc-a-ziskej
+    subject: UniCredit Bank
+    sources:
+      - url: https://www.unicreditbank.cz/cs/ostatni/bankatwork.html
+        type: html
+        selector: "main"
+        anchors: ["doporuč"]
+        note: "Oficiální stránku programu „Doporuč a získej“ se nepodařilo dohledat; toto je nejbližší nalezená oficiální stránka. NUTNO OVĚŘIT a nahradit správnou URL."
+
+  - record_id: moneta__odmena-za-doporuceni
+    subject: Moneta Money Bank
+    sources:
+      - url: https://www.moneta.cz/dokumenty-ke-stazeni/osobni/ucty
+        type: html
+        selector: "main"
+        anchors: ["doporuč"]
+        note: "Rozcestník dokumentů. Nejnovější nalezená pravidla kampaně jsou z roku 2019 — sledovat, zda přibude novější verze."
+
+  - record_id: csob__doporuceni
+    subject: ČSOB (vč. Poštovní spořitelny)
+    sources: []
+    note: "ŽÁDNÝ OVĚŘENÝ ZDROJ. Nepodařilo se najít oficiální stránku ani PDF k MGM programu ČSOB — všechny nalezené dokumenty jsou akviziční kampaně. Doplnit, jakmile bude znám."
+
+  - record_id: oberbank__nenalezeno
+    subject: Oberbank
+    sources:
+      - url: https://www.oberbank.cz/
+        type: html
+        selector: "body"
+        anchors: []
+        note: "Pouze homepage — MGM program nenalezen. Sledování slouží k zachycení případného spuštění programu."
+
+  - record_id: trinity-bank__zadny-mgm
+    subject: Trinity Bank
+    sources:
+      - url: https://www.trinitybank.cz/lide-sporici-ucty-dobry-klient/
+        type: html
+        selector: "main"
+        anchors: []
+        note: "Trinity MGM nemá; sledujeme stránku s bonusy pro případ, že program zavede."
+
+  - record_id: revolut__referrals
+    subject: Revolut
+    sources:
+      - url: https://www.revolut.com/cs-CZ/legal/referrals-terms/
+        type: html
+        selector: "main"
+        anchors: ["doporuč"]
+        note: "Podmínky doporučení — česká lokalizace."
+      - url: https://www.revolut.com/cs-CZ/legal/referrals-revpro-terms/
+        type: html
+        selector: "main"
+        anchors: ["Revolut Pro"]
+        note: "Samostatný program pro Revolut Pro."
+      - url: https://www.revolut.com/cs-CZ/legal/u18referrals/
+        type: html
+        selector: "main"
+        anchors: []
+        note: "Samostatný program Kids & Teens."
+
+  - record_id: n26__refer-a-friend
+    subject: N26
+    sources:
+      - url: https://docs.n26.com/legal/01+DE/01+Account/en/15account-terms-and-conditions-friend-referral-3.0-en.pdf
+        type: pdf
+        anchors: ["Refer a Friend"]
+        note: "Německá verze T&C, v3.0. Česká lokalizace neexistuje. Číslo verze je v URL — nová verze = nová URL."
+      - url: https://n26.com/en-eu/invite-friends
+        type: html
+        selector: "main"
+        anchors: ["refer", "invite"]
+        note: "Marketingová stránka EU."
+
+  - record_id: wise__invite-program
+    subject: Wise
+    sources:
+      - url: https://wise.com/gb/legal/referral-terms
+        type: html
+        selector: "main"
+        anchors: ["referral"]
+        note: "Britská verze. Varianta pro ČR neověřena — pokud existuje wise.com/cz/legal/referral-terms, doplnit ji jako primární."
+
+  - record_id: bunq__refer-a-friend
+    subject: bunq
+    sources:
+      - url: https://www.bunq.com/personal-account/banking-features/refer-a-friend
+        type: html
+        selector: "main"
+        anchors: ["refer"]
+        note: "Konkrétní částky jsou jen v aplikaci, web nese pouze mechaniku."
+
+  - record_id: curve__refer-a-friend
+    subject: Curve
+    sources:
+      - url: https://www.curve.com/legal/referral-promo-terms/
+        type: html
+        selector: "main"
+        anchors: ["referral"]
+        note: "Rozhodne rozpor mezi 1% cashbackem a 50 GBP — prioritní zdroj k ověření."
+
+  - record_id: skip-pay__doporucte-nas
+    subject: Skip Pay
+    sources:
+      - url: https://skippay.cz/doporucte-nas
+        type: html
+        selector: "main"
+        anchors: ["doporuč", "Kč"]
+        note: "Stránka programu."
+      - url: https://skippay.cz/caste-dotazy/dalsi-caste-otazky/kolik-muzu-za-doporuceni-celkem-ziskat
+        type: html
+        selector: "main"
+        anchors: ["doporuč"]
+        note: "FAQ s limitem odměny."
+
+  - record_id: twisto__promo-kody
+    subject: Twisto
+    sources:
+      - url: https://www.twisto.cz/vychytavky/twistoucet/
+        type: html
+        selector: "main"
+        anchors: []
+        note: "Twisto nemá veřejnou stránku programu — promo kódy nejsou plošné. Sledujeme produktovou stránku."
+
+  - record_id: komercni-banka__zadny-mgm
+    subject: Komerční banka
+    sources:
+      - url: https://www.kb.cz/cs/obcane/bonus-az-4-000-kc-pro-nove-klienty
+        type: html
+        selector: "main"
+        anchors: []
+        note: "KB MGM nemá. Sledujeme akviziční stránku — pokud MGM zavede, objeví se pravděpodobně zde nebo vedle."
+
+  - record_id: fio-banka__zadny-mgm
+    subject: Fio banka
+    sources:
+      - url: https://www.fio.cz/bankovni-sluzby/bankovni-ucty/bezny-ucet
+        type: html
+        selector: "main"
+        anchors: []
+        note: "Fio MGM nemá. Sledujeme stránku běžného účtu pro případ změny strategie."
+
+  - record_id: max-banka__odmena-za-doporuceni
+    subject: Max banka
+    sources: []
+    note: "Subjekt zanikl fúzí s Bankou CREDITAS k 1. 10. 2024, program ukončen 27. 10. 2022. Nesledovat — záznam je historický."
