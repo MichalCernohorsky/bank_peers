@@ -102,22 +102,39 @@ class Fetcher:
                 time.sleep(wait)
         self._last_hit[host] = time.monotonic()
 
+    def _load_robots(self, origin: str):
+        """Nacte robots.txt S TIMEOUTEM.
+
+        Zamerne se nepouziva RobotFileParser.read() - ta vola urlopen() bez
+        timeoutu, takze jediny zaseknuty server dokaze zablokovat cely beh.
+        """
+        try:
+            import requests
+        except ImportError:
+            return None
+        try:
+            resp = requests.get(
+                f"{origin}/robots.txt",
+                timeout=min(self.timeout, 10),
+                headers={"User-Agent": self.ua},
+            )
+        except Exception:
+            # Nedostupny robots.txt se povazuje za "zadna omezeni" - stejne se
+            # chova bezny crawler. Vypadek robots.txt nesmi shodit beh.
+            return None
+        if resp.status_code != 200:
+            return None
+        parser = urllib.robotparser.RobotFileParser()
+        parser.parse(resp.text.splitlines())
+        return parser
+
     def _allowed(self, url: str) -> tuple[bool, str]:
         if not self.respect_robots:
             return True, ""
         parsed = urlparse(url)
         origin = f"{parsed.scheme}://{parsed.netloc}"
         if origin not in self._robots:
-            parser = urllib.robotparser.RobotFileParser()
-            parser.set_url(f"{origin}/robots.txt")
-            try:
-                parser.read()
-            except Exception:
-                # Nedostupny robots.txt nesmi zablokovat beh - povazuje se za
-                # "zadna omezeni", coz je i chovani bezneho crawleru.
-                self._robots[origin] = None
-            else:
-                self._robots[origin] = parser
+            self._robots[origin] = self._load_robots(origin)
         parser = self._robots[origin]
         if parser is None:
             return True, ""
