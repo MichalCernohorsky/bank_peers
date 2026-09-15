@@ -111,9 +111,11 @@ def _semantic_checks(rec: dict, path: str, errors: list[str]) -> None:
                       "reward_referrer_value", "reward_referee_value"):
             if rec.get(field) not in (None, "", []):
                 errors.append(f"{path}: status='none', ale {field} je vyplnene ({rec[field]!r})")
-    else:
+    elif status == "active":
+        # Jen u 'active' je absence odmeny rozpor. U 'unknown'/'ended' je legitimni,
+        # ze program existuje (nebo existoval), ale vysi odmeny se nepodarilo overit.
         if not rec.get("reward_referrer") and not rec.get("reward_referee"):
-            errors.append(f"{path}: status='{status}' bez jakekoli odmeny - pouzij status 'none' nebo doplň odmenu")
+            errors.append(f"{path}: status='active' bez jakekoli odmeny - pouzij 'unknown' nebo doplň odmenu")
 
     # confidence 'high' == oficialni T&C, ne marketing.
     if rec.get("confidence") == "high":

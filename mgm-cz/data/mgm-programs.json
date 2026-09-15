@@ -1,0 +1,1222 @@
+{
+  "generated_at": "2026-09-15",
+  "schema": "schema/mgm-program.schema.json",
+  "scope_note": "Retailové banky s českou licencí a neobanky/fintechy dostupné českým klientům. Mimo rozsah: investiční platformy, pojišťovny, stavební spořitelny, telco. Akviziční bonusy pro nové klienty NEJSOU MGM a nejsou zahrnuty.",
+  "records": [
+    {
+      "record_id": "ceska-sporitelna__doporucte-george",
+      "subject": "Česká spořitelna",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Doporučte George",
+      "status": "active",
+      "product_scope": [
+        "běžný účet (Plus, Standard, Premier, Erste Private Banking)"
+      ],
+      "reward_referrer": "až 6 000 Kč celkem (až 1 200 Kč za každého z max. 5 doporučených)",
+      "reward_referee": "až 1 200 Kč",
+      "reward_referrer_value": 6000,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": 1200,
+      "reward_referee_currency": "CZK",
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Doporučený si přes George sjedná účet Plus, Standard, Premier nebo Erste Private Banking a následně zaplatí alespoň 4× kartou v každém ze 3 měsíců následujících po měsíci založení účtu. Odměna 1 200 Kč se vyplácí rozděleně do 3 měsíců.",
+      "channel": [
+        "app",
+        "link"
+      ],
+      "limits": "max. 5 doporučených přátel (6 000 Kč pro doporučujícího)",
+      "timing": "podmínka aktivity ve 3 měsících po založení účtu; odměna rozdělena do 3 měsíčních plateb",
+      "campaign_period": {
+        "from": null,
+        "to": null,
+        "note": "Program byl prodloužen a pokračuje i v roce 2026; konkrétní datum konce se nepodařilo ověřit."
+      },
+      "eligibility": "doporučující = klient ČS s George; doporučený = nový klient sjednávající účet přes George",
+      "source_url": "https://www.e15.cz/finexpert/banky-a-ucty/ceska-sporitelna-prodlouzila-odmenovani-za-doporuceni-uctu-ziskat-muzete-az-6-000-korun-1430070",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "campaign_period": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.e15.cz/finexpert/banky-a-ucty/ceska-sporitelna-prodlouzila-odmenovani-za-doporuceni-uctu-ziskat-muzete-az-6-000-korun-1430070",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "ČS prodlužuje bonus za doporučení až 6 000 Kč (e15)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.penize.cz/osobni-ucty/480388-sporitelna-da-klientum-odmenu-az-6000-korun-mysli-i-na-novacky",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Spořitelna dá klientům odměnu až 6000 Kč (Peníze.cz)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "Největší odměna pro doporučujícího mezi velkými bankami. Odměna je strukturovaná per-doporučený (1 200 Kč), ne jako jedna částka. Dřívější komunikace banky uváděla 1 200 Kč pro obě strany — viz FB post ČS. Oficiální T&C se nepodařilo dohledat (egress blokován), proto medium."
+    },
+    {
+      "record_id": "csob__doporuceni",
+      "subject": "ČSOB (vč. Poštovní spořitelny)",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": null,
+      "status": "unknown",
+      "product_scope": [
+        "běžný účet"
+      ],
+      "reward_referrer": "nejednoznačné: sekundární zdroje uvádějí 500 Kč i 1 000 Kč za doporučeného",
+      "reward_referee": "nejednoznačné: jeden zdroj uvádí 500 Kč pro obě strany, jiný pouze odměnu pro doporučujícího",
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Nepodařilo se ověřit. Nalezené oficiální PDF s pravidly ČSOB se týkají akvizičních kampaní (Plus konto, podnikatelský účet, Premium konto), ne MGM programu.",
+      "channel": [],
+      "limits": null,
+      "timing": null,
+      "campaign_period": null,
+      "eligibility": null,
+      "source_url": "https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "sources": [
+        {
+          "url": "https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Banky vás odmění za doporučení (Peníze.cz)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.csob.cz/documents/10710/17504789/pravidla-akce-podnikatelsky-ucet-s-odmenou-2000-kc-2026.pdf",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Pravidla akce ČSOB podnikatelský účet — AKVIZIČNÍ, ne MGM",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "ROZPOR MEZI ZDROJI, NEROZŘEŠEN. Jeden sekundární zdroj tvrdí 500 Kč na oba účty, jiný 1 000 Kč pro doporučujícího. Nepodařilo se najít žádnou oficiální stránku ani PDF s pravidly MGM programu ČSOB — všechny nalezené oficiální dokumenty jsou akviziční kampaně pro nové klienty. Dokud nebude ověřeno z T&C, částku neuvádím jako fakt. Prioritní kandidát na ověření trackerem."
+    },
+    {
+      "record_id": "komercni-banka__zadny-mgm",
+      "subject": "Komerční banka",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": null,
+      "status": "none",
+      "product_scope": [],
+      "reward_referrer": null,
+      "reward_referee": null,
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": null,
+      "conditions": null,
+      "channel": [],
+      "limits": null,
+      "timing": null,
+      "campaign_period": null,
+      "eligibility": null,
+      "source_url": "https://www.kb.cz/cs/obcane/bonus-az-4-000-kc-pro-nove-klienty",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.kb.cz/cs/obcane/bonus-az-4-000-kc-pro-nove-klienty",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Bonus až 4 000 Kč pro nové klienty (KB) — AKVIZIČNÍ, ne MGM",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.mesec.cz/clanky/ktere-banky-vam-nyni-daji-financni-bonus-za-sjednani-sveho-produktu-nebo-doporuceni-klienta/",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Které banky dají bonus za sjednání nebo doporučení (Měšec.cz)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "KB nemá MGM program. Má pouze AKVIZIČNÍ bonus až 4 000 Kč pro nové klienty (sjednání do 30. 11. 2026, 3× 1 000 Kč za 5 plateb kartou + příjem ≥ 15 000 Kč měsíčně). POZOR: agregátory tyto dvě věci opakovaně zaměňují — jeden vyhledávací souhrn přiřadil KB parametry Air Bank (500 Kč, max 10 ročně). Akviziční bonus není MGM a do rozsahu tohoto reportu nepatří."
+    },
+    {
+      "record_id": "moneta__odmena-za-doporuceni",
+      "subject": "Moneta Money Bank",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Odměna za doporučení klienta",
+      "status": "unknown",
+      "product_scope": [
+        "běžný účet"
+      ],
+      "reward_referrer": "výše neověřena; banka komunikuje „tisíce korun ročně“",
+      "reward_referee": "existuje (obě strany dostávají odměnu), výše neověřena",
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Nepodařilo se ověřit. Banka odkazuje na PDF s podmínkami kampaně „Odměna za doporučení klienta“.",
+      "channel": [
+        "app"
+      ],
+      "limits": null,
+      "timing": null,
+      "campaign_period": null,
+      "eligibility": null,
+      "source_url": "https://www.moneta.cz/dokumenty-ke-stazeni/osobni/ucty",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "sources": [
+        {
+          "url": "https://www.moneta.cz/dokumenty-ke-stazeni/osobni/ucty",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Dokumenty ke stažení — Účty (Moneta), obsahuje PDF podmínek kampaně",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.moneta.cz/ucty-a-karty/program-odmeny",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Program Odměny (Moneta) — cashback u obchodníků, NE MGM",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "Program prokazatelně existuje (banka pro něj vydává vlastní PDF s pravidly a komunikuje „obě strany dostanou odměnu“), ale aktuální výši odměny se nepodařilo z veřejných zdrojů ověřit. Historicky 100 Kč, od 15. 9. 2018 zvýšeno na 300 Kč — pouze fórový zdroj, confidence low, do historie nezařazeno. Nezaměňovat s „Program Odměny“, což je cashback u obchodníků, ne MGM."
+    },
+    {
+      "record_id": "raiffeisenbank__odmena-za-doporuceni",
+      "subject": "Raiffeisenbank",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Odměna za doporučení",
+      "status": "active",
+      "product_scope": [
+        "osobní běžný účet",
+        "podnikatelský účet",
+        "stavební spoření"
+      ],
+      "reward_referrer": "1 000 Kč za osobní účet, 2 000 Kč za podnikatelský účet, 1 000 Kč za stavební spoření",
+      "reward_referee": "6× 500 Kč za aktivní používání účtu (akviziční složka navázaná na doporučení)",
+      "reward_referrer_value": 2000,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": 3000,
+      "reward_referee_currency": "CZK",
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Doporučený se registruje telefonním číslem přes unikátní odkaz a do 30 dnů od registrace uzavře a aktivuje smlouvu o běžném účtu nebo stavebním spoření. Novým klientem je ten, kdo v posledních 12 měsících neměl u RB vedený žádný bankovní účet. Odměnu dostanou obě strany jen při splnění všech podmínek.",
+      "channel": [
+        "app",
+        "link"
+      ],
+      "limits": "nepodařilo se ověřit",
+      "timing": "30 dnů od registrace na uzavření smlouvy; odměna připsána nejpozději 15. den měsíce následujícího po aktivaci produktu",
+      "campaign_period": null,
+      "eligibility": "doporučující = stávající klient RB; doporučený = nový klient bez účtu u RB v posledních 12 měsících. Zaměstnanci RB a jejich rodinní příslušníci jsou vyloučeni.",
+      "source_url": "https://www.rb.cz/podpora/podminky-akci/odmena-za-doporuceni",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "limits": "low",
+        "reward_referee": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.rb.cz/podpora/podminky-akci/odmena-za-doporuceni",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Podmínky akce Odměna za doporučení (Raiffeisenbank)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.rb.cz/attachments/pi/pravidla-reklamni-akce/pravidla-reklamni-akce-financni-odmena-za-doporuceni.pdf",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Pravidla reklamní akce Finanční odměna za doporučení (PDF)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.rb.cz/attachments/pi/pravidla-reklamni-akce/pravidla-reklamni-akce-odmena-za-doporuceni-final.pdf",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Pravidla reklamní akce Odměna za doporučení (PDF)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.rb.cz/osobni/ucty/doporuceni/odmena-za-doporuceni",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Odměna za doporučení (Raiffeisenbank)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "Jediná banka v přehledu s odstupňováním odměny podle TYPU produktu (osobní/podnikatelský/stavební spoření) — 2 000 Kč za podnikatelský účet je nejvyšší jednorázová sazba za doporučeného na trhu. Banka pro program vydává hned tři různá PDF s pravidly, což naznačuje více paralelních variant kampaně; jejich vzájemný vztah se bez přečtení PDF nepodařilo určit. reward_referrer_value = 2000 jako nejvyšší dosažitelná sazba."
+    },
+    {
+      "record_id": "unicredit__doporuc-a-ziskej",
+      "subject": "UniCredit Bank",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Doporuč a získej",
+      "status": "active",
+      "product_scope": [
+        "běžný účet (U konto, U konto Premium)",
+        "spotřebitelský úvěr (PRESTO Půjčka)"
+      ],
+      "reward_referrer": "až 1 700 Kč za každého doporučeného: 300 Kč za U konto / U konto Premium, 700 Kč za PRESTO Půjčku ≥ 100 000 Kč",
+      "reward_referee": "nepodařilo se ověřit, zda doporučený dostává odměnu",
+      "reward_referrer_value": 1700,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": true,
+      "reward_type": "cash",
+      "conditions": "Doporučující sdělí novému klientovi svůj unikátní promo kód. Nový klient si během trvání kampaně sjedná příslušný produkt; u PRESTO Půjčky musí být ve výši alespoň 100 000 Kč.",
+      "channel": [
+        "code"
+      ],
+      "limits": "celková výše odměny není omezena, záleží pouze na počtu doporučených",
+      "timing": "nepodařilo se ověřit",
+      "campaign_period": null,
+      "eligibility": "doporučující = klient UniCredit Bank s promo kódem",
+      "source_url": "https://www.investujeme.cz/tiskove-zpravy/doporucte-produkty-unicredit-bank-svym-pratelum-a-ziskejte-odmenu-az-1700-korun-za-kazdeho-doporuceneho-klienta/",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "reward_referee": "low",
+        "campaign_period": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.investujeme.cz/tiskove-zpravy/doporucte-produkty-unicredit-bank-svym-pratelum-a-ziskejte-odmenu-az-1700-korun-za-kazdeho-doporuceneho-klienta/",
+          "type": "press",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Tisková zpráva UniCredit Bank — odměna až 1 700 Kč",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.mesec.cz/clanky/za-doporuceni-noveho-klienta-az-3-z-platby-kartou-unicredit-bank-rozdava-bonusy/",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Za doporučení až 3 % z platby kartou (Měšec.cz)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "JEDINÝ program v přehledu BEZ STROPU na počet doporučení i celkovou odměnu. Zároveň jediný, který odměňuje za doporučení ÚVĚRU (700 Kč za PRESTO Půjčku ≥ 100 tis. Kč) — to je podstatně agresivnější než doporučování běžných účtů a vyvolává otázku vhodnosti motivovat laiky k šíření úvěrových produktů. 300 + 700 = 1 000 Kč; deklarovaných 1 700 Kč implikuje ještě další produkt, který se z dostupných zdrojů nepodařilo identifikovat — proto reward_tiered a nižší jistota. Měšec uvádí odlišnou mechaniku (až 3 % z platby kartou), zdroje si neodpovídají."
+    },
+    {
+      "record_id": "fio-banka__zadny-mgm",
+      "subject": "Fio banka",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": null,
+      "status": "none",
+      "product_scope": [],
+      "reward_referrer": null,
+      "reward_referee": null,
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": null,
+      "conditions": null,
+      "channel": [],
+      "limits": null,
+      "timing": null,
+      "campaign_period": null,
+      "eligibility": null,
+      "source_url": "https://www.finparada.cz/3524-Banky-zkouseji-ziskat-nove-klienty-odmenou-za-doporuceni.aspx",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "sources": [
+        {
+          "url": "https://www.finparada.cz/3524-Banky-zkouseji-ziskat-nove-klienty-odmenou-za-doporuceni.aspx",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Banky zkoušejí získat nové klienty odměnou za doporučení (Finparáda)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.fio.cz/spolecnost-fio/media/tiskove-zpravy/326669-fio-banka-spousti-program-odmen-za-splaceni-hypotek",
+          "type": "press",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Fio spouští program odměn za splácení hypoték — NE MGM",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "Fio dlouhodobě nenabízí akviziční bonusy ani MGM; staví na bezpoplatkovosti a kvalitě služby. Odměňuje jinak — za splácení hypotéky a cashback přes Mastercard Priceless Specials, což nejsou MGM. Status 'none' opřen pouze o sekundární zdroje a o absenci jakékoli zmínky na straně banky, proto confidence low: negativní zjištění se z veřejných zdrojů dokazuje hůř než pozitivní."
+    },
+    {
+      "record_id": "air-bank__pozvete-pratele",
+      "subject": "Air Bank",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Pozvěte přátele",
+      "status": "active",
+      "product_scope": [
+        "běžný účet"
+      ],
+      "reward_referrer": "500 Kč za každého doporučeného",
+      "reward_referee": "500 Kč",
+      "reward_referrer_value": 5000,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": 500,
+      "reward_referee_currency": "CZK",
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Doporučující pošle odkaz z mobilní aplikace (Menu / Nastavení a banka / Pozvat přátele). Doporučený si nejpozději do 45 dnů založí účet na stejné telefonní číslo, na které byl pozván, a zaplatí alespoň 5× kartou v měsíci aktivace účtu nebo v měsíci bezprostředně následujícím.",
+      "channel": [
+        "app",
+        "link"
+      ],
+      "limits": "max. 10 doporučených přátel ročně (tj. max. 5 000 Kč ročně pro doporučujícího)",
+      "timing": "45 dnů na založení účtu od pozvánky; 5 plateb kartou v měsíci aktivace nebo následujícím; výplata zpravidla do druhého dne po splnění podmínek, nejpozději do konce kalendářního měsíce následujícího po měsíci splnění",
+      "campaign_period": null,
+      "eligibility": "doporučený musí být starší 15 let a nesmí být ani v minulosti být klientem Air Bank s vlastní rámcovou smlouvou (disponent nebo držitel karty k cizímu účtu doporučen být může)",
+      "source_url": "https://www.airbank.cz/file-download/pravidla-akce-pozvani-pratel-doporucujici",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.airbank.cz/file-download/pravidla-akce-pozvani-pratel-doporucujici",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Pravidla akce Pozvání přátel — doporučující (Air Bank)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.airbank.cz/co-vas-nejvic-zajima/jak-doporucit-air-bank-priteli/",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Jak doporučit Air Bank příteli",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.airbank.cz/co-vas-nejvic-zajima/jak-se-stat-klientem-air-bank-na-doporuceni-pritele/",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Jak se stát klientem Air Bank na doporučení přítele",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "Nejlépe zdokumentovaný program v přehledu — jediný, u kterého jsou z veřejných zdrojů známé VŠECHNY parametry včetně lhůt a výplatního cyklu. Symetrická odměna 500/500 Kč. reward_referrer_value = 5 000 Kč jako roční maximum (500 Kč × 10). Podmínka „stejné telefonní číslo“ je nezvyklá a v praxi je nejčastější příčinou nevyplacení. Air Bank v září 2026 paralelně běží akviziční bonus 500 Kč „na vyzkoušení“ a kód SVET500 — to NEJSOU MGM."
+    },
+    {
+      "record_id": "mbank__doporucte-mbank",
+      "subject": "mBank",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Doporučte mBank (mKlub)",
+      "status": "active",
+      "product_scope": [
+        "běžný účet (mKonto, mKonto #navlastnitriko)",
+        "dětský účet"
+      ],
+      "reward_referrer": "100 Kč za každou platbu kartou doporučeného, max. 1 000 Kč za doporučeného; navíc mimořádný bonus 1 000 Kč za každého 3., 6., 9., 12., 15. a 18. doporučeného; celkem až 26 000 Kč",
+      "reward_referee": "100 Kč za každou vlastní platbu kartou, max. 1 000 Kč",
+      "reward_referrer_value": 26000,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": 1000,
+      "reward_referee_currency": "CZK",
+      "reward_tiered": true,
+      "reward_type": "cash",
+      "conditions": "Doporučující je stávající klient mBank starší 15 let, majitel mKonta nebo mKonta #navlastnitriko. Nový i dosavadní klient dostanou 100 Kč za každou platbu kartou, nejvýše za 10 plateb během 60 dnů od založení účtu. Mimořádný bonus 1 000 Kč se vyplácí za každého 3., 6., 9., 12., 15. a 18. doporučeného, který splní alespoň 1 platbu.",
+      "channel": [
+        "app",
+        "link",
+        "code"
+      ],
+      "limits": "max. 20 doporučených na jednoho doporučujícího; max. 1 000 Kč za jednoho doporučeného; celkem až 26 000 Kč",
+      "timing": "60 dnů od založení účtu na provedení 10 plateb kartou",
+      "campaign_period": {
+        "from": "2026-01-30",
+        "to": "2026-03-31",
+        "note": "Období akce dle pravidel; k datu researche (2026-09-15) banka program stále komunikuje, takže buď byl prodloužen, nebo běží navazující kampaň — neověřeno."
+      },
+      "eligibility": "doporučující = klient mBank 15+ s mKontem; doporučený = nový klient",
+      "source_url": "https://www.mbank.cz/informace-k-produktum/dokumenty-ke-stazeni/dokumenty/akce/doporucte-mbank_pravidla-unor2026.pdf",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "campaign_period": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.mbank.cz/informace-k-produktum/dokumenty-ke-stazeni/dokumenty/akce/doporucte-mbank_pravidla-unor2026.pdf",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Dodatek č. 2 k Pravidlům akce Doporučte mBank (únor 2026)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.mbank.cz/informace-k-produktum/dokumenty-ke-stazeni/dokumenty/akce/doporucte-mbank_pravidla-leden2026.pdf",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Dodatek č. 1 k Pravidlům akce Doporučte mBank (leden 2026)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.e15.cz/finexpert/banky-a-ucty/bankovni-bonusy-v-zari-2026-az-26-tisic-za-doporuceni-slevy-na-netflix-nebo-cashback-na-jidlo-1435389",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Bankovní bonusy v září 2026: až 26 tisíc za doporučení (e15)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.mbank.cz/blog/post,550,caste-dotazy-odmeny-za-doporuceni-a-zalozeni-mkonta.html",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Časté dotazy: Odměny za doporučení a založení mKonta",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "NEJŠTĚDŘEJŠÍ a zároveň NEJVÍC GAMIFIKOVANÝ program na trhu. Tři odlišné mechaniky najednou: (1) per-transakční drobení odměny (100 Kč za platbu, ne jednorázová částka), (2) milníkový bonus za každého 3. doporučeného, (3) strop 20 doporučených. Odměna tedy není lineární — doporučující je tlačen k dosažení násobků tří. Samostatná větev pro dětský účet: 500 Kč rodič + 500 Kč dítě, dítě dále 300 Kč za založení a 10× 67 Kč „kapesné“ (celkem 970 Kč). mBank v roce 2026 zvýšila strop z 10 000 Kč na 26 000 Kč. Existence dodatků č. 1 (leden) a č. 2 (únor 2026) dokládá, že pravidla se mění v řádu týdnů — silný argument pro tracker."
+    },
+    {
+      "record_id": "creditas__doporucte-a-ziskejte",
+      "subject": "Banka CREDITAS",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Doporučte a získejte",
+      "status": "active",
+      "product_scope": [
+        "spořicí účet",
+        "termínovaný vklad"
+      ],
+      "reward_referrer": "500 Kč za doporučeného",
+      "reward_referee": "250 Kč",
+      "reward_referrer_value": 500,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": 250,
+      "reward_referee_currency": "CZK",
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Doporučený uvede při založení produktu jméno, příjmení a členské číslo doporučujícího. U spořicího účtu je nutný vklad minimálně 20 000 Kč. U termínovaného vkladu doba sjednání 24, 36 nebo 48 měsíců a vklad minimálně 90 000 Kč (pouze CZK).",
+      "channel": [
+        "branch",
+        "web"
+      ],
+      "limits": "nepodařilo se ověřit",
+      "timing": "nepodařilo se ověřit",
+      "campaign_period": null,
+      "eligibility": "doporučující = stávající klient s členským číslem; doporučený = nový klient",
+      "source_url": "https://www2020.creditas.cz/doporucte-a-ziskejte",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "limits": "low",
+        "timing": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www2020.creditas.cz/doporucte-a-ziskejte",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Doporučte a získejte (Banka CREDITAS)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.mesec.cz/aktuality/zalozna-creditas-rozdava-financni-bonusy-za-doporuceni/",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Creditas rozdává bonusy za doporučení (Měšec.cz)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.e15.cz/finexpert/vydelavame/za-doporuceni-sporicicho-uctu-nabizi-creditas-500-korun-akce-ma-ale-jeden-hacek-1352981",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Za doporučení spořicího účtu nabízí Creditas 500 Kč — akce má háček (e15)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "JEDINÝ program v přehledu vázaný na DEPOZITNÍ produkty místo běžného účtu — Creditas si přes MGM kupuje vklady, ne transakční klienty. Tomu odpovídají vstupní bariéry (20 000 Kč na spořicí účet, 90 000 Kč a 2–4 roky vázanosti na termínovaný vklad), které jsou řádově vyšší než u ostatních programů, kde stačí zaplatit kartou. Asymetrická odměna v neprospěch doporučeného (500 vs. 250 Kč). Doporučení běží přes členské číslo, ne přes odkaz nebo kód — pozůstatek družstevní záložny. Doména www2020.creditas.cz naznačuje starou stránku, riziko neaktuálnosti."
+    },
+    {
+      "record_id": "partners-banka__doporuc-a-ziskej",
+      "subject": "Partners Banka",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Doporuč a získej",
+      "status": "active",
+      "product_scope": [
+        "spořicí účet"
+      ],
+      "reward_referrer": "zvýhodněná sazba 4,06 % p.a. na spořicím účtu do 500 000 Kč na 1 kalendářní měsíc",
+      "reward_referee": "zvýhodněná sazba 4,06 % p.a. na spořicím účtu do 500 000 Kč na 3 měsíce",
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "other",
+      "conditions": "Doporučený zadá kód stávajícího klienta. Zvýhodněná sazba za doporučení platí i bez plnění standardních podmínek pro zvýšený úrok (5 plateb kartou měsíčně + aktivní Hlídač minimálního zůstatku nastavený na alespoň 20 000 Kč).",
+      "channel": [
+        "code",
+        "app"
+      ],
+      "limits": "nepodařilo se ověřit",
+      "timing": "doporučující 1 kalendářní měsíc, doporučený 3 měsíce",
+      "campaign_period": null,
+      "eligibility": "doporučující = stávající klient Partners Banky; doporučený = nový klient s kódem",
+      "source_url": "https://www.partnersbanka.cz/userfiles/podminky-doporuc-a-ziskej-5e249b95.pdf",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "limits": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.partnersbanka.cz/userfiles/podminky-doporuc-a-ziskej-5e249b95.pdf",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Pravidla klientské akce Doporuč a získej (Partners Banka, PDF)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.partnersbanka.cz/urok-sporici-ucet",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Úroky u spořicího účtu (Partners Banka)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.e15.cz/finexpert/banky-a-ucty/bankovni-bonusy-v-zari-2026-az-26-tisic-za-doporuceni-slevy-na-netflix-nebo-cashback-na-jidlo-1435389",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Bankovní bonusy v září 2026 (e15)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "JEDINÝ program na trhu, kde odměnou NENÍ PENĚŽNÍ ČÁSTKA, ale úroková sazba — proto reward_type 'other' a reward_*_value = null. Hodnota odměny závisí na zůstatku klienta, takže není srovnatelná s hotovostními programy a nelze ji seřadit do tabulky; při plném zůstatku 500 000 Kč a rozdílu cca 0,86 p.b. proti základní sazbě 3,2 % vychází zhruba 360 Kč za měsíc pro doporučujícího — ORIENTAČNÍ ODVOZENÍ, ne údaj banky. Pozoruhodná asymetrie: doporučený dostává výhodu 3× déle než doporučující. Zároveň jediný program, kde odměna obchází standardní podmínky pro zvýšený úrok."
+    },
+    {
+      "record_id": "max-banka__odmena-za-doporuceni",
+      "subject": "Max banka",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": "Odměna za doporučení (Neo účet)",
+      "status": "ended",
+      "product_scope": [
+        "běžný účet (Neo účet)"
+      ],
+      "reward_referrer": "500 Kč (program ukončen)",
+      "reward_referee": "500 Kč (program ukončen)",
+      "reward_referrer_value": 500,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": 500,
+      "reward_referee_currency": "CZK",
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Nový klient musel provést 3 platby debetní kartou do 2 měsíců od založení účtu.",
+      "channel": [
+        "link"
+      ],
+      "limits": null,
+      "timing": "3 platby kartou do 2 měsíců od založení účtu",
+      "campaign_period": {
+        "from": null,
+        "to": "2022-10-27",
+        "note": "Akce měla původně běžet do 31. 3. 2023, banka ji ale předčasně ukončila k 27. 10. 2022 na základě výhrady v podmínkách."
+      },
+      "eligibility": "doporučující = stávající klient Max banky; doporučený = nový klient",
+      "source_url": "https://www.mesec.cz/aktuality/max-banka-predcasne-ukoncila-odmeny-za-zalozeni-uctu-puvodne-mela-skoncit-az-v-breznu-2023/",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "sources": [
+        {
+          "url": "https://www.mesec.cz/aktuality/max-banka-predcasne-ukoncila-odmeny-za-zalozeni-uctu-puvodne-mela-skoncit-az-v-breznu-2023/",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Max banka předčasně ukončila odměny za založení účtu (Měšec.cz)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://forum.finexpert.e15.cz/viewtopic.php?f=316&p=13347117",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "MaxBanka — fúze s Creditas k 1. 10. 2024 (FinExpert fórum)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "SUBJEKT JIŽ NEEXISTUJE SAMOSTATNĚ — Max banka fúzovala s Bankou CREDITAS k 1. 10. 2024 (datum fúze pouze z fórového zdroje, confidence low). Program 500 + 500 Kč byl ukončen podstatně dříve, 27. 10. 2022, ačkoli podmínky slibovaly běh do 31. 3. 2023; banka využila výhradu o možnosti předčasného ukončení. Je to jediný doložený případ v přehledu, kdy banka MGM program ukončila dřív, než sama avizovala — relevantní pro posouzení závaznosti deklarovaných campaign_period u ostatních subjektů."
+    },
+    {
+      "record_id": "trinity-bank__zadny-mgm",
+      "subject": "Trinity Bank",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": null,
+      "status": "none",
+      "product_scope": [],
+      "reward_referrer": null,
+      "reward_referee": null,
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": null,
+      "conditions": null,
+      "channel": [],
+      "limits": null,
+      "timing": null,
+      "campaign_period": null,
+      "eligibility": null,
+      "source_url": "https://www.trinitybank.cz/download/391",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "sources": [
+        {
+          "url": "https://www.trinitybank.cz/download/391",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Prémiový klub — podmínky (Trinity Bank) — věrnostní, ne MGM",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.trinitybank.cz/file/1196",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Pravidla akce Narozeninový bonus (Trinity Bank) — ne MGM",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://forum.finexpert.e15.cz/viewtopic.php?style=5&f=316&t=1296326&p=13670233",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Trinity Bank — dotaz na program doporučení (FinExpert fórum)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "MGM program nenalezen. Trinity Bank má několik jiných bonusových schémat — Prémiový klub (finanční odměna 1 500 Kč), Narozeninový bonus, Bonus+ (příplatek k sazbě až 0,40 % p.a.), Dobrý klient — žádné z nich ale není MGM, všechna odměňují vlastní chování klienta, ne přivedení nového. Absence programu doložena jen fórovým zdrojem a absencí zmínky na webu banky, proto confidence low."
+    },
+    {
+      "record_id": "oberbank__nenalezeno",
+      "subject": "Oberbank",
+      "subject_type": "bank",
+      "in_original_scope": true,
+      "program_name": null,
+      "status": "unknown",
+      "product_scope": [],
+      "reward_referrer": null,
+      "reward_referee": null,
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": null,
+      "conditions": null,
+      "channel": [],
+      "limits": null,
+      "timing": null,
+      "campaign_period": null,
+      "eligibility": null,
+      "source_url": "https://www.oberbank.cz/",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "sources": [
+        {
+          "url": "https://www.oberbank.cz/",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Oberbank ČR — web banky",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "NENALEZENO. Žádný ze zdrojů — ani oficiální web, ani žádný ze srovnávačů pokrývajících český trh — o MGM programu Oberbank nic neuvádí. Oberbank se v českých přehledech bonusů a odměn za doporučení systematicky nevyskytuje, což je slabá nepřímá indicie, že program nemá; banka ale cílí na privátní a firemní klientelu, kde se MGM běžně neřeší veřejnou kampaní. Rozlišeno jako 'unknown', ne 'none': absence zmínky v médiích zaměřených na retail nedokazuje neexistenci programu. Vyžaduje ověření přímo na webu banky, až bude dostupný."
+    },
+    {
+      "record_id": "revolut__referrals",
+      "subject": "Revolut",
+      "subject_type": "neobank",
+      "in_original_scope": true,
+      "program_name": "Doporučení (Refer a friend)",
+      "status": "active",
+      "product_scope": [
+        "osobní účet",
+        "Revolut Pro (samostatný program)",
+        "Kids & Teens (samostatný program)"
+      ],
+      "reward_referrer": "výše se mění podle kampaně; sekundární zdroj uvádí až 1 500 Kč",
+      "reward_referee": "dle podmínek odměnu dostává POUZE doporučující, ne pozvaný",
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Doporučující musí mít aktivní osobní účet po celou dobu trvání akce i v okamžiku připsání odměny. Pozvaný si musí otevřít osobní účet přes odkaz pro doporučení a provést kroky uvedené v pozvánce v určeném časovém rámci. Odměna nebude vyplacena nebo bude zrušena, pokud pozvaný zruší účet do 14 dnů od otevření.",
+      "channel": [
+        "link",
+        "app"
+      ],
+      "limits": "max. 5 pozvaných osob v rámci jedné kampaně",
+      "timing": "kroky musí být dokončeny před termínem uvedeným v pozvánce; clawback při zrušení účtu pozvaným do 14 dnů",
+      "campaign_period": {
+        "from": null,
+        "to": "2026-03-31",
+        "note": "Sekundární zdroj uvádí konec aktuální akce k 31. 3. 2026; k datu researche (2026-09-15) je toto datum v minulosti, takže buď běží navazující kampaň, nebo je údaj neaktuální. Neověřeno."
+      },
+      "eligibility": "doporučující = zákazník Revolutu s aktivním osobním účtem; pozvaný = nový uživatel",
+      "source_url": "https://www.revolut.com/cs-CZ/legal/referrals-terms/",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "reward_referrer": "low",
+        "campaign_period": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.revolut.com/cs-CZ/legal/referrals-terms/",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Podmínky pro doporučení (Revolut Česko)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.revolut.com/cs-CZ/legal/referrals-revpro-terms/",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Podmínky doporučení Revolut Pro",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.revolut.com/cs-CZ/legal/u18referrals/",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Kids & Teens Referrals Promotion (Revolut)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://help.revolut.com/cs-CZ/help/referrals/other/what-are-the-requirements-to-get-my-referral-reward/",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Jaké jsou požadavky pro získání odměny za doporučení",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://inteligentnisvet.cz/clanky/ziskejte-bonus-1250-kc-u-revolutu-jak-ziskat-odmenu-za-doporuceni",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Bonus u Revolutu za doporučení (Inteligentnisvet.cz)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "STRUKTURÁLNĚ ODLIŠNÝ OD ČESKÝCH BANK: podle podmínek odměnu dostává POUZE doporučující — chybí symetrie, která je u českých bank pravidlem (Air Bank 500/500, ČS 6000/1200, Creditas 500/250). Revolut jako jediný subjekt v přehledu provozuje TŘI oddělené referral programy s vlastními T&C (osobní, Pro, Kids & Teens). Výše odměny není v T&C fixovaná, mění se kampaň od kampaně a je vázaná na konkrétní pozvánku — proto reward_referrer_value = null. Explicitní clawback (zrušení účtu do 14 dnů) je v přehledu ojedinělý; české banky takovou klauzuli veřejně nekomunikují."
+    },
+    {
+      "record_id": "wise__invite-program",
+      "subject": "Wise",
+      "subject_type": "neobank",
+      "in_original_scope": true,
+      "program_name": "Invite program / Referral program",
+      "status": "active",
+      "product_scope": [
+        "mezinárodní převody",
+        "platební karta"
+      ],
+      "reward_referrer": "závisí na zemi; typicky cca 75 GBP po 3 pozvaných, kteří provedou kvalifikovaný převod (obvykle ≥ 200 GBP každý)",
+      "reward_referee": "převod zdarma na první mezinárodní platbu do stanoveného limitu (typicky cca 500 GBP) nebo karta zdarma — podle země",
+      "reward_referrer_value": 75,
+      "reward_referrer_currency": "GBP",
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": true,
+      "reward_type": "cash",
+      "conditions": "Doporučující musí mít ověřený účet v dobrém stavu a mít za sebou alespoň jeden osobní převod. Pozvaný musí být nový uživatel, zaregistrovat se přes odkaz, projít ověřením totožnosti a splnit požadavek na objem převodu nebo útratu kartou. Odměnu lze uplatnit do jednoho roku od kvalifikace, poté propadá.",
+      "channel": [
+        "link"
+      ],
+      "limits": "nepodařilo se ověřit pro ČR",
+      "timing": "odměnu je nutné uplatnit do 1 roku od kvalifikace",
+      "campaign_period": null,
+      "eligibility": "geografická omezení — v některých zemích je místo hotovostního bonusu pouze sleva na poplatku; konkrétní varianta platná pro české klienty neověřena",
+      "source_url": "https://wise.com/gb/legal/referral-terms",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "field_confidence": {
+        "reward_referrer": "low",
+        "reward_referee": "low"
+      },
+      "sources": [
+        {
+          "url": "https://wise.com/gb/legal/referral-terms",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Wise Referral Program terms (GB verze)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://wise.com/help/articles/2Q37yOkW1DmaMo1oKBWa5Z/how-do-invite-programs-work",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "How do invite programs work (Wise Help)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "NEJNIŽŠÍ JISTOTA V CELÉM PŘEHLEDU. Wise přiřazuje „invite program“ podle země a nalezené T&C jsou britská verze (wise.com/gb/) — částky v GBP se na české klienty nemusí vztahovat vůbec. Zdroje samy uvádějí, že v některých zemích je místo bonusu jen sleva na poplatku. Číselné hodnoty ponechány v GBP bez přepočtu na CZK (rozhodnutí D3); ODMĚNA PLATNÁ PRO ČESKÉ KLIENTY NENÍ OVĚŘENA a nesmí se z tohoto záznamu vyvozovat. Odměna je prahová (3 pozvaní najednou), ne per-doporučený — to je mezi sledovanými subjekty ojedinělé. Prioritní kandidát na ověření trackerem přes wise.com/cz/."
+    },
+    {
+      "record_id": "n26__refer-a-friend",
+      "subject": "N26",
+      "subject_type": "neobank",
+      "in_original_scope": true,
+      "program_name": "Refer a Friend Program",
+      "status": "active",
+      "product_scope": [
+        "osobní účet"
+      ],
+      "reward_referrer": "výše bonusu se liší podle kampaně; celkový strop 1 500 EUR na zákazníka",
+      "reward_referee": "nepodařilo se ověřit, zda pozvaný dostává odměnu",
+      "reward_referrer_value": 1500,
+      "reward_referrer_currency": "EUR",
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Pozvaný musí provést první platbu kartou (nákup v obchodě nebo online, PayPal vyloučen) v hodnotě alespoň rovné výši referral bonusu. Program lze používat pouze pro osobní, nekomerční účely.",
+      "channel": [
+        "link",
+        "app"
+      ],
+      "limits": "max. 10 referral bonusů na uživatele; celkem max. 1 500 EUR na zákazníka",
+      "timing": "připsání odměny může trvat až 60 dnů; zahájená, ale nedokončená doporučení se po roce mažou",
+      "campaign_period": null,
+      "eligibility": "doporučující = stávající zákazník N26; pozvaný = nový uživatel",
+      "source_url": "https://docs.n26.com/legal/01+DE/01+Account/en/15account-terms-and-conditions-friend-referral-3.0-en.pdf",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "reward_referrer": "low",
+        "reward_referee": "low"
+      },
+      "sources": [
+        {
+          "url": "https://docs.n26.com/legal/01+DE/01+Account/en/15account-terms-and-conditions-friend-referral-3.0-en.pdf",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "T&C of N26 Bank SE for the Refer a Friend Program (v3.0, DE)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://support.n26.com/en-de/app-and-features/friend-referral/why-hasnt-my-referral-bonus-arrived",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Referral Bonus Criteria (N26 Support)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://n26.com/en-eu/invite-friends",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Invite friends to join N26",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "NEJVYŠŠÍ STROP ODMĚNY V CELÉM PŘEHLEDU: 1 500 EUR (řádově 37 000 Kč) proti 26 000 Kč u mBank — pozor ale, že jde o strop, ne o reálně dosahovanou částku, a jednotková odměna za doporučeného je neznámá. Dvě mechaniky jinde nevídané: (1) podmínka, že pozvaný musí zaplatit kartou ALESPOŇ TOLIK, KOLIK ČINÍ BONUS — odměna si tak sama určuje kvalifikační práh, (2) bonus může být vyplacen v AKCIÍCH nebo zlomcích akcií místo v eurech, navázaný na N26 Brokerservice. Nalezené T&C jsou německá a italská verze; česká varianta neexistuje, N26 pro ČR nemá lokalizované podmínky. Částka ponechána v EUR bez přepočtu (rozhodnutí D3)."
+    },
+    {
+      "record_id": "bunq__refer-a-friend",
+      "subject": "bunq",
+      "subject_type": "neobank",
+      "in_original_scope": true,
+      "program_name": "Refer a friend",
+      "status": "active",
+      "product_scope": [
+        "osobní účet",
+        "karty",
+        "spoření",
+        "akcie",
+        "krypto"
+      ],
+      "reward_referrer": "obě strany dostávají stejnou odměnu; forma se liší podle aktuální nabídky v aplikaci — hotovost, krypto, Metal Card, bonusový úrok na spoření nebo výhody pro obchodování s akciemi",
+      "reward_referee": "stejná odměna jako doporučující (symetrická)",
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "other",
+      "conditions": "Pozvaný se připojí a splní kvalifikační krok navázaný na konkrétní nabídku — aktivace Switch Service, vložení peněz nebo provedení platby. Po splnění přijde doporučujícímu notifikace a odměnu je nutné aktivně nárokovat tlačítkem Claim Reward.",
+      "channel": [
+        "app",
+        "link"
+      ],
+      "limits": "max. 5 pozvaných za kalendářní měsíc — 1 z každé záložky (Home, Cards, Savings, Stocks, Crypto)",
+      "timing": "nepodařilo se ověřit",
+      "campaign_period": null,
+      "eligibility": "doporučující = uživatel bunq; pozvaný = nový uživatel (zvaný přes telefonní číslo v aplikaci)",
+      "source_url": "https://www.bunq.com/personal-account/banking-features/refer-a-friend",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "reward_referrer": "low",
+        "reward_referee": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.bunq.com/personal-account/banking-features/refer-a-friend",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Refer a friend and earn rewards (bunq)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://help.bunq.com/articles/how-can-i-invite-my-friends-to-join-bunq",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "How can I invite my friends to join bunq (bunq Help)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "NEJŠIRŠÍ PALETA FOREM ODMĚNY v přehledu — jako jediný subjekt nabízí krypto a zlomky akcií vedle hotovosti, fyzické karty a bonusového úroku; proto reward_type 'other'. Limit je konstruován zcela odlišně od všech ostatních: ne „X doporučených celkem“, ale 1 pozvaný z KAŽDÉ z pěti záložek aplikace za měsíc, což uživatele tlačí k používání všech produktů banky, ne jen účtu. Odměna se nepřipisuje automaticky — je nutné ji ručně nárokovat (Claim Reward), což je mechanika, která část odměn nechá propadnout. Konkrétní částky nejsou veřejné, závisí na nabídce v aplikaci — bez přístupu do aplikace neověřitelné."
+    },
+    {
+      "record_id": "curve__refer-a-friend",
+      "subject": "Curve",
+      "subject_type": "neobank",
+      "in_original_scope": true,
+      "program_name": "Refer a friend",
+      "status": "active",
+      "product_scope": [
+        "platební karta / agregátor karet"
+      ],
+      "reward_referrer": "ROZPOR MEZI ZDROJI: oficiální podmínky uvádějí 1 % cashback na 30 dnů navíc za každého doporučeného; sekundární zdroje uvádějí 50 GBP v Curve Cash za doporučeného",
+      "reward_referee": "nepodařilo se spolehlivě ověřit; sekundární zdroje uvádějí 50 GBP v Curve Cash",
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "other",
+      "conditions": "Doporučený musí podat žádost, dokončit onboarding a provést alespoň 1 nákup kartou Curve. Odměny se za více doporučených sčítají (3 doporučení = 1 % cashback po 90 dnů).",
+      "channel": [
+        "link",
+        "code"
+      ],
+      "limits": "dle sekundárních zdrojů max. 5 doporučených za období nabídky (až 250 GBP v Curve Cash); dle oficiálních podmínek limit neuveden",
+      "timing": "1 % cashback navazuje na úvodních 6 měsíců cashbacku, poté +30 dnů za každé doporučení",
+      "campaign_period": null,
+      "eligibility": "nepodařilo se ověřit dostupnost a podmínky pro české klienty",
+      "source_url": "https://www.curve.com/legal/referral-promo-terms/",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "field_confidence": {
+        "reward_referrer": "low",
+        "reward_referee": "low",
+        "limits": "low"
+      },
+      "sources": [
+        {
+          "url": "https://www.curve.com/legal/referral-promo-terms/",
+          "type": "tc",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Referral promo terms (Curve)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://referralcodes.com/shop/curve-referral-codes",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Curve Referral Rewards 2026 (referralcodes.com)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "ROZPOR NEROZŘEŠEN. Dvě neslučitelné mechaniky ve zdrojích: prodloužení 1% cashbacku o 30 dnů vs. 50 GBP v Curve Cash. Pravděpodobně jde o dvě různé kampaně v čase, ale bez přístupu k T&C to nelze rozhodnout, proto žádnou z nich neuvádím jako číselnou hodnotu. Odměna ve formě PRODLOUŽENÍ CASHBACKU je v přehledu unikátní — hodnota pro doporučujícího závisí na jeho vlastní útratě, takže program odměňuje nejvíc ty, kdo kartu stejně používají nejvíc. Sekundární zdroje jsou převážně affiliate weby sbírající referral kódy, tedy strana se zájmem na nadsazení odměny — zacházet s nimi opatrně. Dostupnost Curve pro české klienty a měna odměny neověřena."
+    },
+    {
+      "record_id": "twisto__promo-kody",
+      "subject": "Twisto",
+      "subject_type": "neobank",
+      "in_original_scope": true,
+      "program_name": "Promo kódy / doporučení",
+      "status": "unknown",
+      "product_scope": [
+        "odložené platby",
+        "Twisto účet",
+        "karta"
+      ],
+      "reward_referrer": "nejednoznačné: zdroje uvádějí 50 Kč za doporučeného, jinde 300–500 Kč pouze pro vybrané zákazníky",
+      "reward_referee": "500 Kč po registraci s promo kódem (dle sekundárních zdrojů)",
+      "reward_referrer_value": null,
+      "reward_referrer_currency": null,
+      "reward_referee_value": null,
+      "reward_referee_currency": null,
+      "reward_tiered": false,
+      "reward_type": "cash",
+      "conditions": "Nepodařilo se ověřit. Zdroje shodně uvádějí, že nejde o plošnou kampaň — promo kódy jsou dostupné jen vybraným zákazníkům z portfolia.",
+      "channel": [
+        "code"
+      ],
+      "limits": "nepodařilo se ověřit",
+      "timing": "nepodařilo se ověřit",
+      "campaign_period": null,
+      "eligibility": "pouze vybraní zákazníci Twista, neplošně",
+      "source_url": "https://www.twisto.cz/vychytavky/twistoucet/",
+      "source_date": "2026-09-15",
+      "confidence": "low",
+      "sources": [
+        {
+          "url": "https://www.twisto.cz/vychytavky/twistoucet/",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Twisto účet (Twisto)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.moneyspot.cz/twisto-recenze/",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Twisto recenze 2026 — promo kód 500 Kč",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.duofinance.cz/recenze-twisto",
+          "type": "secondary",
+          "date": "2026-09-15",
+          "confidence": "low",
+          "title": "Twisto recenze + bonus 500 Kč (DuoFinance)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "NEJDE O STANDARDNÍ MGM PROGRAM. Zdroje se shodují jen v tom, že promo kódy nejsou plošné a dostávají je pouze vybraní zákazníci — tím se Twisto vymyká definici otevřeného MGM programu, kde může doporučovat každý klient. Uváděné částky si přímo odporují (50 Kč vs. 300–500 Kč), a část zdrojů jsou recenzní weby s vlastním affiliate kódem v textu, tedy motivované k nadsazení. Žádnou částku proto neuvádím jako fakt. Status 'unknown' místo 'active': není jisté, že program v otevřené podobě vůbec existuje."
+    },
+    {
+      "record_id": "skip-pay__doporucte-nas",
+      "subject": "Skip Pay",
+      "subject_type": "neobank",
+      "in_original_scope": true,
+      "program_name": "Doporučte Skip Pay",
+      "status": "active",
+      "product_scope": [
+        "odložené platby (balíček MAXI)"
+      ],
+      "reward_referrer": "500 Kč za každý nově ověřený balíček MAXI přes odkaz, celkem až 5 000 Kč",
+      "reward_referee": "sleva 500 Kč (voucher do e-mailu)",
+      "reward_referrer_value": 5000,
+      "reward_referrer_currency": "CZK",
+      "reward_referee_value": 500,
+      "reward_referee_currency": "CZK",
+      "reward_tiered": false,
+      "reward_type": "voucher",
+      "conditions": "Odkaz lze sdílet neomezeně často. Odměna 500 Kč náleží za každý nově ověřený balíček MAXI pořízený přes odkaz doporučujícího. Doporučený dostane slevu 500 Kč e-mailem a uplatní ji při platbě objednávky nebo měsíčního vyúčtování v minimální hodnotě 501 Kč v Zákaznické zóně.",
+      "channel": [
+        "link"
+      ],
+      "limits": "max. 10 doporučení, tj. až 5 000 Kč",
+      "timing": "nepodařilo se ověřit",
+      "campaign_period": null,
+      "eligibility": "nepodařilo se ověřit",
+      "source_url": "https://skippay.cz/doporucte-nas",
+      "source_date": "2026-09-15",
+      "confidence": "medium",
+      "field_confidence": {
+        "timing": "low",
+        "eligibility": "low"
+      },
+      "sources": [
+        {
+          "url": "https://skippay.cz/doporucte-nas",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Doporučte Skip Pay a získejte až 5 000 Kč",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://skippay.cz/caste-dotazy/dalsi-caste-otazky/kolik-muzu-za-doporuceni-celkem-ziskat",
+          "type": "marketing",
+          "date": "2026-09-15",
+          "confidence": "medium",
+          "title": "Kolik můžu za doporučení celkem získat (Skip Pay FAQ)",
+          "retrieved_via": "websearch"
+        }
+      ],
+      "last_checked": null,
+      "notes": "ASYMETRIE FORMY ODMĚNY: doporučující dostává 500 Kč, ale doporučený jen SLEVOVÝ VOUCHER 500 Kč použitelný na objednávku od 501 Kč — tedy nutí k další útratě a je podmíněně hodnotný, ne hotovost. Proto reward_type 'voucher', nikoli 'cash'. Skip Pay patří do skupiny ČSOB, takže jde fakticky o jediný MGM program v této skupině, který se podařilo doložit (u samotné ČSOB zůstává nejasný). Struktura 500 Kč × 10 = 5 000 Kč je totožná s Air Bank, ale mechanika je vázaná na produkt odložených plateb, ne na běžný účet."
+    }
+  ]
+}
