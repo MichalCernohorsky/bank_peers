@@ -113,8 +113,12 @@ subjects:
 
   - record_id: csob__doporuceni
     subject: ČSOB (vč. Poštovní spořitelny)
-    sources: []
-    note: "ŽÁDNÝ OVĚŘENÝ ZDROJ. Nepodařilo se najít oficiální stránku ani PDF k MGM programu ČSOB — všechny nalezené dokumenty jsou akviziční kampaně. Doplnit, jakmile bude znám."
+    sources:
+      - url: https://www.csob.cz/documents/10710/15586783/podminky-akce-500-za-doporuceni.pdf
+        type: pdf
+        anchors: ["doporuč"]
+        note: "Podmínky akce „500 za doporučení“ — DOBĚHLÁ KAMPAŇ (1. 4. – 12. 5. 2020). Sleduje se jen jako kotva: pokud ČSOB spustí nový MGM, dokument se pravděpodobně změní nebo zmizí."
+    note: "Aktuální MGM program ČSOB v retailu neexistuje nebo není veřejně doložitelný. ČSOB Penzijní společnost má vlastní aktivní MGM (csob-penze.cz/download/mgm/), ale penzijní společnost je mimo rozsah."
 
   - record_id: oberbank__nenalezeno
     subject: Oberbank
@@ -210,11 +214,16 @@ subjects:
   - record_id: twisto__promo-kody
     subject: Twisto
     sources:
-      - url: https://www.twisto.cz/vychytavky/twistoucet/
+      - url: https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/registrace/co-je-promokod/
         type: html
         selector: "main"
-        anchors: []
-        note: "Twisto nemá veřejnou stránku programu — promo kódy nejsou plošné. Sledujeme produktovou stránku."
+        anchors: ["promokód"]
+        note: "Oficiální nápověda k promokódu — nese mechaniku doporučení."
+      - url: https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/obecne/ziskani-kreditu/
+        type: html
+        selector: "main"
+        anchors: ["kredit"]
+        note: "Získání kreditů — nejbližší zdroj k výši odměny, která je napříč zdroji rozporná (50 / 150 / 300 / 500 Kč)."
 
   - record_id: komercni-banka__zadny-mgm
     subject: Komerční banka

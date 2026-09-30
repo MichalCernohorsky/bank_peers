@@ -8,6 +8,7 @@
 
 | Datum | Subjekt | Změna | Jistota |
 |---|---|---|---|
+| 1. 4. – 12. 5. 2020 | ČSOB | Proběhla akce „500 za doporučení" (500 Kč za doporučení Plus Konta). Jediný doložený MGM program ČSOB v retailu; od té doby žádný nalezen. | střední (oficiální PDF) |
 | 27. 10. 2022 | Max banka | Předčasně ukončila program 500 + 500 Kč za doporučení Neo účtu. Podmínky slibovaly běh **do 31. 3. 2023**; banka využila výhradu o možnosti kdykoli akci ukončit. | střední (Měšec.cz) |
 | 1. 10. 2024 | Max banka | Fúze s Bankou CREDITAS — subjekt přestal existovat samostatně. | nízká (pouze fórový zdroj) |
 | 30. 1. 2026 | mBank | Začátek aktuální akce „Doporučte mBank" (dle pravidel do 31. 3. 2026). | střední (oficiální PDF) |
@@ -23,11 +24,13 @@
 1. **Pravidla se mění v řádu týdnů, ne let.** mBank vydala ke stejné kampani dva dodatky během dvou po sobě jdoucích měsíců. To je samo o sobě nejsilnější argument pro tracker — roční ani čtvrtletní kontrola takový pohyb nezachytí.
 2. **Deklarovaná platnost kampaně není závazná.** Max banka je doložený případ, kdy banka ukončila program o pět měsíců dříve, než sama avizovala, na základě výhrady ve vlastních podmínkách. Údaje v poli `campaign_period` je proto u všech subjektů nutné číst jako záměr, ne jako závazek.
 3. **Na horním konci trhu došlo k eskalaci.** Zvýšení stropu mBank z 10 000 na 26 000 Kč je jediná doložená změna výše odměny v datech a jde o více než zdvojnásobení.
+4. **Velké banky z MGM odešly, menší ho zesílily.** ČSOB naposledy doložitelně odměňovala za doporučení v roce 2020 a Komerční banka MGM nemá vůbec; obě spoléhají na akviziční bonusy pro nové klienty. Naproti tomu mBank, Air Bank a Partners Banka na MGM staví aktivně. Vzorek je malý a nejde o tvrdý trend, ale rozdíl mezi velkou čtyřkou a vyzyvateli je v datech vidět.
 
 **Nedoložitelné z tohoto běhu** — uvádím explicitně, aby se z mlčení nevyvozoval závěr:
 
 - Zda 500 Kč bylo tržním standardem i před třemi lety, nebo jde o nedávnou konvergenci.
-- Kdy přesně jednotlivé banky programy zaváděly a rušily (mimo Max banku).
+- Kdy přesně jednotlivé banky programy zaváděly a rušily (mimo Max banku a ČSOB).
+- Zda Moneta program formálně ukončila, nebo ho jen přestala aktualizovat a komunikovat.
 - Zda gamifikace (milníkové bonusy, drobení po transakcích) je nový jev, nebo tu byla vždy. mBank je dnes jediný takový program v přehledu, ale bez historie nelze říct, jestli jde o trend, nebo o odlehlou hodnotu.
 - Zda posun k nehotovostním odměnám (Partners Banka, bunq, Curve) roste, nebo je stabilní.
 

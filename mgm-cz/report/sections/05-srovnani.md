@@ -5,9 +5,9 @@ závazné**, a v **tom, čím se odměna kvalifikuje**.
 
 | | Banky s českou licencí | Neobanky a fintechy |
 |---|---|---|
-| Převažující forma | hotovost připsaná na účet (9 z 11 programů) | proměnlivá — hotovost, krypto, zlomky akcií, kovová karta, prodloužený cashback, bonusový úrok |
+| Převažující forma | hotovost připsaná na účet — všechny bankovní programy kromě jednoho | proměnlivá — hotovost, kredity, krypto, zlomky akcií, kovová karta, prodloužený cashback, bonusový úrok |
 | Je částka veřejná? | **ano**, uvedená v korunách v pravidlech akce | **zpravidla ne** — výše plave podle kampaně v aplikaci (Revolut, bunq, N26) |
-| Výjimky ze vzorce | Partners Banka (úroková sazba), Skip Pay (voucher) | Skip Pay a Twisto drží korunové částky jako české banky |
+| Výjimky ze vzorce | Partners Banka (úroková sazba) | Skip Pay drží korunové částky jako české banky; Twisto platí kredity do vlastní aplikace |
 
 Nejpodstatnější zjištění: **u neobank nelze v řadě případů odměnu vůbec zapsat jako číslo.** Revolut,
 bunq a Curve mají v datech `reward_*_value: null` ne proto, že by se nepodařilo dohledat zdroj, ale

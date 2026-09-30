@@ -1,6 +1,7 @@
 ### Jak data vznikla
 
 Research proběhl **15. 9. 2026** pomocí cílených webových vyhledávání na 21 subjektů ze zadání,
+s doplňujícím kolem **30. 9. 2026** zaměřeným na tři tehdy neověřené subjekty (ČSOB, Moneta, Twisto);
 s křížovou kontrolou přes české srovnávače (Měšec.cz, Peníze.cz, Finparáda, e15/FinExpert) a tiskové
 zprávy. Data jsou v `data/mgm-programs.json`, validovaná proti `schema/mgm-program.schema.json`
 skriptem `tracker/validate.py`.
@@ -32,16 +33,18 @@ nepodařilo potvrdit, jsou v datech `null` s vysvětlením v `notes`, ne dopoč�
 Druhým systematickým rizikem je **záměna akvizičního bonusu za MGM**. České srovnávače je běžně mísí
 v jednom článku i v jedné větě. Akviziční bonus (odměna novému klientovi za založení účtu) do rozsahu
 tohoto reportu **nepatří** a je z dat vyloučen — týká se to zejména KB (4 000 Kč), ČSOB (Plus konto),
+Monety (5 % cashback do 3 000 Kč od 1. 9. 2026), Twista (registrační promokódy za 500 Kč, které
+šíří slevové weby s vlastním affiliate zájmem),
 UniCredit (10 000 Kč) a zářijové akce Air Bank (500 Kč „na vyzkoušení", kód SVET500).
 
 ### Co se konkrétně nepodařilo ověřit
 
 | Subjekt | Co chybí | Proč to vadí |
 |---|---|---|
-| **ČSOB** | existence a výše MGM odměny | Zdroje si odporují (500 Kč vs. 1 000 Kč) a žádný oficiální dokument k MGM se nenašel — všechna nalezená PDF ČSOB jsou akviziční kampaně. Největší nevyřešená mezera v reportu. |
-| **Moneta** | aktuální výše odměny | Program prokazatelně existuje (banka k němu vydává vlastní PDF), ale částku nelze doložit. |
+| **ČSOB** | ~~existence a výše odměny~~ **dořešeno 30. 9. 2026** | Nalezeny oficiální podmínky akce „500 za doporučení“: 500 Kč, Plus Konto, ale doba trvání **1. 4. – 12. 5. 2020**. Spor 500 vs. 1 000 Kč tím padá. Otevřené zůstává jen to, zda banka od té doby spustila jiný program — žádná stopa po něm není. |
+| **Moneta** | zda program vůbec běží | Všechny nalezené verze podmínek jsou z let 2018–2020, novější nic, žádná stránka programu ani položka v FAQ. Opakované hledání 30. 9. 2026 nepřineslo nic nového. Nejpravděpodobněji doběhlý program, ale bez dokladu o ukončení. |
 | **Oberbank** | cokoli | Nulový výskyt v českých přehledech. Vedeno jako `unknown`, ne `none` — absence zmínky není důkaz neexistence. |
-| **Twisto** | zda jde o otevřený program | Zdroje se shodují jen na tom, že promo kódy nejsou plošné. Částky si odporují (50 Kč vs. 300–500 Kč). |
+| **Twisto** | výše odměny | **Dořešeno 30. 9. 2026:** program existuje, má oficiální mechaniku (promokód v sekci „Pozvěte své přátele“, kredity pro obě strany, zpětně nelze). Výše ale ne — zdroje uvádějí 50, 150, 300 i 500 Kč. |
 | **Wise** | varianta platná pro ČR | Nalezená T&C jsou britská; v některých zemích je místo bonusu jen sleva na poplatku. Nejnižší jistota v přehledu. |
 | **Curve** | která mechanika platí | Dva neslučitelné modely ve zdrojích (prodloužení cashbacku vs. 50 GBP). Sekundární zdroje jsou affiliate weby motivované odměnu nadsazovat. |
 | **UniCredit** | z čeho se skládá 1 700 Kč | Doložené položky dávají 300 + 700 = 1 000 Kč. Zbytek do deklarovaných 1 700 Kč se nepodařilo identifikovat. |

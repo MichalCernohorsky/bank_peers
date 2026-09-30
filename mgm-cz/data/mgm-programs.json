@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-15",
+  "generated_at": "2026-09-30",
   "schema": "schema/mgm-program.schema.json",
   "scope_note": "Retailové banky s českou licencí a neobanky/fintechy dostupné českým klientům. Mimo rozsah: investiční platformy, pojišťovny, stavební spořitelny, telco. Akviziční bonusy pro nové klienty NEJSOU MGM a nejsou zahrnuty.",
   "records": [
@@ -74,48 +74,67 @@
       "subject": "ČSOB (vč. Poštovní spořitelny)",
       "subject_type": "bank",
       "in_original_scope": true,
-      "program_name": null,
-      "status": "unknown",
+      "program_name": "500 za doporučení",
+      "status": "ended",
       "product_scope": [
-        "běžný účet"
+        "běžný účet (Plus Konto)"
       ],
-      "reward_referrer": "nejednoznačné: sekundární zdroje uvádějí 500 Kč i 1 000 Kč za doporučeného",
-      "reward_referee": "nejednoznačné: jeden zdroj uvádí 500 Kč pro obě strany, jiný pouze odměnu pro doporučujícího",
-      "reward_referrer_value": null,
-      "reward_referrer_currency": null,
+      "reward_referrer": "500 Kč (kampaň skončila 12. 5. 2020)",
+      "reward_referee": "z dostupné části podmínek nevyplývá, že by doporučený dostával odměnu",
+      "reward_referrer_value": 500,
+      "reward_referrer_currency": "CZK",
       "reward_referee_value": null,
       "reward_referee_currency": null,
       "reward_tiered": false,
       "reward_type": "cash",
-      "conditions": "Nepodařilo se ověřit. Nalezené oficiální PDF s pravidly ČSOB se týkají akvizičních kampaní (Plus konto, podnikatelský účet, Premium konto), ne MGM programu.",
-      "channel": [],
+      "conditions": "Doporučující musel být klient ČSOB s aktivním účtem a doporučit založení účtu Plus Konto jiné fyzické osobě. Nový klient nesměl mít jiné aktivní Plus Konto u ČSOB a zadal číslo účtu doporučujícího do pole pro kód akce při online založení, nebo ho nadiktoval na telefonní lince.",
+      "channel": [
+        "code",
+        "web",
+        "branch"
+      ],
       "limits": null,
       "timing": null,
-      "campaign_period": null,
-      "eligibility": null,
-      "source_url": "https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite",
-      "source_date": "2026-09-15",
-      "confidence": "low",
+      "campaign_period": {
+        "from": "2020-04-01",
+        "to": "2020-05-12",
+        "note": "Doložená doba trvání akce dle oficiálních podmínek."
+      },
+      "eligibility": "doporučující = klient ČSOB s aktivním účtem; doporučený = fyzická osoba bez jiného aktivního Plus Konta u ČSOB",
+      "source_url": "https://www.csob.cz/documents/10710/15586783/podminky-akce-500-za-doporuceni.pdf",
+      "source_date": "2026-09-30",
+      "confidence": "medium",
       "sources": [
+        {
+          "url": "https://www.csob.cz/documents/10710/15586783/podminky-akce-500-za-doporuceni.pdf",
+          "type": "tc",
+          "date": "2026-09-30",
+          "confidence": "medium",
+          "title": "Podmínky marketingové akce „500 za doporučení“ (ČSOB, PDF)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.csob-penze.cz/download/mgm/",
+          "type": "tc",
+          "date": "2026-09-30",
+          "confidence": "low",
+          "title": "Podmínky akce Doporuč nového klienta (ČSOB Penzijní společnost) — MIMO ROZSAH",
+          "retrieved_via": "websearch"
+        },
         {
           "url": "https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite",
           "type": "secondary",
           "date": "2026-09-15",
           "confidence": "low",
-          "title": "Banky vás odmění za doporučení (Peníze.cz)",
-          "retrieved_via": "websearch"
-        },
-        {
-          "url": "https://www.csob.cz/documents/10710/17504789/pravidla-akce-podnikatelsky-ucet-s-odmenou-2000-kc-2026.pdf",
-          "type": "tc",
-          "date": "2026-09-15",
-          "confidence": "low",
-          "title": "Pravidla akce ČSOB podnikatelský účet — AKVIZIČNÍ, ne MGM",
+          "title": "Banky vás odmění za doporučení (Peníze.cz) — tvrdí aktuální program, nedoloženo",
           "retrieved_via": "websearch"
         }
       ],
       "last_checked": null,
-      "notes": "ROZPOR MEZI ZDROJI, NEROZŘEŠEN. Jeden sekundární zdroj tvrdí 500 Kč na oba účty, jiný 1 000 Kč pro doporučujícího. Nepodařilo se najít žádnou oficiální stránku ani PDF s pravidly MGM programu ČSOB — všechny nalezené oficiální dokumenty jsou akviziční kampaně pro nové klienty. Dokud nebude ověřeno z T&C, částku neuvádím jako fakt. Prioritní kandidát na ověření trackerem."
+      "notes": "ROZŘEŠENO OPROTI PRVNÍMU BĚHU. Spor sekundárních zdrojů (500 vs. 1 000 Kč) rozhodly nalezené oficiální podmínky: akce se jmenovala „500 za doporučení“, odměna byla 500 Kč a vztahovala se na Plus Konto. ZÁSADNÍ ALE JE, ŽE AKCE BĚŽELA JEN OD 1. 4. DO 12. 5. 2020 — šest týdnů před šesti lety. Žádný doklad o aktuálně běžícím MGM programu ČSOB se najít nepodařilo; cílené hledání na rok 2026 nevrátilo nic relevantního a na webu banky neexistuje stránka programu. Sekundární zdroje, které v roce 2026 tvrdí, že ČSOB za doporučení platí, tedy patrně recyklují starou informaci — proto status 'ended', ne 'active'. Mechanika akce byla na trhu neobvyklá: místo odkazu nebo kódu se zadávalo ČÍSLO ÚČTU doporučujícího do pole pro kód akce. POZNÁMKA MIMO ROZSAH: ČSOB Penzijní společnost provozuje vlastní aktivní MGM „Doporuč nového klienta a získej odměnu“ (csob-penze.cz/download/mgm/). Penzijní společnost není retailová banka a do rozsahu tohoto reportu nepatří, ale ukazuje, že skupina ČSOB MGM používá — jen ne doložitelně v bankovním retailu.",
+      "field_confidence": {
+        "reward_referee": "low"
+      }
     },
     {
       "record_id": "komercni-banka__zadny-mgm",
@@ -190,7 +209,7 @@
       "campaign_period": null,
       "eligibility": null,
       "source_url": "https://www.moneta.cz/dokumenty-ke-stazeni/osobni/ucty",
-      "source_date": "2026-09-15",
+      "source_date": "2026-09-30",
       "confidence": "low",
       "sources": [
         {
@@ -211,7 +230,7 @@
         }
       ],
       "last_checked": null,
-      "notes": "Program prokazatelně existuje (banka pro něj vydává vlastní PDF s pravidly a komunikuje „obě strany dostanou odměnu“), ale aktuální výši odměny se nepodařilo z veřejných zdrojů ověřit. VÝZNAMNÁ INDICIE: nalezené verze podmínek kampaně jsou účinné od 4. 3. 2019, 20. 8. 2019, 1. 11. 2019 a 14. 6. 2020 — žádná novější. Sedm let bez aktualizace pravidel naznačuje, že program je spíše spící nebo doběhlý než aktivně provozovaný, ale bez přečtení dokumentů to nelze tvrdit. Historicky 100 Kč, od 15. 9. 2018 zvýšeno na 300 Kč — pouze fórový zdroj, do historie nezařazeno. Nezaměňovat s „Program Odměny“, což je cashback u obchodníků, ne MGM."
+      "notes": "OPAKOVANÉ HLEDÁNÍ (30. 9. 2026) NIC NOVÉHO NEPŘINESLO. Program „Odměna za doporučení klienta“ prokazatelně existoval — banka k němu vydávala vlastní PDF s podmínkami — ale VŠECHNY nalezené verze jsou z let 2018 až 2020 (účinnost 4. 3. 2019, 20. 8. 2019, 1. 11. 2019 a 14. 6. 2020). Žádná novější verze, žádná stránka programu, žádná položka v sekci častých dotazů. Šest let bez aktualizace pravidel a bez jediné veřejné zmínky silně naznačuje, že program doběhl. Ponechávám 'unknown' místo 'ended' vědomě: absence dokumentu není důkaz ukončení, a na rozdíl od ČSOB tu chybí i doklad o tom, kdy měla akce skončit. Rozhodne až první ostrý běh trackeru nad rozcestníkem dokumentů. Historicky 100 Kč, od 15. 9. 2018 zvýšeno na 300 Kč — pouze fórový zdroj, do historie nezařazeno. Nezaměňovat s „Program Odměny“, což je cashback u obchodníků."
     },
     {
       "record_id": "raiffeisenbank__odmena-za-doporuceni",
@@ -1117,39 +1136,57 @@
       "subject": "Twisto",
       "subject_type": "neobank",
       "in_original_scope": true,
-      "program_name": "Promo kódy / doporučení",
-      "status": "unknown",
+      "program_name": "Pozvěte své přátele",
+      "status": "active",
       "product_scope": [
         "odložené platby",
         "Twisto účet",
         "karta"
       ],
-      "reward_referrer": "nejednoznačné: zdroje uvádějí 50 Kč za doporučeného, jinde 300–500 Kč pouze pro vybrané zákazníky",
-      "reward_referee": "500 Kč po registraci s promo kódem (dle sekundárních zdrojů)",
+      "reward_referrer": "kredity na nákupy; zdroje uvádějí 150 Kč, jinde 300 Kč nebo 500 Kč",
+      "reward_referee": "kredity na nákupy ve stejné výši jako doporučující",
       "reward_referrer_value": null,
       "reward_referrer_currency": null,
       "reward_referee_value": null,
       "reward_referee_currency": null,
       "reward_tiered": false,
-      "reward_type": "cash",
-      "conditions": "Nepodařilo se ověřit. Zdroje shodně uvádějí, že nejde o plošnou kampaň — promo kódy jsou dostupné jen vybraným zákazníkům z portfolia.",
+      "reward_type": "voucher",
+      "conditions": "Doporučený musí zadat promokód doporučujícího PŘI REGISTRACI — zpětně kredity připsat nelze. Po dokončení registrace dostanou kredity obě strany. Twisto si vyhrazuje právo podmínky akce kdykoli změnit nebo akci zrušit.",
       "channel": [
-        "code"
+        "code",
+        "app",
+        "web"
       ],
       "limits": "nepodařilo se ověřit",
       "timing": "nepodařilo se ověřit",
       "campaign_period": null,
-      "eligibility": "pouze vybraní zákazníci Twista, neplošně",
-      "source_url": "https://www.twisto.cz/vychytavky/twistoucet/",
-      "source_date": "2026-09-15",
+      "eligibility": "unikátní promokód se přiděluje po aktivaci Twisto účtu a je v sekci „Pozvěte své přátele“ v aplikaci i na webu; část zdrojů uvádí, že doporučení je dostupné jen vybraným zákazníkům",
+      "source_url": "https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/registrace/co-je-promokod/",
+      "source_date": "2026-09-30",
       "confidence": "low",
       "sources": [
         {
-          "url": "https://www.twisto.cz/vychytavky/twistoucet/",
+          "url": "https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/registrace/co-je-promokod/",
           "type": "marketing",
-          "date": "2026-09-15",
+          "date": "2026-09-30",
+          "confidence": "medium",
+          "title": "Co je promokód (Twisto, nápověda)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/obecne/ziskani-kreditu/",
+          "type": "marketing",
+          "date": "2026-09-30",
+          "confidence": "medium",
+          "title": "Získání kreditů (Twisto, nápověda)",
+          "retrieved_via": "websearch"
+        },
+        {
+          "url": "https://blog.twisto.cz/soutez-o-10-000-kc-za-referral/",
+          "type": "marketing",
+          "date": "2026-09-30",
           "confidence": "low",
-          "title": "Twisto účet (Twisto)",
+          "title": "Soutěž Doporuč kamaráda a získej 10 000 Kč (Twisto blog)",
           "retrieved_via": "websearch"
         },
         {
@@ -1157,20 +1194,17 @@
           "type": "secondary",
           "date": "2026-09-15",
           "confidence": "low",
-          "title": "Twisto recenze 2026 — promo kód 500 Kč",
-          "retrieved_via": "websearch"
-        },
-        {
-          "url": "https://www.duofinance.cz/recenze-twisto",
-          "type": "secondary",
-          "date": "2026-09-15",
-          "confidence": "low",
-          "title": "Twisto recenze + bonus 500 Kč (DuoFinance)",
+          "title": "Twisto recenze — promo kód 500 Kč",
           "retrieved_via": "websearch"
         }
       ],
       "last_checked": null,
-      "notes": "NEJDE O STANDARDNÍ MGM PROGRAM. Zdroje se shodují jen v tom, že promo kódy nejsou plošné a dostávají je pouze vybraní zákazníci — tím se Twisto vymyká definici otevřeného MGM programu, kde může doporučovat každý klient. Uváděné částky si přímo odporují (50 Kč vs. 300–500 Kč), a část zdrojů jsou recenzní weby s vlastním affiliate kódem v textu, tedy motivované k nadsazení. Žádnou částku proto neuvádím jako fakt. Status 'unknown' místo 'active': není jisté, že program v otevřené podobě vůbec existuje."
+      "notes": "UPŘESNĚNO OPROTI PRVNÍMU BĚHU: program prokazatelně existuje a má oficiální mechaniku — unikátní promokód v sekci „Pozvěte své přátele“ v aplikaci i na webu, kredity dostanou OBĚ strany, kód musí padnout při registraci a zpětně se nepřipisuje. Proto status 'active' místo 'unknown'. VÝŠE ODMĚNY ZŮSTÁVÁ NEROZŘEŠENÁ: napříč zdroji se objevuje 50 Kč, 150 Kč, 300 Kč i 500 Kč a část zdrojů tvrdí, že doporučení je dostupné jen vybraným zákazníkům z portfolia. Tři různé částky ve třech zdrojích znamenají buď kampaně v čase, nebo segmentaci podle zákazníka — rozhodnout to nejde, proto reward_*_value zůstává null a confidence low. Odměnou nejsou peníze, ale KREDITY NA NÁKUPY uvnitř Twista, proto reward_type 'voucher'. Pozor na záměnu s akvizičními promo kódy (TWISTOCZ, INSMART500 apod. za 500 Kč při registraci) — ty rozdávají recenzní a slevové weby s vlastním affiliate zájmem a nejde o MGM.",
+      "field_confidence": {
+        "reward_referrer": "low",
+        "reward_referee": "low",
+        "limits": "low"
+      }
     },
     {
       "record_id": "skip-pay__doporucte-nas",

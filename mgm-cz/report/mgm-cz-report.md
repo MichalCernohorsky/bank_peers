@@ -1,6 +1,6 @@
 # Member-Get-Member programy na českém bankovním trhu
 
-*Datová základna ověřena k 2026-09-15. Report je generovaný z `data/mgm-programs.json` skriptem `tracker/report.py` — needitovat ručně; analytické sekce se upravují v `report/sections/`.*
+*Datová základna ověřena k 2026-09-30. Report je generovaný z `data/mgm-programs.json` skriptem `tracker/report.py` — needitovat ručně; analytické sekce se upravují v `report/sections/`.*
 
 ---
 
@@ -16,18 +16,20 @@
 
 - **Tři subjekty MGM prokazatelně nemají: Komerční banka, Fio banka a Trinity Bank.** U KB je to nejnápadnější — jako jediná z velké čtyřky nahrazuje MGM čistě akvizičním bonusem (až 4 000 Kč novým klientům). Fio staví na bezpoplatkovosti místo bonusů, Trinity odměňuje jen vlastní chování klienta (Prémiový klub, Narozeninový bonus), ne přivedení nového.
 
-- **U čtyř subjektů se program nepodařilo ověřit: ČSOB, Moneta, Oberbank a Twisto.** U ČSOB a Monety je to nejvíc frustrující — obě banky MGM zjevně provozují (Moneta k němu vydává vlastní PDF s pravidly), ale aktuální výši odměny nelze z veřejných zdrojů doložit. U ČSOB si sekundární zdroje přímo odporují (500 Kč vs. 1 000 Kč) a žádný oficiální dokument k MGM se nepodařilo najít.
+- **ČSOB MGM v retailu nemá — a nejspíš ho šest let nemá.** Jediný nalezený oficiální dokument je akce „500 za doporučení", která běžela **1. 4. – 12. 5. 2020**, tedy šest týdnů před šesti lety. Sekundární zdroje přitom v roce 2026 tvrdí, že ČSOB za doporučení platí, a neshodnou se na částce (500 vs. 1 000 Kč) — patrně recyklují právě tu starou akci. Aktivní MGM má v rámci skupiny jen ČSOB Penzijní společnost, což je mimo rozsah tohoto reportu.
+
+- **Neověřené zůstávají dva subjekty: Moneta a Oberbank.** U Monety program prokazatelně existoval, ale všechny nalezené verze podmínek jsou z let 2018–2020 a novější nic — šest let bez aktualizace naznačuje doběhlý program, na tvrzení „ukončen" to ale nestačí. Oberbank se v českých přehledech nevyskytuje vůbec.
 
 - **Neobanky hrají jinou hru než české banky: neuvádějí částky.** Zatímco česká banka odměnu zveřejní v korunách v pravidlech akce, Revolut, bunq i N26 nechávají výši odměny plovoucí podle aktuální kampaně v aplikaci. Odměna tam navíc často není hotovost — bunq nabízí krypto, zlomky akcií nebo kovovou kartu, N26 může bonus vyplatit v akciích, Curve prodlužuje cashback. **Symetrie odměny, u českých bank pravidlo, u neobank mizí:** podle podmínek Revolutu dostává odměnu pouze doporučující.
 
-- **Odměnou nemusí být peníze.** Partners Banka jako jediná nabízí místo částky **úrokovou sazbu** (4,06 % p.a. do 500 000 Kč, doporučující na 1 měsíc, doporučený na 3) a Skip Pay dává doporučenému jen **slevový voucher** použitelný od útraty 501 Kč. Hodnota takové odměny závisí na chování klienta a nelze ji postavit do jedné tabulky s hotovostí.
+- **Odměnou nemusí být peníze.** Partners Banka jako jediná nabízí místo částky **úrokovou sazbu** (4,06 % p.a. do 500 000 Kč, doporučující na 1 měsíc, doporučený na 3), Skip Pay dává doporučenému **slevový voucher** použitelný od útraty 501 Kč a Twisto odměňuje **kredity na nákupy** uvnitř své aplikace. Hodnota takové odměny závisí na chování klienta a nelze ji postavit do jedné tabulky s hotovostí.
 
 
 ### Souhrnná čísla
 
 - **Subjektů celkem:** 21 (14 bank, 7 neobank/fintechů)
-- **Podle statusu:** aktivní: 13, neověřeno: 4, nemá MGM: 3, ukončen: 1
-- **Podle jistoty zdroje:** střední: 13, nízká: 8
+- **Podle statusu:** aktivní: 14, nemá MGM: 3, ukončen: 2, neověřeno: 2
+- **Podle jistoty zdroje:** střední: 14, nízká: 7
 
 
 ---
@@ -39,7 +41,7 @@
 | **Air Bank** | banka | aktivní | 500 Kč za každého doporučeného | 500 Kč | Doporučující pošle odkaz z mobilní aplikace (Menu / Nastavení a banka / Pozvat přátele). Doporučený… | max. 10 doporučených přátel ročně (tj. max. 5 000 Kč ročně… | střední | [odkaz](https://www.airbank.cz/file-download/pravidla-akce-pozvani-pratel-doporucujici) |
 | **Banka CREDITAS** | banka | aktivní | 500 Kč za doporučeného | 250 Kč | Doporučený uvede při založení produktu jméno, příjmení a členské číslo doporučujícího. U spořicího… | nepodařilo se ověřit | střední | [odkaz](https://www2020.creditas.cz/doporucte-a-ziskejte) |
 | **Česká spořitelna** | banka | aktivní | až 6 000 Kč celkem (až 1 200 Kč za každého z max. 5 doporučených) | až 1 200 Kč | Doporučený si přes George sjedná účet Plus, Standard, Premier nebo Erste Private Banking a následně… | max. 5 doporučených přátel (6 000 Kč pro doporučujícího) | střední | [odkaz](https://www.csas.cz/static_grg/cs/MGM/Prilohy/pravidla_marketingove_akce_doporucte_george.pdf) |
-| **ČSOB (vč. Poštovní spořitelny)** | banka | neověřeno | nejednoznačné: sekundární zdroje uvádějí 500 Kč i 1 000 Kč za doporučeného | nejednoznačné: jeden zdroj uvádí 500 Kč pro obě strany, jiný pouze odměnu pro d… | Nepodařilo se ověřit. Nalezené oficiální PDF s pravidly ČSOB se týkají akvizičních kampaní (Plus ko… | — | nízká | [odkaz](https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite) |
+| **ČSOB (vč. Poštovní spořitelny)** | banka | ukončen | 500 Kč (kampaň skončila 12. 5. 2020) | z dostupné části podmínek nevyplývá, že by doporučený dostával odměnu | Doporučující musel být klient ČSOB s aktivním účtem a doporučit založení účtu Plus Konto jiné fyzic… | — | střední | [odkaz](https://www.csob.cz/documents/10710/15586783/podminky-akce-500-za-doporuceni.pdf) |
 | **Fio banka** | banka | nemá MGM | — | — | — | — | nízká | [odkaz](https://www.finparada.cz/3524-Banky-zkouseji-ziskat-nove-klienty-odmenou-za-doporuceni.aspx) |
 | **Komerční banka** | banka | nemá MGM | — | — | — | — | střední | [odkaz](https://www.kb.cz/cs/obcane/bonus-az-4-000-kc-pro-nove-klienty) |
 | **Max banka** | banka | ukončen | 500 Kč (program ukončen) | 500 Kč (program ukončen) | Nový klient musel provést 3 platby debetní kartou do 2 měsíců od založení účtu. | — | střední | [odkaz](https://www.mesec.cz/aktuality/max-banka-predcasne-ukoncila-odmeny-za-zalozeni-uctu-puvodne-mela-skoncit-az-v-breznu-2023/) |
@@ -55,7 +57,7 @@
 | **N26** | neobanka | aktivní | výše bonusu se liší podle kampaně; celkový strop 1 500 EUR na zákazníka | nepodařilo se ověřit, zda pozvaný dostává odměnu | Pozvaný musí provést první platbu kartou (nákup v obchodě nebo online, PayPal vyloučen) v hodnotě a… | max. 10 referral bonusů na uživatele; celkem max. 1 500 EUR… | střední | [odkaz](https://docs.n26.com/legal/01+DE/01+Account/en/15account-terms-and-conditions-friend-referral-3.0-en.pdf) |
 | **Revolut** | neobanka | aktivní | výše se mění podle kampaně; sekundární zdroj uvádí až 1 500 Kč | dle podmínek odměnu dostává POUZE doporučující, ne pozvaný | Doporučující musí mít aktivní osobní účet po celou dobu trvání akce i v okamžiku připsání odměny. P… | max. 5 pozvaných osob v rámci jedné kampaně | střední | [odkaz](https://www.revolut.com/cs-CZ/legal/referrals-terms/) |
 | **Skip Pay** | neobanka | aktivní | 500 Kč za každý nově ověřený balíček MAXI přes odkaz, celkem až 5 000 Kč | sleva 500 Kč (voucher do e-mailu) | Odkaz lze sdílet neomezeně často. Odměna 500 Kč náleží za každý nově ověřený balíček MAXI pořízený… | max. 10 doporučení, tj. až 5 000 Kč | střední | [odkaz](https://skippay.cz/doporucte-nas) |
-| **Twisto** | neobanka | neověřeno | nejednoznačné: zdroje uvádějí 50 Kč za doporučeného, jinde 300–500 Kč pouze pro… | 500 Kč po registraci s promo kódem (dle sekundárních zdrojů) | Nepodařilo se ověřit. Zdroje shodně uvádějí, že nejde o plošnou kampaň — promo kódy jsou dostupné j… | nepodařilo se ověřit | nízká | [odkaz](https://www.twisto.cz/vychytavky/twistoucet/) |
+| **Twisto** | neobanka | aktivní | kredity na nákupy; zdroje uvádějí 150 Kč, jinde 300 Kč nebo 500 Kč | kredity na nákupy ve stejné výši jako doporučující | Doporučený musí zadat promokód doporučujícího PŘI REGISTRACI — zpětně kredity připsat nelze. Po dok… | nepodařilo se ověřit | nízká | [odkaz](https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/registrace/co-je-promokod/) |
 | **Wise** | neobanka | aktivní | závisí na zemi; typicky cca 75 GBP po 3 pozvaných, kteří provedou kvalifikovaný… | převod zdarma na první mezinárodní platbu do stanoveného limitu (typicky cca 50… | Doporučující musí mít ověřený účet v dobrém stavu a mít za sebou alespoň jeden osobní převod. Pozva… | nepodařilo se ověřit pro ČR | nízká | [odkaz](https://wise.com/gb/legal/referral-terms) |
 
 
@@ -136,22 +138,24 @@
 
 | Pole | Hodnota |
 |---|---|
-| Program | — |
-| Status | neověřeno |
-| Produkty | běžný účet |
-| Odměna doporučující | nejednoznačné: sekundární zdroje uvádějí 500 Kč i 1 000 Kč za doporučeného |
-| Odměna doporučený | nejednoznačné: jeden zdroj uvádí 500 Kč pro obě strany, jiný pouze odměnu pro doporučujícího |
+| Program | 500 za doporučení |
+| Status | ukončen |
+| Produkty | běžný účet (Plus Konto) |
+| Odměna doporučující | 500 Kč (kampaň skončila 12. 5. 2020) |
+| Odměna doporučený | z dostupné části podmínek nevyplývá, že by doporučený dostával odměnu |
 | Typ odměny | cash |
-| Podmínky | Nepodařilo se ověřit. Nalezené oficiální PDF s pravidly ČSOB se týkají akvizičních kampaní (Plus konto, podnikatelský účet, Premium konto), ne MGM programu. |
-| Kanál | — |
+| Podmínky | Doporučující musel být klient ČSOB s aktivním účtem a doporučit založení účtu Plus Konto jiné fyzické osobě. Nový klient nesměl mít jiné aktivní Plus Konto u ČSOB a zadal číslo účtu doporučujícího do pole pro kód akce při online založení, nebo ho nadiktoval na telefonní lince. |
+| Kanál | code; web; branch |
 | Limity | — |
 | Lhůty | — |
-| Platnost kampaně | — |
-| Kdo se může účastnit | — |
-| Confidence | nízká |
-| Ověřeno dne | 2026-09-15 |
+| Platnost kampaně | 2020-04-01 – 2020-05-12 (Doložená doba trvání akce dle oficiálních podmínek.) |
+| Kdo se může účastnit | doporučující = klient ČSOB s aktivním účtem; doporučený = fyzická osoba bez jiného aktivního Plus Konta u ČSOB |
+| Confidence | střední |
+| Ověřeno dne | 2026-09-30 |
 
-**Poznámky.** ROZPOR MEZI ZDROJI, NEROZŘEŠEN. Jeden sekundární zdroj tvrdí 500 Kč na oba účty, jiný 1 000 Kč pro doporučujícího. Nepodařilo se najít žádnou oficiální stránku ani PDF s pravidly MGM programu ČSOB — všechny nalezené oficiální dokumenty jsou akviziční kampaně pro nové klienty. Dokud nebude ověřeno z T&C, částku neuvádím jako fakt. Prioritní kandidát na ověření trackerem.
+*Nižší jistota u jednotlivých polí:* `reward_referee`: nízká
+
+**Poznámky.** ROZŘEŠENO OPROTI PRVNÍMU BĚHU. Spor sekundárních zdrojů (500 vs. 1 000 Kč) rozhodly nalezené oficiální podmínky: akce se jmenovala „500 za doporučení“, odměna byla 500 Kč a vztahovala se na Plus Konto. ZÁSADNÍ ALE JE, ŽE AKCE BĚŽELA JEN OD 1. 4. DO 12. 5. 2020 — šest týdnů před šesti lety. Žádný doklad o aktuálně běžícím MGM programu ČSOB se najít nepodařilo; cílené hledání na rok 2026 nevrátilo nic relevantního a na webu banky neexistuje stránka programu. Sekundární zdroje, které v roce 2026 tvrdí, že ČSOB za doporučení platí, tedy patrně recyklují starou informaci — proto status 'ended', ne 'active'. Mechanika akce byla na trhu neobvyklá: místo odkazu nebo kódu se zadávalo ČÍSLO ÚČTU doporučujícího do pole pro kód akce. POZNÁMKA MIMO ROZSAH: ČSOB Penzijní společnost provozuje vlastní aktivní MGM „Doporuč nového klienta a získej odměnu“ (csob-penze.cz/download/mgm/). Penzijní společnost není retailová banka a do rozsahu tohoto reportu nepatří, ale ukazuje, že skupina ČSOB MGM používá — jen ne doložitelně v bankovním retailu.
 
 #### Fio banka
 
@@ -256,9 +260,9 @@
 | Platnost kampaně | — |
 | Kdo se může účastnit | — |
 | Confidence | nízká |
-| Ověřeno dne | 2026-09-15 |
+| Ověřeno dne | 2026-09-30 |
 
-**Poznámky.** Program prokazatelně existuje (banka pro něj vydává vlastní PDF s pravidly a komunikuje „obě strany dostanou odměnu“), ale aktuální výši odměny se nepodařilo z veřejných zdrojů ověřit. VÝZNAMNÁ INDICIE: nalezené verze podmínek kampaně jsou účinné od 4. 3. 2019, 20. 8. 2019, 1. 11. 2019 a 14. 6. 2020 — žádná novější. Sedm let bez aktualizace pravidel naznačuje, že program je spíše spící nebo doběhlý než aktivně provozovaný, ale bez přečtení dokumentů to nelze tvrdit. Historicky 100 Kč, od 15. 9. 2018 zvýšeno na 300 Kč — pouze fórový zdroj, do historie nezařazeno. Nezaměňovat s „Program Odměny“, což je cashback u obchodníků, ne MGM.
+**Poznámky.** OPAKOVANÉ HLEDÁNÍ (30. 9. 2026) NIC NOVÉHO NEPŘINESLO. Program „Odměna za doporučení klienta“ prokazatelně existoval — banka k němu vydávala vlastní PDF s podmínkami — ale VŠECHNY nalezené verze jsou z let 2018 až 2020 (účinnost 4. 3. 2019, 20. 8. 2019, 1. 11. 2019 a 14. 6. 2020). Žádná novější verze, žádná stránka programu, žádná položka v sekci častých dotazů. Šest let bez aktualizace pravidel a bez jediné veřejné zmínky silně naznačuje, že program doběhl. Ponechávám 'unknown' místo 'ended' vědomě: absence dokumentu není důkaz ukončení, a na rozdíl od ČSOB tu chybí i doklad o tom, kdy měla akce skončit. Rozhodne až první ostrý běh trackeru nad rozcestníkem dokumentů. Historicky 100 Kč, od 15. 9. 2018 zvýšeno na 300 Kč — pouze fórový zdroj, do historie nezařazeno. Nezaměňovat s „Program Odměny“, což je cashback u obchodníků.
 
 #### Oberbank
 
@@ -492,22 +496,24 @@
 
 | Pole | Hodnota |
 |---|---|
-| Program | Promo kódy / doporučení |
-| Status | neověřeno |
+| Program | Pozvěte své přátele |
+| Status | aktivní |
 | Produkty | odložené platby; Twisto účet; karta |
-| Odměna doporučující | nejednoznačné: zdroje uvádějí 50 Kč za doporučeného, jinde 300–500 Kč pouze pro vybrané zákazníky |
-| Odměna doporučený | 500 Kč po registraci s promo kódem (dle sekundárních zdrojů) |
-| Typ odměny | cash |
-| Podmínky | Nepodařilo se ověřit. Zdroje shodně uvádějí, že nejde o plošnou kampaň — promo kódy jsou dostupné jen vybraným zákazníkům z portfolia. |
-| Kanál | code |
+| Odměna doporučující | kredity na nákupy; zdroje uvádějí 150 Kč, jinde 300 Kč nebo 500 Kč |
+| Odměna doporučený | kredity na nákupy ve stejné výši jako doporučující |
+| Typ odměny | voucher |
+| Podmínky | Doporučený musí zadat promokód doporučujícího PŘI REGISTRACI — zpětně kredity připsat nelze. Po dokončení registrace dostanou kredity obě strany. Twisto si vyhrazuje právo podmínky akce kdykoli změnit nebo akci zrušit. |
+| Kanál | code; app; web |
 | Limity | nepodařilo se ověřit |
 | Lhůty | nepodařilo se ověřit |
 | Platnost kampaně | — |
-| Kdo se může účastnit | pouze vybraní zákazníci Twista, neplošně |
+| Kdo se může účastnit | unikátní promokód se přiděluje po aktivaci Twisto účtu a je v sekci „Pozvěte své přátele“ v aplikaci i na webu; část zdrojů uvádí, že doporučení je dostupné jen vybraným zákazníkům |
 | Confidence | nízká |
-| Ověřeno dne | 2026-09-15 |
+| Ověřeno dne | 2026-09-30 |
 
-**Poznámky.** NEJDE O STANDARDNÍ MGM PROGRAM. Zdroje se shodují jen v tom, že promo kódy nejsou plošné a dostávají je pouze vybraní zákazníci — tím se Twisto vymyká definici otevřeného MGM programu, kde může doporučovat každý klient. Uváděné částky si přímo odporují (50 Kč vs. 300–500 Kč), a část zdrojů jsou recenzní weby s vlastním affiliate kódem v textu, tedy motivované k nadsazení. Žádnou částku proto neuvádím jako fakt. Status 'unknown' místo 'active': není jisté, že program v otevřené podobě vůbec existuje.
+*Nižší jistota u jednotlivých polí:* `reward_referrer`: nízká, `reward_referee`: nízká, `limits`: nízká
+
+**Poznámky.** UPŘESNĚNO OPROTI PRVNÍMU BĚHU: program prokazatelně existuje a má oficiální mechaniku — unikátní promokód v sekci „Pozvěte své přátele“ v aplikaci i na webu, kredity dostanou OBĚ strany, kód musí padnout při registraci a zpětně se nepřipisuje. Proto status 'active' místo 'unknown'. VÝŠE ODMĚNY ZŮSTÁVÁ NEROZŘEŠENÁ: napříč zdroji se objevuje 50 Kč, 150 Kč, 300 Kč i 500 Kč a část zdrojů tvrdí, že doporučení je dostupné jen vybraným zákazníkům z portfolia. Tři různé částky ve třech zdrojích znamenají buď kampaně v čase, nebo segmentaci podle zákazníka — rozhodnout to nejde, proto reward_*_value zůstává null a confidence low. Odměnou nejsou peníze, ale KREDITY NA NÁKUPY uvnitř Twista, proto reward_type 'voucher'. Pozor na záměnu s akvizičními promo kódy (TWISTOCZ, INSMART500 apod. za 500 Kč při registraci) — ty rozdávají recenzní a slevové weby s vlastním affiliate zájmem a nejde o MGM.
 
 #### Wise
 
@@ -547,6 +553,7 @@
 
 | Datum | Subjekt | Změna | Jistota |
 |---|---|---|---|
+| 1. 4. – 12. 5. 2020 | ČSOB | Proběhla akce „500 za doporučení" (500 Kč za doporučení Plus Konta). Jediný doložený MGM program ČSOB v retailu; od té doby žádný nalezen. | střední (oficiální PDF) |
 | 27. 10. 2022 | Max banka | Předčasně ukončila program 500 + 500 Kč za doporučení Neo účtu. Podmínky slibovaly běh **do 31. 3. 2023**; banka využila výhradu o možnosti kdykoli akci ukončit. | střední (Měšec.cz) |
 | 1. 10. 2024 | Max banka | Fúze s Bankou CREDITAS — subjekt přestal existovat samostatně. | nízká (pouze fórový zdroj) |
 | 30. 1. 2026 | mBank | Začátek aktuální akce „Doporučte mBank" (dle pravidel do 31. 3. 2026). | střední (oficiální PDF) |
@@ -562,11 +569,13 @@
 1. **Pravidla se mění v řádu týdnů, ne let.** mBank vydala ke stejné kampani dva dodatky během dvou po sobě jdoucích měsíců. To je samo o sobě nejsilnější argument pro tracker — roční ani čtvrtletní kontrola takový pohyb nezachytí.
 2. **Deklarovaná platnost kampaně není závazná.** Max banka je doložený případ, kdy banka ukončila program o pět měsíců dříve, než sama avizovala, na základě výhrady ve vlastních podmínkách. Údaje v poli `campaign_period` je proto u všech subjektů nutné číst jako záměr, ne jako závazek.
 3. **Na horním konci trhu došlo k eskalaci.** Zvýšení stropu mBank z 10 000 na 26 000 Kč je jediná doložená změna výše odměny v datech a jde o více než zdvojnásobení.
+4. **Velké banky z MGM odešly, menší ho zesílily.** ČSOB naposledy doložitelně odměňovala za doporučení v roce 2020 a Komerční banka MGM nemá vůbec; obě spoléhají na akviziční bonusy pro nové klienty. Naproti tomu mBank, Air Bank a Partners Banka na MGM staví aktivně. Vzorek je malý a nejde o tvrdý trend, ale rozdíl mezi velkou čtyřkou a vyzyvateli je v datech vidět.
 
 **Nedoložitelné z tohoto běhu** — uvádím explicitně, aby se z mlčení nevyvozoval závěr:
 
 - Zda 500 Kč bylo tržním standardem i před třemi lety, nebo jde o nedávnou konvergenci.
-- Kdy přesně jednotlivé banky programy zaváděly a rušily (mimo Max banku).
+- Kdy přesně jednotlivé banky programy zaváděly a rušily (mimo Max banku a ČSOB).
+- Zda Moneta program formálně ukončila, nebo ho jen přestala aktualizovat a komunikovat.
 - Zda gamifikace (milníkové bonusy, drobení po transakcích) je nový jev, nebo tu byla vždy. mBank je dnes jediný takový program v přehledu, ale bez historie nelze říct, jestli jde o trend, nebo o odlehlou hodnotu.
 - Zda posun k nehotovostním odměnám (Partners Banka, bunq, Curve) roste, nebo je stabilní.
 
@@ -584,9 +593,9 @@ závazné**, a v **tom, čím se odměna kvalifikuje**.
 
 | | Banky s českou licencí | Neobanky a fintechy |
 |---|---|---|
-| Převažující forma | hotovost připsaná na účet (9 z 11 programů) | proměnlivá — hotovost, krypto, zlomky akcií, kovová karta, prodloužený cashback, bonusový úrok |
+| Převažující forma | hotovost připsaná na účet — všechny bankovní programy kromě jednoho | proměnlivá — hotovost, kredity, krypto, zlomky akcií, kovová karta, prodloužený cashback, bonusový úrok |
 | Je částka veřejná? | **ano**, uvedená v korunách v pravidlech akce | **zpravidla ne** — výše plave podle kampaně v aplikaci (Revolut, bunq, N26) |
-| Výjimky ze vzorce | Partners Banka (úroková sazba), Skip Pay (voucher) | Skip Pay a Twisto drží korunové částky jako české banky |
+| Výjimky ze vzorce | Partners Banka (úroková sazba) | Skip Pay drží korunové částky jako české banky; Twisto platí kredity do vlastní aplikace |
 
 Nejpodstatnější zjištění: **u neobank nelze v řadě případů odměnu vůbec zapsat jako číslo.** Revolut,
 bunq a Curve mají v datech `reward_*_value: null` ne proto, že by se nepodařilo dohledat zdroj, ale
@@ -652,6 +661,7 @@ přepočtu a **nesmí se z nich vyvozovat, co dostane český klient**.
 ### Jak data vznikla
 
 Research proběhl **15. 9. 2026** pomocí cílených webových vyhledávání na 21 subjektů ze zadání,
+s doplňujícím kolem **30. 9. 2026** zaměřeným na tři tehdy neověřené subjekty (ČSOB, Moneta, Twisto);
 s křížovou kontrolou přes české srovnávače (Měšec.cz, Peníze.cz, Finparáda, e15/FinExpert) a tiskové
 zprávy. Data jsou v `data/mgm-programs.json`, validovaná proti `schema/mgm-program.schema.json`
 skriptem `tracker/validate.py`.
@@ -683,16 +693,18 @@ nepodařilo potvrdit, jsou v datech `null` s vysvětlením v `notes`, ne dopoč�
 Druhým systematickým rizikem je **záměna akvizičního bonusu za MGM**. České srovnávače je běžně mísí
 v jednom článku i v jedné větě. Akviziční bonus (odměna novému klientovi za založení účtu) do rozsahu
 tohoto reportu **nepatří** a je z dat vyloučen — týká se to zejména KB (4 000 Kč), ČSOB (Plus konto),
+Monety (5 % cashback do 3 000 Kč od 1. 9. 2026), Twista (registrační promokódy za 500 Kč, které
+šíří slevové weby s vlastním affiliate zájmem),
 UniCredit (10 000 Kč) a zářijové akce Air Bank (500 Kč „na vyzkoušení", kód SVET500).
 
 ### Co se konkrétně nepodařilo ověřit
 
 | Subjekt | Co chybí | Proč to vadí |
 |---|---|---|
-| **ČSOB** | existence a výše MGM odměny | Zdroje si odporují (500 Kč vs. 1 000 Kč) a žádný oficiální dokument k MGM se nenašel — všechna nalezená PDF ČSOB jsou akviziční kampaně. Největší nevyřešená mezera v reportu. |
-| **Moneta** | aktuální výše odměny | Program prokazatelně existuje (banka k němu vydává vlastní PDF), ale částku nelze doložit. |
+| **ČSOB** | ~~existence a výše odměny~~ **dořešeno 30. 9. 2026** | Nalezeny oficiální podmínky akce „500 za doporučení“: 500 Kč, Plus Konto, ale doba trvání **1. 4. – 12. 5. 2020**. Spor 500 vs. 1 000 Kč tím padá. Otevřené zůstává jen to, zda banka od té doby spustila jiný program — žádná stopa po něm není. |
+| **Moneta** | zda program vůbec běží | Všechny nalezené verze podmínek jsou z let 2018–2020, novější nic, žádná stránka programu ani položka v FAQ. Opakované hledání 30. 9. 2026 nepřineslo nic nového. Nejpravděpodobněji doběhlý program, ale bez dokladu o ukončení. |
 | **Oberbank** | cokoli | Nulový výskyt v českých přehledech. Vedeno jako `unknown`, ne `none` — absence zmínky není důkaz neexistence. |
-| **Twisto** | zda jde o otevřený program | Zdroje se shodují jen na tom, že promo kódy nejsou plošné. Částky si odporují (50 Kč vs. 300–500 Kč). |
+| **Twisto** | výše odměny | **Dořešeno 30. 9. 2026:** program existuje, má oficiální mechaniku (promokód v sekci „Pozvěte své přátele“, kredity pro obě strany, zpětně nelze). Výše ale ne — zdroje uvádějí 50, 150, 300 i 500 Kč. |
 | **Wise** | varianta platná pro ČR | Nalezená T&C jsou britská; v některých zemích je místo bonusu jen sleva na poplatku. Nejnižší jistota v přehledu. |
 | **Curve** | která mechanika platí | Dva neslučitelné modely ve zdrojích (prodloužení cashbacku vs. 50 GBP). Sekundární zdroje jsou affiliate weby motivované odměnu nadsazovat. |
 | **UniCredit** | z čeho se skládá 1 700 Kč | Doložené položky dávají 300 + 700 = 1 000 Kč. Zbytek do deklarovaných 1 700 Kč se nepodařilo identifikovat. |
@@ -738,8 +750,9 @@ a založí základ pro sledování změn v čase.
 
 **ČSOB (vč. Poštovní spořitelny)**
 
-- [Banky vás odmění za doporučení (Peníze.cz)](https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite) — sekundární, jistota nízká, ověřeno 2026-09-15
-- [Pravidla akce ČSOB podnikatelský účet — AKVIZIČNÍ, ne MGM](https://www.csob.cz/documents/10710/17504789/pravidla-akce-podnikatelsky-ucet-s-odmenou-2000-kc-2026.pdf) — T&C, jistota nízká, ověřeno 2026-09-15
+- [Podmínky marketingové akce „500 za doporučení“ (ČSOB, PDF)](https://www.csob.cz/documents/10710/15586783/podminky-akce-500-za-doporuceni.pdf) — T&C, jistota střední, ověřeno 2026-09-30
+- [Podmínky akce Doporuč nového klienta (ČSOB Penzijní společnost) — MIMO ROZSAH](https://www.csob-penze.cz/download/mgm/) — T&C, jistota nízká, ověřeno 2026-09-30
+- [Banky vás odmění za doporučení (Peníze.cz) — tvrdí aktuální program, nedoloženo](https://www.penize.cz/osobni-ucty/487348-banky-vas-odmeni-za-doporuceni-prehled-kde-a-jak-si-prilepsite) — sekundární, jistota nízká, ověřeno 2026-09-15
 
 **Fio banka**
 
@@ -827,9 +840,10 @@ a založí základ pro sledování změn v čase.
 
 **Twisto**
 
-- [Twisto účet (Twisto)](https://www.twisto.cz/vychytavky/twistoucet/) — oficiální marketing, jistota nízká, ověřeno 2026-09-15
-- [Twisto recenze 2026 — promo kód 500 Kč](https://www.moneyspot.cz/twisto-recenze/) — sekundární, jistota nízká, ověřeno 2026-09-15
-- [Twisto recenze + bonus 500 Kč (DuoFinance)](https://www.duofinance.cz/recenze-twisto) — sekundární, jistota nízká, ověřeno 2026-09-15
+- [Co je promokód (Twisto, nápověda)](https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/registrace/co-je-promokod/) — oficiální marketing, jistota střední, ověřeno 2026-09-30
+- [Získání kreditů (Twisto, nápověda)](https://www.twisto.cz/article/pro-uzivatele/twisto-ucet/obecne/ziskani-kreditu/) — oficiální marketing, jistota střední, ověřeno 2026-09-30
+- [Soutěž Doporuč kamaráda a získej 10 000 Kč (Twisto blog)](https://blog.twisto.cz/soutez-o-10-000-kc-za-referral/) — oficiální marketing, jistota nízká, ověřeno 2026-09-30
+- [Twisto recenze — promo kód 500 Kč](https://www.moneyspot.cz/twisto-recenze/) — sekundární, jistota nízká, ověřeno 2026-09-15
 
 **Wise**
 
