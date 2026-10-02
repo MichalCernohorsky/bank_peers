@@ -32,3 +32,9 @@ Pozn. Moneta „Commercial" = celý firemní segment (SME + small business + lea
 SME loans y/y 3/2026: +11,1 % [EST: 120,1/108,1-1]. Pozn.: ČSOB „SME" zahrnuje i střední firmy (hranice obratu nezveřejněna ve fact sheetu – [DATA GAP: ČSOB výroční zpráva 2025, segment „SME" definice]) → širší než náš segment do 50 mil. Kč. Pobočky ČSOB ve fact sheetu nejsou.
 
 ## ČS – key_figures_q1_2026.xlsx (list Key_figures) – viz níže doplněné řady pobočky/FTE
+| Ukazatel (ČS, Group) | 3/2021 | 12/2021 | 12/2022 | 12/2023 | 12/2024 | 6/2025 | 12/2025 | 3/2026 | Značka |
+|---|---|---|---|---|---|---|---|---|---|
+| Number of branches (od 6/2022 fyzické pobočky) | 409 | 400 | 398 | 366 | 337 | 336 | 329 | 324 | [FACT] |
+| Employees (FTE, Group) | 9 803 | 9 711 | 10 010 | 9 829 | 9 674 | 9 629 | 9 483 | 9 299 | [FACT] |
+| Net loans to customers (mld. Kč) | 773,9 | 836,9 | 913,8 | 1 010,6 | 1 091,0 | 1 130,3 | 1 178,9 | 1 206,1 | [FACT] |
+Pobočky ČS 3/2021→3/2026: −85 (−20,8 %) [EST: 324/409−1]; KB 3/2021→3/2026: 242→172 = −28,9 % [EST]; Moneta 4Q 2022→1Q 2026: 153→123 = −19,6 % [EST] (2021 pro Monetu v lokálních xlsx není – [DATA GAP: mmb FY2021 basic financial data]). ČS fact sheet neobsahuje segmentové členění podnikatelé/SME ani počet podnikatelských klientů – [DATA GAP: ČS výroční zpráva 2025, segment reporting „Corporates/SME"].
