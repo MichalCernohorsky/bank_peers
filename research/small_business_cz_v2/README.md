@@ -15,6 +15,7 @@ Zpracováno 2. 10. 2026. Navazuje na verzi 1 (`../small_business_cz/`, hranice 2
 | `07_ws6_swot.md` | WS6 – SWOT, TOWS, big bets, no-regret moves |
 | `08_ws7_plan.md` | WS7 – akční plán 0–6 / 6–18 / 18–36 m, roadmap, KPI dashboard |
 | `09_glosar.md` | Glosář |
+| `10_zadani_claude_design_deck_v2.md` | Zadání pro Claude Design – HBR deck v2 (39 slidů, texty a data z v2) |
 | `data/*.md` | Datové tabulky per workstream (vč. extrakce lokálních IR fact sheetů KB, ČSOB, Moneta, ČS) |
 | `BRIEF_v2.md` | Společný brief pro research agenty |
 
