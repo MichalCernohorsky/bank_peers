@@ -5,14 +5,29 @@ Definice: KB „Loans to small businesses (KB + ESSOX)“ = podnikatelé a malé
 ## T1 – Komerční banka: klienti a úvěry (list Business; klienti v ks, úvěry mil. Kč)
 | Ukazatel | 1Q 2026 | 4Q 2025 | 4Q 2024 | 4Q 2023 | 4Q 2022 | 4Q 2021 | 4Q 2020 | 4Q 2019 |
 |---|---|---|---|---|---|---|---|---|
+| KB | 1798000 | 1777000 | 1727000 | 1664000 | 1652000 | 1625000 | 1641000 | 1664000 |
+| - o/w Individual clients | 1556000 | 1536000 | 1485000 | 1422000 | 1408000 | 1383000 | 1389000 | 1407000 |
+| - o/w KB+ users | 1673000 | 1610000 | 1028000 | 137000 | n.a. | n.a. | n.a. | n.a. |
+| KB PS | 389000 | 394000 | 421000 | 474000 | 505000 | 520000 | 525000 | 531000 |
+| KB Payment cards - active | 1902000 | 1883000 | 1827000 | 1715000 | 1666000 | 1604000 | 1588000 | 1581000 |
+| KB Group (outstanding volume without repo operations (CZK mi | 914100 | 905800 | 848300 | 827700 | 784900 | 738900 | 691400 | 654000 |
+| Loans to small businesses (KB + ESSOX)** | 51200 | 50300 | 47900 | 47500 | 46800 | 47900 | 45900 | n.a. |
+| KB (standalone bank) | 787900 | 779900 | 723800 | 708400 | 672400 | 635400 | 599600 | 573100 |
+| Factoring KB | 13000 | 14600 | 12700 | 10000 | 10100 | 11400 | 8300 | 9400 |
+| KB Group deposits | – | – | – | – | – | – | – | – |
 
 ### KB pobočky (list Operations)
 | Ukazatel | 03/2026 | 12/2025 | 12/2024 | 12/2023 | 12/2022 | 12/2021 | 12/2020 | 12/2019 |
 |---|---|---|---|---|---|---|---|---|
+| KB Retail branches* | 172 | 186 | 204 | 210 | 217 | 241 | 242 | 342 |
+| KB Poradenství outlets | 203 | 193 | 187 | n.a. | n.a. | n.a. | n.a. | n.a. |
 
 ### KB NPL, NIM, hrubé úvěry (list Ratios; 4Q 2023–1Q 2026)
 | Ukazatel | 1Q 2026 | 4Q 2025 | 4Q 2024 | 4Q 2023 | 4Q 2022 | 4Q 2021 | 4Q 2020 | 4Q 2019 | 4Q 2018 | 4Q 2017 |
 |---|---|---|---|---|---|---|---|---|---|---|
+| Net Interest Margin (NII/Interest bearing assets) annualized | 0.016 | 0.017 | 0.017 | 0.018 | 0.022 | 0.021 | 0.019 | 0.022 | 0.023 | n.a. |
+| Gross client loans (CZK billion) | 914.9 | 905.8 | 848.3 | 827.7 | 784.9 | 738.9 | 691.4 | 656.6 | 636.6 | 607.4 |
+| NPL loans (share on portfolio) | 0.0154 | 0.01593 | 0.01937 | 0.01847 | 0.02343 | 0.02469 | 0.02629 | 0.0213 | 0.02711 | 0.03063 |
 
 ## T2 – Moneta: Segment analysis – FY 2024 / 31. 12. 2024 (mil. Kč)
 | Položka | Commercial | Retail | Treasury/Other | Total |
@@ -106,10 +121,22 @@ Definice: KB „Loans to small businesses (KB + ESSOX)“ = podnikatelé a malé
 ## T3 – ČSOB: Business volumes (mld. Kč)
 | Ukazatel | 12/2024 | 03/2025 | 06/2025 | 09/2025 | 12/2025 | 03/2026 |
 |---|---|---|---|---|---|---|
+| Loan portfolio | 979.2 | 1009 | 1020 | 1042 | 1061 | 1084 |
+| SME loans | 105.2 | 108.1 | 110.7 | 113.2 | 115.4 | 120.1 |
+| Leasing | 53.41 | 53.56 | 54.68 | 56.67 | 57.88 | 59.28 |
+| Corporate loans | 225.4 | 242.3 | 235.5 | 236.9 | 237.5 | 242.4 |
+| Factoring | 6.443 | 6.7 | 7.486 | 6.578 | 6.855 | 7.429 |
+| Client deposits | 1298 | 1297 | 1298 | 1311 | 1319 | 1320 |
+| Current accounts | 620 | 604.3 | 614 | 606 | 610.2 | 607.9 |
+| Savings deposits | 341.6 | 372.2 | 388 | 399.7 | 411.8 | 421.3 |
 
 ### ČSOB ratios (Additional information)
 | Ukazatel | 12/2022 | 12/2023 | 12/2024 | 12/2025 | 03/2026 |
 |---|---|---|---|---|---|
+| Net interest margin (Ytd., annualized) | 0.02543 | 0.02299 | 0.02416 | 0.02405 | 0.02446 |
+| Cost / income ratio excl. banking taxes | 0.5063 | 0.5124 | 0.4985 | 0.4761 | 0.4744 |
+| Credit cost ratio (Ytd., annualized) | 0.00125 | -0.001767 | -0.0009 | 0.001007 | 0.002803 |
+| NPL ratio | 0.01693 | 0.01423 | 0.0135 | 0.01297 | 0.01281 |
 
 ## T4 – Česká spořitelna: Key figures (mil. Kč; NIM, NPL jako podíl)
 | Ukazatel | 12/2019 | 12/2020 | 12/2021 | 12/2022 | 12/2023 | 12/2024 | 12/2025 | 03/2026 |
