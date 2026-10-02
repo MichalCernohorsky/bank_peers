@@ -1,0 +1,18 @@
+[ZADÁNÍ – ČÁST 7/19] Toto je pokračování jednoho dlouhého zadání. Zatím nic negeneruj, jen odpověz „OK 7/19“ a počkej na další část.
+
+**B09 – Stock OSVČ (L1 skládané sloupce 2019–6/2026).** Headline: „OSVČ poprvé přes 1,2 milionu; od 2024 roste hlavně vedlejší činnost." Hlavní / vedlejší: 2019 598 086 / 433 279 · 2021 634 205 / 443 891 · 2022 649 189 / 455 069 · 2023 668 737 / 458 452 · 2024 681 351 / 473 529 · 2025 692 402 / 486 112 · 6/2026 701 819 / 501 041. 9/2026 `[DATA GAP]` jako prázdný sloupec. Callout: podíl hlavní činnosti na ročním přírůstku 73–85 % (2021–23) → 46–47 % (2024–25) → ≈ 45 % (1H 2026) `[EST]`; 2019→6/2026 +171 495 (+16,6 %) `[EST]`. Zdroj: ČSSZ via Podnikatel.cz `[FACT]`.
+
+**B10 – Toky FOP a PO (L1 sloupce vznik/zánik).** Headline: „Vznik akceleruje, zánik klesá: 19 nových FOP na 10 zaniklých v 1H 2026, nejvíce za 8 let." FOP 2025 ~84 tis. / ~49 tis.; 1H 2026 51 534 (+10 %) / 27 300 (−11 %). PO 2025 34 621 (max za 20 let) / 16 853 (rekord); 1H 2026 15 498 / 7 796. Poznámka: v 1H 2025 přerušeno 53 779 živností. Zdroj: CRIF, D&B `[FACT]`.
+
+**B11 – Triangulace „kolik je živnostníků" (L1 vodorovné sloupce s indexem ČSSZ = 100).** Headline: „Registrace ≠ aktivita: 2,03 mil. na papíře, 1,13–1,20 mil. reálně." RŽP 2 029 257 (172) · ČSÚ RES FO 2 028 363 (172) · ČSÚ RES FO+PO aktivní 1 780 970 (151) · ČSSZ OSVČ 1 178 514 (100) · D&B aktivní ~1 131 000 (96) · ČSSZ hlavní 692 402 (59) · paušál 125 449 (11). Callout: rozdíl RŽP − ČSSZ ≈ 851 tis. `[EST]`. Stav 31. 12. 2025 `[FACT]`.
+
+**B12 – Právnické osoby (L4, 3 karty + mini tabulka).** Headline: „594 520 obchodních společností, pětina spí – aktivních ≈ 475 tis." Karty: 594 520 PO (D&B 2026) `[FACT]` · ~1/5 neaktivních, z toho 57 % v Praze (57 212) `[FACT, datum neznámé]` · ≈ 475 tis. aktivních `[EST = 594 520 × 0,8]`. Řádek: MSP 0–249 zam. 1 341 014 = 99,87 % subjektů (2024) `[FACT]`. Prázdný obdélník: „podíl PO s obratem ≤ 50 mil. Kč – chybí – ČSÚ SBS / MF DPPO".
+
+**B13 – Paušál a odvody (L1 řada + tabulka vpravo).** Headline: „Paušální daň: 125 449 OSVČ bez daňového přiznání, 96 % v 1. pásmu." 1. pásmo: 2022 63 413 · 2023 77 410 · 2024 97 512 · 2025 110 854 · 2026 120 114; 2. pásmo 4 709, 3. pásmo 626; nově 11 554. Tabulka 2026: min. VZ hlavní 40 % průměrné mzdy = 19 587 Kč · záloha soc. 5 720 → 5 005 Kč od 1. 7. 2026 · vedlejší 1 574 Kč · zdravotní 3 306 Kč · paušál 1. pásmo 9 984 → 9 162 Kč od 7/2026; 2./3. pásmo 16 745 / 27 139 Kč. Zdroj: FS, ČSSZ `[FACT]`.
+
+**B14 – Struktura: cizinci, regiony, obory (L4, 3 karty).** Headline: „Třetina přítoku FOP jsou cizinci, třetina živnostníků sedí v Praze a Středních Čechách." Cizinci: 26 535 = 30 % nových FOP (2025); stock téměř 10 %; UA 37,8 % (73 699), SK 16,8 %, VN 16,1 % `[FACT]`; ≈ 195 tis. cizích živnostníků `[EST]`. Regiony: Praha 18 % + STČ 14 % = 32 % (2022) `[FACT]`; Praha 195 146 aktivních živnostníků (2025); STČ 72,1 % živnostníků mezi subjekty. Obory: stavebnictví 11,77 % živností; obchod 13,1 % / stavebnictví 13,0 % subjektů (krajské RES). Gender: ~16 % mužů vs. < 10 % žen na vlastní účet. Věk `[DATA GAP]`.
+
+**B15 – So what: velikost (L9).** 1. Adresovatelný trh ≈ 1,18 mil. subjektů (702 tis. hlavních OSVČ + ≈ 475 tis. aktivních PO `[EST]`); penetraci měřit proti ČSSZ/D&B, ne RŽP. 2. Růst je v přítoku: ~120 tis. onboardingů/rok, 30 % cizinci. 3. Vedlejší OSVČ (+16 tis. y/y) = „podnikatelský modul v osobním Georgi". 4. Paušalisté a mikro ÚJ = levný automatizovaný servis; úvěry pro 577 tis. hlavních ne-paušalistů `[EST]` a aktivní s.r.o. 5. Doplnit: podíl PO ≤ 50 mil. Kč, ČNB S.14 vs. S.11, krajský rozpad 2025.
+
+### B · 3 KONDICE SEGMENTU – WS2 (B16–B22)
+
