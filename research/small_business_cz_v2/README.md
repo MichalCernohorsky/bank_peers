@@ -16,6 +16,11 @@ Zpracováno 2. 10. 2026. Navazuje na verzi 1 (`../small_business_cz/`, hranice 2
 | `08_ws7_plan.md` | WS7 – akční plán 0–6 / 6–18 / 18–36 m, roadmap, KPI dashboard |
 | `09_glosar.md` | Glosář |
 | `10_zadani_claude_design_deck_v2.md` | Zadání pro Claude Design – HBR deck v2: Část A executive summary (16 slidů, styl v1) + Část B detail (78 slidů), matice pokrytí zadání v2 |
+| `10_vernostni_programy_SB.md` | Navazující studie (6. 10. 2026): věrnostní programy pro podnikatele a firmy v ČR, Evropě a ve světě, hypotézy H1–H7, ekonomika (IFR, interchange), 5 variant pro ČS, shrnutí pro CEO, QA |
+| `10_vernostni_programy_db.csv` | Databáze 125 programů (UTF-8, `;`, 22 sloupců, region CZ/EU/WORLD, mechanika A–H, značky) |
+| `10_vernostni_programy_cases.md` | 7 případových studií (BofA, Allica, VÚB vs. SLSP, Mastercard Business Savings/Bonus, commercial rebaty, MONETA, Air Bank) |
+| `loyalty_data/` | Pracovní výstupy agentů L1–L6 (brief, rešerše, logy zdrojů, dílčí CSV) |
+| `deck_brief_parts/` | Zadání pro Claude Design rozdělené do 19 zpráv pod 4 000 znaků |
 | `data/*.md` | Datové tabulky per workstream (vč. extrakce lokálních IR fact sheetů KB, ČSOB, Moneta, ČS) |
 | `BRIEF_v2.md` | Společný brief pro research agenty |
 
